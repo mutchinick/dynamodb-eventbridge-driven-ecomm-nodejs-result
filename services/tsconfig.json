@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "rootDir": ".",
+    "outDir": ".build",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "lib": ["ES6"],
+    "target": "ES6",
+    "module": "commonjs",
+    "declaration": true,
+    "moduleResolution": "node",
+    "typeRoots": ["node_modules/@types/"],
+    "esModuleInterop": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "strictNullChecks": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "removeComments": true,
+    "jsx": "react",
+    "composite": true
+  },
+  "include": ["src"]
+}
