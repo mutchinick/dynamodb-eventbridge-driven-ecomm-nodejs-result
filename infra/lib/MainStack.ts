@@ -4,6 +4,7 @@ import { DynamoDbConstruct } from './DynamoDbConstruct'
 import { EventBusConstruct } from './EventBusConstruct'
 import { PlaceOrderApiConstruct } from './orders/PlaceOrderApiConstruct'
 import { SyncOrderWorkerConstruct } from './orders/SyncOrderWorkerConstruct'
+import { SimulateRawEventApiConstruct } from './testing/SimulateRawEventApiConstruct'
 
 export interface IMainStackProps extends StackProps {
   config: {
@@ -15,6 +16,7 @@ export class MainStack extends Stack {
   constructor(scope: Construct, id: string, props?: IMainStackProps) {
     super(scope, id, props)
 
+    // Common
     const ddbConstructName = `${id}-DynamoDb`
     const ddbConstruct = new DynamoDbConstruct(this, ddbConstructName)
 
@@ -23,6 +25,7 @@ export class MainStack extends Stack {
       dynamoDbTable: ddbConstruct.dynamoDbTable,
     })
 
+    // Orders
     const placeOrderApiConstructName = `${id}-PlaceOrderApi`
     new PlaceOrderApiConstruct(this, placeOrderApiConstructName, {
       dynamoDbTable: ddbConstruct.dynamoDbTable,
@@ -32,6 +35,12 @@ export class MainStack extends Stack {
     new SyncOrderWorkerConstruct(this, syncOrderWorkerConstructName, {
       dynamoDbTable: ddbConstruct.dynamoDbTable,
       eventBus: eventBusConstruct.eventBus,
+    })
+
+    // Testing
+    const simulateRawEventApiConstructName = `${id}-SimulateRawEventApi`
+    new SimulateRawEventApiConstruct(this, simulateRawEventApiConstructName, {
+      dynamoDbTable: ddbConstruct.dynamoDbTable,
     })
   }
 }
