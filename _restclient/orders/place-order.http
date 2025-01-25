@@ -1,7 +1,7 @@
-@endpoint = https://no0yrj3aai.execute-api.us-east-1.amazonaws.com
+@placeOrderBaseUrl = {{$dotenv PLACE_ORDER_BASE_URL}}
 
 ### POST ###
-POST {{endpoint}}/api/v1/orders/placeOrder
+POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
 Content-Type: application/json
 
@@ -14,7 +14,7 @@ Content-Type: application/json
 }
 
 ### POST ###
-POST {{endpoint}}/api/v1/orders/placeOrder
+POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
 Content-Type: application/json
 
@@ -27,7 +27,7 @@ Content-Type: application/json
 }
 
 ### POST ###
-POST {{endpoint}}/api/v1/orders/placeOrder
+POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
 Content-Type: application/json
 
@@ -40,6 +40,6 @@ Content-Type: application/json
 }
 
 ### OPTIONS ###
-OPTIONS  {{endpoint}}/api/v1/orders/placeOrder
+OPTIONS  {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
 Access-Control-Request-Method: POST
