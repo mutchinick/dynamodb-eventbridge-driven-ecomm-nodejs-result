@@ -20,9 +20,22 @@ Content-Type: application/json
 
 {
   "orderId": "CPQ909",
-  "sku": "ORANGE",
+  "sku": "ORANGES",
   "quantity": 3,
   "price": 5.59,
+  "userId": "123456"
+}
+
+### POST ###
+POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "orderId": "ZXF523",
+  "sku": "GRAPES",
+  "quantity": 4,
+  "price": 2.34,
   "userId": "123456"
 }
 

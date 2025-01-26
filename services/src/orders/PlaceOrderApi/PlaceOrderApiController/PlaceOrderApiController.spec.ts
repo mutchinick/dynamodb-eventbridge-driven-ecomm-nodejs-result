@@ -34,7 +34,8 @@ function buildMockApiEvent(incomingPlaceOrderRequest: IncomingPlaceOrderRequest)
 }
 
 function buildMockPlaceOrderApiService_placeOrder_resolves(): IPlaceOrderApiService {
-  const mockServiceOutput: ServiceOutput = { orderId: mockOrderId }
+  const mockApiEventBody = buildMockApiEventBody()
+  const mockServiceOutput: ServiceOutput = { ...mockApiEventBody }
   return { placeOrder: jest.fn().mockResolvedValue(mockServiceOutput) }
 }
 
@@ -349,8 +350,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   it('calls PlaceOrderApiService.placeOrder a single time', async () => {
     const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
     const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
-    const mockTestRequest = buildMockApiEventBody()
-    const mockApiEvent = buildMockApiEvent(mockTestRequest)
+    const mockApiEventBody = buildMockApiEventBody()
+    const mockApiEvent = buildMockApiEvent(mockApiEventBody)
     await placeOrderApiController.placeOrder(mockApiEvent)
     expect(mockPlaceOrderApiService.placeOrder).toHaveBeenCalledTimes(1)
   })
@@ -358,9 +359,9 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   it('calls PlaceOrderApiService.placeOrder with the expected input', async () => {
     const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
     const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
-    const mockTestRequest = buildMockApiEventBody()
-    const mockApiEvent = buildMockApiEvent(mockTestRequest)
-    const expectedServiceInput = { ...mockTestRequest }
+    const mockApiEventBody = buildMockApiEventBody()
+    const mockApiEvent = buildMockApiEvent(mockApiEventBody)
+    const expectedServiceInput = { ...mockApiEventBody }
     await placeOrderApiController.placeOrder(mockApiEvent)
     expect(mockPlaceOrderApiService.placeOrder).toHaveBeenCalledWith(expectedServiceInput)
   })
@@ -368,8 +369,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   it('responds with 500 Internal Server Error if PlaceOrderApiService.placeOrder throws', async () => {
     const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_throws()
     const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
-    const mockTestRequest = buildMockApiEventBody()
-    const mockApiEvent = buildMockApiEvent(mockTestRequest)
+    const mockApiEventBody = buildMockApiEventBody()
+    const mockApiEvent = buildMockApiEvent(mockApiEventBody)
     await placeOrderApiController.placeOrder(mockApiEvent)
     const expectedErrorResponse = HttpResponse.InternalServerError()
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
@@ -379,8 +380,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   it('responds with 400 Bad Request if PlaceOrderApiService.placeOrder throws and InvalidArgumentsError', async () => {
     const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_throws_InvalidArgumentsError()
     const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
-    const mockTestRequest = buildMockApiEventBody()
-    const mockApiEvent = buildMockApiEvent(mockTestRequest)
+    const mockApiEventBody = buildMockApiEventBody()
+    const mockApiEvent = buildMockApiEvent(mockApiEventBody)
     await placeOrderApiController.placeOrder(mockApiEvent)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
@@ -393,8 +394,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   it('responds with status code 202 Accepted', async () => {
     const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
     const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
-    const mockTestRequest = buildMockApiEventBody()
-    const mockApiEvent = buildMockApiEvent(mockTestRequest)
+    const mockApiEventBody = buildMockApiEventBody()
+    const mockApiEvent = buildMockApiEvent(mockApiEventBody)
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
     expect(actualResponse.statusCode).toStrictEqual(202)
   })
@@ -402,10 +403,10 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   it('responds with the agreed HttpResponse.Accepted response', async () => {
     const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
     const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
-    const mockTestRequest = buildMockApiEventBody()
-    const mockApiEvent = buildMockApiEvent(mockTestRequest)
+    const mockApiEventBody = buildMockApiEventBody()
+    const mockApiEvent = buildMockApiEvent(mockApiEventBody)
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
-    const expectedAcceptedResponse = HttpResponse.Accepted({ orderId: mockTestRequest.orderId })
+    const expectedAcceptedResponse = HttpResponse.Accepted({ ...mockApiEventBody })
     expect(actualResponse).toStrictEqual(expectedAcceptedResponse)
   })
 })

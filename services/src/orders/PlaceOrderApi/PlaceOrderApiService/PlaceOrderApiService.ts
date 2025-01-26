@@ -7,9 +7,7 @@ export interface IPlaceOrderApiService {
   placeOrder: (incomingPlaceOrderRequest: IncomingPlaceOrderRequest) => Promise<ServiceOutput>
 }
 
-export interface ServiceOutput {
-  orderId: string
-}
+export type ServiceOutput = IncomingPlaceOrderRequest
 
 export class PlaceOrderApiService implements IPlaceOrderApiService {
   //
@@ -49,8 +47,6 @@ export class PlaceOrderApiService implements IPlaceOrderApiService {
   //
   //
   private buildServiceOutput(incomingPlaceOrderRequest: IncomingPlaceOrderRequest): ServiceOutput {
-    return {
-      orderId: incomingPlaceOrderRequest.orderId,
-    }
+    return incomingPlaceOrderRequest
   }
 }

@@ -17,7 +17,7 @@ const mockValidIncomingPlaceOrderRequestInput: IncomingPlaceOrderRequestInput = 
 const expectedOrderPlacedEvent = OrderPlacedEvent.validateAndBuild(mockValidIncomingPlaceOrderRequestInput)
 
 const expectedValidOutput: ServiceOutput = {
-  orderId: mockValidIncomingPlaceOrderRequestInput.orderId,
+  ...mockValidIncomingPlaceOrderRequestInput,
 }
 
 function buildMockDdbPlaceOrderEventClient_raiseEvent_resolves(): IEsRaiseOrderPlacedEventClient {
