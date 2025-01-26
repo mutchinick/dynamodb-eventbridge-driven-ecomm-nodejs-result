@@ -4,7 +4,7 @@ import { DbGetOrderClient } from '../SyncOrderWorker/DbGetOrderClient/DbGetOrder
 import { DbCreateOrderClient } from '../SyncOrderWorker/DbCreateOrderClient/DbCreateOrderClient'
 import { EsRaiseOrderCreatedEventClient } from '../SyncOrderWorker/EsRaiseOrderCreatedEventClient/EsRaiseOrderCreatedEventClient'
 import { DbUpdateOrderClient } from '../SyncOrderWorker/DbUpdateOrderClient/DbUpdateOrderClient'
-import { SyncOrderController } from '../SyncOrderWorker/SyncOrderController/SyncOrderController'
+import { SyncOrderWorkerController } from '../SyncOrderWorker/SyncOrderWorkerController/SyncOrderWorkerController'
 import { SyncOrderService } from '../SyncOrderWorker/SyncOrderService/SyncOrderService'
 
 function createHandler() {
@@ -20,8 +20,8 @@ function createHandler() {
     updateOrderClient,
     syncOrderEventClient,
   )
-  const syncOrderController = new SyncOrderController(syncOrderService)
-  return syncOrderController.syncOrders
+  const syncOrderWorkerController = new SyncOrderWorkerController(syncOrderService)
+  return syncOrderWorkerController.syncOrders
 }
 
 export const handler = createHandler()

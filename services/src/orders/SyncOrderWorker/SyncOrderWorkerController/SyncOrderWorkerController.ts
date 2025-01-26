@@ -3,11 +3,11 @@ import { OrderError } from '../../errors/OrderError'
 import { IncomingOrderEvent } from '../model/IncomingOrderEvent'
 import { ISyncOrderService } from '../SyncOrderService/SyncOrderService'
 
-export interface ISyncOrderController {
+export interface ISyncOrderWorkerController {
   syncOrders: (sqsEvent: SQSEvent) => Promise<SQSBatchResponse>
 }
 
-export class SyncOrderController implements ISyncOrderController {
+export class SyncOrderWorkerController implements ISyncOrderWorkerController {
   //
   //
   //
@@ -19,7 +19,7 @@ export class SyncOrderController implements ISyncOrderController {
   //
   //
   public async syncOrders(sqsEvent: SQSEvent): Promise<SQSBatchResponse> {
-    console.info('SyncOrderController.syncOrders init:', { sqsEvent })
+    console.info('SyncOrderWorkerController.syncOrders init:', { sqsEvent })
     const batchItemFailures: SQSBatchItemFailure[] = []
     for (const record of sqsEvent.Records) {
       try {
@@ -32,7 +32,7 @@ export class SyncOrderController implements ISyncOrderController {
       }
     }
     const sqsBatchResponse: SQSBatchResponse = { batchItemFailures }
-    console.info('SyncOrderController.syncOrders exit:', { sqsBatchResponse })
+    console.info('SyncOrderWorkerController.syncOrders exit:', { sqsBatchResponse })
     return sqsBatchResponse
   }
 
@@ -41,12 +41,12 @@ export class SyncOrderController implements ISyncOrderController {
   //
   private async syncOrder(sqsRecord: SQSRecord) {
     try {
-      console.info('SyncOrderController.syncOrder init:', { sqsRecord })
+      console.info('SyncOrderWorkerController.syncOrder init:', { sqsRecord })
       const incomingOrderEvent = this.parseValidateEvent(sqsRecord.body)
       await this.syncOrderService.syncOrder(incomingOrderEvent)
-      console.info('SyncOrderController.syncOrder exit:', { incomingOrderEvent })
+      console.info('SyncOrderWorkerController.syncOrder exit:', { incomingOrderEvent })
     } catch (error) {
-      console.error('SyncOrderController.syncOrder error:', { error })
+      console.error('SyncOrderWorkerController.syncOrder error:', { error })
       throw error
     }
   }
@@ -56,13 +56,13 @@ export class SyncOrderController implements ISyncOrderController {
   //
   private parseValidateEvent(bodyText: string): IncomingOrderEvent {
     try {
-      console.info('SyncOrderController.parseValidateEvent init:', { bodyText })
+      console.info('SyncOrderWorkerController.parseValidateEvent init:', { bodyText })
       const eventBridgeEvent = JSON.parse(bodyText)
       const incomingOrderEvent = IncomingOrderEvent.validateAndBuild(eventBridgeEvent)
-      console.info('SyncOrderController.parseValidateEvent exit:', { incomingOrderEvent })
+      console.info('SyncOrderWorkerController.parseValidateEvent exit:', { incomingOrderEvent })
       return incomingOrderEvent
     } catch (error) {
-      console.error('SyncOrderController.parseValidateEvent error:', { error })
+      console.error('SyncOrderWorkerController.parseValidateEvent error:', { error })
       OrderError.addName(error, OrderError.InvalidArgumentsError)
       OrderError.addName(error, OrderError.DoNotRetryError)
       throw error
