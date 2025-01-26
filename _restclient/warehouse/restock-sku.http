@@ -1,0 +1,34 @@
+@restockSkuBaseUrl = {{$dotenv RESTOCK_SKU_BASE_URL}}
+
+### POST ###
+POST {{restockSkuBaseUrl}}/api/v1/warehouse/restockSku
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "sku": "APPLES",
+  "units": 100,
+  "lotId": "A00001"
+}
+
+### POST ###
+POST {{restockSkuBaseUrl}}/api/v1/warehouse/restockSku
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "sku": "APPLES",
+  "units": 200,
+  "lotId": "A00002"
+}
+
+### POST ###
+POST {{restockSkuBaseUrl}}/api/v1/warehouse/restockSku
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "sku": "GRAPES",
+  "units": 10,
+  "lotId": "B00001"
+}
