@@ -1,7 +1,47 @@
+import { OrderEventName } from './OrderEventName'
 import { OrderStatus } from './OrderStatus'
 import { ValueValidators } from './ValueValidators'
 
 describe('Orders Service ValueValidators tests', () => {
+  describe('validIncomingEventName tests', () => {
+    it('throws if eventName is undefined', () => {
+      const testValue = undefined as string
+      expect(() => ValueValidators.validIncomingEventName().parse(testValue)).toThrow()
+    })
+
+    it('throws if eventName is not a OrderEventName', () => {
+      const testValue = 'mockInvalidValue'
+      expect(() => ValueValidators.validIncomingEventName().parse(testValue)).toThrow()
+    })
+
+    it('is valid if eventName is a OrderEventName', () => {
+      const testValue = OrderEventName.ORDER_CANCELED_EVENT
+      expect(() => ValueValidators.validIncomingEventName().parse(testValue)).not.toThrow()
+    })
+  })
+
+  describe('validOrderPlacedEventName tests', () => {
+    it('throws if eventName is undefined', () => {
+      const testValue = undefined as string
+      expect(() => ValueValidators.validOrderPlacedEventName().parse(testValue)).toThrow()
+    })
+
+    it('throws if eventName is not a OrderEventName', () => {
+      const testValue = 'mockInvalidValue'
+      expect(() => ValueValidators.validOrderPlacedEventName().parse(testValue)).toThrow()
+    })
+
+    it('throws if eventName is not a OrderEventName.ORDER_PLACED_EVENT', () => {
+      const testValue = OrderEventName.ORDER_CREATED_EVENT
+      expect(() => ValueValidators.validOrderPlacedEventName().parse(testValue)).toThrow()
+    })
+
+    it('is valid if eventName is a OrderEventName.ORDER_PLACED_EVENT', () => {
+      const testValue = OrderEventName.ORDER_PLACED_EVENT
+      expect(() => ValueValidators.validOrderPlacedEventName().parse(testValue)).not.toThrow()
+    })
+  })
+
   describe('validOrderId tests', () => {
     it('throws if orderId is undefined', () => {
       const testValue = undefined as string
