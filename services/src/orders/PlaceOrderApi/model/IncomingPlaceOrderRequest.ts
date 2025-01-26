@@ -51,7 +51,7 @@ export class IncomingPlaceOrderRequest implements IncomingPlaceOrderRequestProps
         .parse(incomingPlaceOrderRequestInput) as IncomingPlaceOrderRequestProps
       return incomingPlaceOrderRequest
     } catch (error) {
-      console.error('PlaceOrderController.buildIncomingPlaceOrderRequest error:', { error })
+      console.error('PlaceOrderApiController.buildIncomingPlaceOrderRequest error:', { error })
       OrderError.addName(error, OrderError.InvalidArgumentsError)
       OrderError.addName(error, OrderError.DoNotRetryError)
       throw error

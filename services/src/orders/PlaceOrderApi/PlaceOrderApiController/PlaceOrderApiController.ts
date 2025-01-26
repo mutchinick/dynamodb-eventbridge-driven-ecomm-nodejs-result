@@ -4,11 +4,11 @@ import { OrderError } from '../../errors/OrderError'
 import { IPlaceOrderService } from '../PlaceOrderService/PlaceOrderService'
 import { IncomingPlaceOrderRequest, IncomingPlaceOrderRequestInput } from '../model/IncomingPlaceOrderRequest'
 
-export interface IPlaceOrderController {
+export interface IPlaceOrderApiController {
   placeOrder: (apiEvent: APIGatewayProxyEventV2) => Promise<APIGatewayProxyStructuredResultV2>
 }
 
-export class PlaceOrderController implements IPlaceOrderController {
+export class PlaceOrderApiController implements IPlaceOrderApiController {
   //
   //
   //
@@ -21,14 +21,14 @@ export class PlaceOrderController implements IPlaceOrderController {
   //
   public async placeOrder(apiEvent: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> {
     try {
-      console.info('PlaceOrderController.placeOrder init:', { apiEvent })
+      console.info('PlaceOrderApiController.placeOrder init:', { apiEvent })
       const incomingPlaceOrderRequest = this.parseValidateRequest(apiEvent.body)
       const placeOrderOutput = await this.placeOrderService.placeOrder(incomingPlaceOrderRequest)
       const apiResponse = HttpResponse.Accepted(placeOrderOutput)
-      console.info('PlaceOrderController.placeOrder exit:', { apiResponse })
+      console.info('PlaceOrderApiController.placeOrder exit:', { apiResponse })
       return apiResponse
     } catch (error) {
-      console.error('PlaceOrderController.placeOrder error:', { error })
+      console.error('PlaceOrderApiController.placeOrder error:', { error })
       if (OrderError.hasName(error, OrderError.InvalidArgumentsError)) {
         return HttpResponse.BadRequestError()
       }
@@ -42,13 +42,13 @@ export class PlaceOrderController implements IPlaceOrderController {
   //
   private parseValidateRequest(bodyText: string): IncomingPlaceOrderRequest {
     try {
-      console.info('PlaceOrderController.parseValidateRequest init:', { bodyText })
+      console.info('PlaceOrderApiController.parseValidateRequest init:', { bodyText })
       const unverifiedRequest = JSON.parse(bodyText) as IncomingPlaceOrderRequestInput
       const incomingPlaceOrderRequest = IncomingPlaceOrderRequest.validateAndBuild(unverifiedRequest)
-      console.info('PlaceOrderController.parseValidateRequest exit:', { incomingPlaceOrderRequest })
+      console.info('PlaceOrderApiController.parseValidateRequest exit:', { incomingPlaceOrderRequest })
       return incomingPlaceOrderRequest
     } catch (error) {
-      console.error('PlaceOrderController.parseValidateRequest error:', { error })
+      console.error('PlaceOrderApiController.parseValidateRequest error:', { error })
       OrderError.addName(error, OrderError.InvalidArgumentsError)
       OrderError.addName(error, OrderError.DoNotRetryError)
       throw error
