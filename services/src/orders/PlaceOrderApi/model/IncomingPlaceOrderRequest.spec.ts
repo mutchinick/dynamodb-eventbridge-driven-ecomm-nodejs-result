@@ -148,7 +148,13 @@ describe('Orders Service PlaceOrderApi IncomingPlaceOrderRequest tests', () => {
 
   it('throws if the input IncomingPlaceOrderRequestInput.quantity < 1', async () => {
     const mockIncomingPlaceOrderRequestInput = buildMockValidIncomingPlaceOrderRequestInput()
-    mockIncomingPlaceOrderRequestInput.quantity = 0.99
+    mockIncomingPlaceOrderRequestInput.quantity = 0
+    expect(() => IncomingPlaceOrderRequest.validateAndBuild(mockIncomingPlaceOrderRequestInput)).toThrow()
+  })
+
+  it('throws if the input IncomingPlaceOrderRequestInput.quantity is not an integer', async () => {
+    const mockIncomingPlaceOrderRequestInput = buildMockValidIncomingPlaceOrderRequestInput()
+    mockIncomingPlaceOrderRequestInput.quantity = 3.45
     expect(() => IncomingPlaceOrderRequest.validateAndBuild(mockIncomingPlaceOrderRequestInput)).toThrow()
   })
 

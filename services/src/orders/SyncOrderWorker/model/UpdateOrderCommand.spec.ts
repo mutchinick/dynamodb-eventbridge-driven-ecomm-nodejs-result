@@ -573,6 +573,12 @@ describe('Orders Service SyncOrderWorker UpdateOrderCommand tests', () => {
     expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).toThrow()
   })
 
+  it('throws if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.quantity is not an integer', () => {
+    const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
+    mockUpdateOrderCommandInput.incomingOrderEvent.eventData.quantity = 3.45
+    expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).toThrow()
+  })
+
   it('throws if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.quantity is not a number', () => {
     const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
     mockUpdateOrderCommandInput.incomingOrderEvent.eventData.quantity = '1' as unknown as number

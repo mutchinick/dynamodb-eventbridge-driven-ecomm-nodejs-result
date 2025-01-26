@@ -276,6 +276,12 @@ describe('Orders Service SyncOrderWorker OrderCreatedEvent tests', () => {
     expect(() => OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)).toThrow()
   })
 
+  it('throws if the input OrderCreatedEventInput.orderData.quantity is not an integer', () => {
+    const mockOrderCreatedEventInput = buildMockValidOrderCreatedEventInput()
+    mockOrderCreatedEventInput.orderData.quantity = 3.45
+    expect(() => OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)).toThrow()
+  })
+
   //
   // Test OrderCreatedEventInput.orderData.price edge cases
   //

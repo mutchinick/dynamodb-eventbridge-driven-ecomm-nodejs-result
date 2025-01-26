@@ -146,6 +146,12 @@ describe('Orders Service PlaceOrderApi OrderPlacedEvent tests', () => {
     expect(() => OrderPlacedEvent.validateAndBuild(mockOrderPlacedEventInput)).toThrow()
   })
 
+  it('throws if the input OrderPlacedEventInput.quantity is not an integer', () => {
+    const mockOrderPlacedEventInput = buildMockValidOrderPlacedEventInput()
+    mockOrderPlacedEventInput.quantity = 3.45
+    expect(() => OrderPlacedEvent.validateAndBuild(mockOrderPlacedEventInput)).toThrow()
+  })
+
   it('throws if the input OrderPlacedEventInput.quantity is not a number', () => {
     const mockOrderPlacedEventInput = buildMockValidOrderPlacedEventInput()
     mockOrderPlacedEventInput.quantity = '1' as unknown as number

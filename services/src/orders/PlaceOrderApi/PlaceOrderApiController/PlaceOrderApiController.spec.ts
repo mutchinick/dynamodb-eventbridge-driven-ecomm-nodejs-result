@@ -238,6 +238,17 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
     expect(actualResponse).toStrictEqual(expectedErrorResponse)
   })
 
+  it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.quantity is not an integer', async () => {
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
+    const expectedErrorResponse = HttpResponse.BadRequestError()
+    const mockApiEventBody = buildMockApiEventBody()
+    mockApiEventBody.quantity = 3.45
+    const mockApiEvent = buildMockApiEvent(mockApiEventBody)
+    const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
+    expect(actualResponse).toStrictEqual(expectedErrorResponse)
+  })
+
   //
   // Test APIGatewayProxyEventV2.body.price edge cases
   //

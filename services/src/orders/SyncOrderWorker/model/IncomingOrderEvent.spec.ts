@@ -420,7 +420,14 @@ describe('Orders Service SyncOrderWorker IncomingOrderEvent tests', () => {
 
   it('throws if the input IncomingOrderEvent.eventData.quantity < 1', async () => {
     const mockIncomingOrderEvent = buildMockValidIncomingOrderEvent()
-    mockIncomingOrderEvent.eventData.quantity = 0.99
+    mockIncomingOrderEvent.eventData.quantity = 0
+    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
+    expect(() => IncomingOrderEvent.validateAndBuild(mockEventBridgeEvent)).toThrow()
+  })
+
+  it('throws if the input IncomingOrderEvent.eventData.quantity is not an integer', async () => {
+    const mockIncomingOrderEvent = buildMockValidIncomingOrderEvent()
+    mockIncomingOrderEvent.eventData.quantity = 3.45
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     expect(() => IncomingOrderEvent.validateAndBuild(mockEventBridgeEvent)).toThrow()
   })

@@ -69,6 +69,11 @@ describe('Orders Service ValueValidators tests', () => {
       expect(() => ValueValidators.validQuantity().parse(testValue)).toThrow()
     })
 
+    it('throws if quantity is not an integer', () => {
+      const testValue = 3.45
+      expect(() => ValueValidators.validQuantity().parse(testValue)).toThrow()
+    })
+
     it('is valid if quantity >= 1', () => {
       const testValue = 1
       expect(() => ValueValidators.validQuantity().parse(testValue)).not.toThrow()
