@@ -4,7 +4,7 @@ import { OrderError } from '../../errors/OrderError'
 import { OrderEventName } from '../../model/OrderEventName'
 import { OrderStatus } from '../../model/OrderStatus'
 import { IncomingOrderEvent } from '../model/IncomingOrderEvent'
-import { ISyncOrderService } from '../SyncOrderService/SyncOrderService'
+import { ISyncOrderWorkerService } from '../SyncOrderWorkerService/SyncOrderWorkerService'
 import { SyncOrderWorkerController } from './SyncOrderWorkerController'
 
 jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
@@ -100,11 +100,11 @@ function buildMockTestObjects(ids: string[]) {
   }
 }
 
-function buildMockSyncOrderService_syncOrder_resolves(): ISyncOrderService {
+function buildMockSyncOrderWorkerService_syncOrder_resolves(): ISyncOrderWorkerService {
   return { syncOrder: jest.fn() }
 }
 
-function buildMockSyncOrderService_syncOrder_throwsIfAsked(errorName: string): ISyncOrderService {
+function buildMockSyncOrderWorkerService_syncOrder_throwsIfAsked(errorName: string): ISyncOrderWorkerService {
   return {
     syncOrder: jest.fn().mockImplementation((incomingOrderEvent: IncomingOrderEvent) => {
       const shouldThrow = Object.values(incomingOrderEvent.eventData).reduce(
@@ -126,29 +126,29 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test SQSEvent edge cases
   //
   it('throws if the input SQSEvent is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockApiEvent = undefined as unknown as SQSEvent
     await expect(syncOrderWorkerController.syncOrders(mockApiEvent)).rejects.toThrow()
   })
 
   it('throws if the input SQSEvent records are missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockApiEvent = {} as unknown as SQSEvent
     await expect(syncOrderWorkerController.syncOrders(mockApiEvent)).rejects.toThrow()
   })
 
   it('does not throw if the input SQSEvent records are empty', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockSqsEvent = buildMockSqsEvent([])
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
   it('return no failures if the input SQSEvent records are empty', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockSqsEvent = buildMockSqsEvent([])
     const result = await syncOrderWorkerController.syncOrders(mockSqsEvent)
     const expected: SQSBatchResponse = { batchItemFailures: [] }
@@ -159,16 +159,16 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test SQSRecord edge cases
   //
   it('does not throw if the input SQSRecord.body is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockSqsRecord = {} as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
   it('return no failures if the input SQSRecord.body is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockSqsRecord = {} as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
     const result = await syncOrderWorkerController.syncOrders(mockSqsEvent)
@@ -177,16 +177,16 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if the input SQSRecord.body is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockSqsRecord = { body: undefined } as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
   it('return no failures if the input SQSRecord.body is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockSqsRecord = { body: undefined } as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
     const result = await syncOrderWorkerController.syncOrders(mockSqsEvent)
@@ -195,8 +195,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if the input SQSRecord.body is not a valid JSON', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockSqsRecord = {} as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
     mockSqsEvent.Records[0].body = ''
@@ -204,8 +204,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('return no failures if the input SQSRecord.body is not a valid JSON', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockSqsRecord = {} as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
     mockSqsEvent.Records[0].body = ''
@@ -218,8 +218,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test EventBridgeEvent edge cases
   //
   it('does not throw if the input EventBridgeEvent is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockEventBridgeEvent = undefined as unknown as EventBridgeEvent<string, MockEventDetail>
     const mockSqsRecord = buildMockSqsRecord('AA', mockEventBridgeEvent)
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
@@ -227,8 +227,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('return no failures if the input EventBridgeEvent is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockEventBridgeEvent = undefined as unknown as EventBridgeEvent<string, MockEventDetail>
     const mockSqsRecord = buildMockSqsRecord('AA', mockEventBridgeEvent)
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
@@ -238,8 +238,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if the input EventBridgeEvent is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockEventBridgeEvent = undefined as unknown as EventBridgeEvent<string, MockEventDetail>
     const mockSqsRecord = buildMockSqsRecord('AA', mockEventBridgeEvent)
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
@@ -247,8 +247,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('return no failures if the input EventBridgeEvent is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockEventBridgeEvent = undefined as unknown as EventBridgeEvent<string, MockEventDetail>
     const mockSqsRecord = buildMockSqsRecord('AA', mockEventBridgeEvent)
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
@@ -258,8 +258,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if the input EventBridgeEvent is invalid', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockEventBridgeEvent = 'mockInvalidValue' as unknown as EventBridgeEvent<string, MockEventDetail>
     const mockSqsRecord = buildMockSqsRecord('AA', mockEventBridgeEvent)
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
@@ -267,8 +267,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('return no failures if the input EventBridgeEvent is invalid', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockEventBridgeEvent = 'mockInvalidValue' as unknown as EventBridgeEvent<string, MockEventDetail>
     const mockSqsRecord = buildMockSqsRecord('AA', mockEventBridgeEvent)
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
@@ -281,8 +281,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test EventBridgeEvent.detail edge cases
   //
   it('does not throw if the input EventBridgeEvent.detail is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -293,8 +293,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('return no failures if the input EventBridgeEvent.detail is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -307,8 +307,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if the input EventBridgeEvent.detail is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -319,8 +319,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('return no failures if the input EventBridgeEvent.detail is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -333,8 +333,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if the input EventBridgeEvent.detail is invalid', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -345,8 +345,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('return no failures if the input EventBridgeEvent.detail is invalid', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -362,8 +362,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test EventBridgeEvent.detail.dynamodb edge cases
   //
   it('does not throw if the input EventBridgeEvent.detail.dynamodb is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -374,8 +374,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('return no failures if the input EventBridgeEvent.detail.dynamodb is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -388,8 +388,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if the input EventBridgeEvent.detail.dynamodb is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -400,8 +400,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('return no failures if the input EventBridgeEvent.detail.dynamodb is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -414,8 +414,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if the input EventBridgeEvent.detail.dynamodb is invalid', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -426,8 +426,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('return no failures if the input EventBridgeEvent.detail.dynamodb is invalid', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -443,8 +443,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test EventBridgeEvent.detail.dynamodb.newImage edge cases
   //
   it('does not throw if the input EventBridgeEvent.detail.dynamodb.newImage is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -455,8 +455,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('return no failures if the input EventBridgeEvent.detail.dynamodb.newImage is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -469,8 +469,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if the input EventBridgeEvent.detail.dynamodb.newImage is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -481,8 +481,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('return no failures if the input EventBridgeEvent.detail.dynamodb.newImage is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -495,8 +495,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if the input EventBridgeEvent.detail.dynamodb.newImage is invalid', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -507,8 +507,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('return no failures if the input EventBridgeEvent.detail.dynamodb.newImage is invalid', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = {} as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -524,8 +524,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test IncomingOrderEvent edge cases
   //
   it('does not throw if an input IncomingOrderEvent is invalid', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = 'mockInvalidValue' as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -537,8 +537,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent is invalid', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = 'mockInvalidValue' as unknown as IncomingOrderEvent
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
@@ -553,8 +553,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test IncomingOrderEvent.eventName edge cases
   //
   it('does not throw if an input IncomingOrderEvent.eventName is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventName
@@ -565,8 +565,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventName is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventName
@@ -579,8 +579,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventName is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventName = undefined
@@ -591,8 +591,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventName is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventName = undefined
@@ -605,8 +605,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventName is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventName = null
@@ -617,8 +617,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventName is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventName = null
@@ -634,8 +634,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test IncomingOrderEvent.eventData edge cases
   //
   it('does not throw if an input IncomingOrderEvent.eventData is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData
@@ -646,8 +646,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData
@@ -660,8 +660,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData = undefined
@@ -672,8 +672,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData = undefined
@@ -686,8 +686,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData = null
@@ -698,8 +698,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData = null
@@ -715,8 +715,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test IncomingOrderEvent.eventData.orderId edge cases
   //
   it('does not throw if an input IncomingOrderEvent.eventData.orderId is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.orderId
@@ -727,8 +727,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.orderId is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.orderId
@@ -741,8 +741,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.orderId is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.orderId = undefined
@@ -753,8 +753,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.orderId is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.orderId = undefined
@@ -767,8 +767,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.orderId is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.orderId = null
@@ -779,8 +779,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.orderId is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.orderId = null
@@ -796,8 +796,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test IncomingOrderEvent.eventData.orderStatus edge cases
   //
   it('does not throw if an input IncomingOrderEvent.eventData.orderStatus is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.orderStatus
@@ -808,8 +808,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.orderStatus is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.orderStatus
@@ -822,8 +822,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.orderStatus is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.orderStatus = undefined
@@ -834,8 +834,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.orderStatus is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.orderStatus = undefined
@@ -848,8 +848,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.orderStatus is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.orderStatus = null
@@ -860,8 +860,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.orderStatus is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.orderStatus = null
@@ -877,8 +877,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test IncomingOrderEvent.eventData.sku edge cases
   //
   it('does not throw if an input IncomingOrderEvent.eventData.sku is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.sku
@@ -889,8 +889,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.sku is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.sku
@@ -903,8 +903,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.sku is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.sku = undefined
@@ -915,8 +915,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.sku is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.sku = undefined
@@ -929,8 +929,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.sku is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.sku = null
@@ -941,8 +941,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.sku is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.sku = null
@@ -958,8 +958,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test IncomingOrderEvent.eventData.quantity edge cases
   //
   it('does not throw if an input IncomingOrderEvent.eventData.quantity is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.quantity
@@ -970,8 +970,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.quantity is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.quantity
@@ -984,8 +984,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.quantity is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.quantity = undefined
@@ -996,8 +996,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.quantity is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.quantity = undefined
@@ -1010,8 +1010,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.quantity is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.quantity = null
@@ -1022,8 +1022,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.quantity is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.quantity = null
@@ -1039,8 +1039,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test IncomingOrderEvent.eventData.price edge cases
   //
   it('does not throw if an input IncomingOrderEvent.eventData.price is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.price
@@ -1051,8 +1051,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.price is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.price
@@ -1065,8 +1065,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.price is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.price = undefined
@@ -1077,8 +1077,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.price is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.price = undefined
@@ -1091,8 +1091,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.price is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.price = null
@@ -1103,8 +1103,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.price is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.price = null
@@ -1120,8 +1120,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test IncomingOrderEvent.eventData.userId edge cases
   //
   it('does not throw if an input IncomingOrderEvent.eventData.userId is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.userId
@@ -1132,8 +1132,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.userId is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.userId
@@ -1146,8 +1146,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.userId is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.userId = undefined
@@ -1158,8 +1158,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.userId is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.userId = undefined
@@ -1172,8 +1172,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.userId is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.userId = null
@@ -1184,8 +1184,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.userId is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.userId = null
@@ -1201,8 +1201,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test IncomingOrderEvent.eventData.createdAt edge cases
   //
   it('does not throw if an input IncomingOrderEvent.eventData.createdAt is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.createdAt
@@ -1213,8 +1213,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.createdAt is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.createdAt
@@ -1227,8 +1227,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.createdAt is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.createdAt = undefined
@@ -1239,8 +1239,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.createdAt is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.createdAt = undefined
@@ -1253,8 +1253,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.createdAt is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.createdAt = null
@@ -1265,8 +1265,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.createdAt is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.createdAt = null
@@ -1282,8 +1282,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test IncomingOrderEvent.eventData.updatedAt edge cases
   //
   it('does not throw if an input IncomingOrderEvent.eventData.updatedAt is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.updatedAt
@@ -1294,8 +1294,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.updatedAt is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.eventData.updatedAt
@@ -1308,8 +1308,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.updatedAt is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.updatedAt = undefined
@@ -1320,8 +1320,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.updatedAt is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.updatedAt = undefined
@@ -1334,8 +1334,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.eventData.updatedAt is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.updatedAt = null
@@ -1346,8 +1346,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.eventData.updatedAt is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.eventData.updatedAt = null
@@ -1363,8 +1363,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test IncomingOrderEvent.createdAt edge cases
   //
   it('does not throw if an input IncomingOrderEvent.createdAt is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.createdAt
@@ -1375,8 +1375,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.createdAt is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.createdAt
@@ -1389,8 +1389,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.createdAt is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.createdAt = undefined
@@ -1401,8 +1401,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.createdAt is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.createdAt = undefined
@@ -1415,8 +1415,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.createdAt is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.createdAt = null
@@ -1427,8 +1427,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.createdAt is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.createdAt = null
@@ -1444,8 +1444,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   // Test IncomingOrderEvent.updatedAt edge cases
   //
   it('does not throw if an input IncomingOrderEvent.updatedAt is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.updatedAt
@@ -1456,8 +1456,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.updatedAt is missing', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     delete mockIncomingOrderEvent.updatedAt
@@ -1470,8 +1470,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.updatedAt is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.updatedAt = undefined
@@ -1482,8 +1482,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.updatedAt is undefined', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.updatedAt = undefined
@@ -1496,8 +1496,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('does not throw if an input IncomingOrderEvent.updatedAt is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.updatedAt = null
@@ -1508,8 +1508,8 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   it('returns no failures if an input IncomingOrderEvent.updatedAt is null', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
     mockIncomingOrderEvent.updatedAt = null
@@ -1524,49 +1524,49 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   //
   // Test internal logic
   //
-  it('calls SyncOrderService.syncOrder a single time for an SQSEvent with a single record', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+  it('calls SyncOrderWorkerService.syncOrder a single time for an SQSEvent with a single record', async () => {
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA']
     const { mockSqsEvent } = buildMockTestObjects(mockIds)
     await syncOrderWorkerController.syncOrders(mockSqsEvent)
-    expect(mockSyncOrderService.syncOrder).toHaveBeenCalledTimes(1)
+    expect(mockSyncOrderWorkerService.syncOrder).toHaveBeenCalledTimes(1)
   })
 
-  it('calls SyncOrderService.syncOrder a multiple times for an SQSEvent with a multiple records', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+  it('calls SyncOrderWorkerService.syncOrder a multiple times for an SQSEvent with a multiple records', async () => {
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA', 'BB', 'CC']
     const { mockSqsRecords, mockSqsEvent } = buildMockTestObjects(mockIds)
     await syncOrderWorkerController.syncOrders(mockSqsEvent)
-    expect(mockSyncOrderService.syncOrder).toHaveBeenCalledTimes(mockSqsRecords.length)
+    expect(mockSyncOrderWorkerService.syncOrder).toHaveBeenCalledTimes(mockSqsRecords.length)
   })
 
-  it('calls SyncOrderService.syncOrder with the expected input', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+  it('calls SyncOrderWorkerService.syncOrder with the expected input', async () => {
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA', 'BB', 'CC']
     const { mockIncomingOrderEvents, mockSqsEvent } = buildMockTestObjects(mockIds)
     await syncOrderWorkerController.syncOrders(mockSqsEvent)
-    expect(mockSyncOrderService.syncOrder).toHaveBeenNthCalledWith(1, mockIncomingOrderEvents[0])
-    expect(mockSyncOrderService.syncOrder).toHaveBeenNthCalledWith(2, mockIncomingOrderEvents[1])
-    expect(mockSyncOrderService.syncOrder).toHaveBeenNthCalledWith(3, mockIncomingOrderEvents[2])
+    expect(mockSyncOrderWorkerService.syncOrder).toHaveBeenNthCalledWith(1, mockIncomingOrderEvents[0])
+    expect(mockSyncOrderWorkerService.syncOrder).toHaveBeenNthCalledWith(2, mockIncomingOrderEvents[1])
+    expect(mockSyncOrderWorkerService.syncOrder).toHaveBeenNthCalledWith(3, mockIncomingOrderEvents[2])
   })
 
   //
   // Test DoNotRetryError edge cases
   //
-  it('does not throw if the SyncOrderService does not throw', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+  it('does not throw if the SyncOrderWorkerService does not throw', async () => {
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA', 'BB', 'CC']
     const { mockSqsEvent } = buildMockTestObjects(mockIds)
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the SyncOrderService does not throw', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_resolves()
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+  it('return no failures if the SyncOrderWorkerService does not throw', async () => {
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA', 'BB', 'CC']
     const { mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await syncOrderWorkerController.syncOrders(mockSqsEvent)
@@ -1574,9 +1574,11 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it('return no failures if the SyncOrderService throws an DoNotRetryError (test 1)', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_throwsIfAsked(OrderError.DoNotRetryError)
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+  it('return no failures if the SyncOrderWorkerService throws an DoNotRetryError (test 1)', async () => {
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_throwsIfAsked(
+      OrderError.DoNotRetryError,
+    )
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA-THROW', 'BB-THROW', 'CC']
     const { mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await syncOrderWorkerController.syncOrders(mockSqsEvent)
@@ -1584,9 +1586,11 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it('return no failures if the SyncOrderService throws an DoNotRetryError (test 2)', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_throwsIfAsked(OrderError.DoNotRetryError)
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+  it('return no failures if the SyncOrderWorkerService throws an DoNotRetryError (test 2)', async () => {
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_throwsIfAsked(
+      OrderError.DoNotRetryError,
+    )
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA', 'BB-THROW', 'CC', 'DD', 'EE-THROW']
     const { mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await syncOrderWorkerController.syncOrders(mockSqsEvent)
@@ -1594,9 +1598,11 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it('return no failures if the SyncOrderService throws an DoNotRetryError (test 3)', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_throwsIfAsked(OrderError.DoNotRetryError)
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+  it('return no failures if the SyncOrderWorkerService throws an DoNotRetryError (test 3)', async () => {
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_throwsIfAsked(
+      OrderError.DoNotRetryError,
+    )
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA', 'BB-THROW', 'CC-THROW', 'DD-THROW', 'EE-THROW']
     const { mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await syncOrderWorkerController.syncOrders(mockSqsEvent)
@@ -1604,9 +1610,9 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it('returns expected failures if the SyncOrderService throws an Error not DoNotRetryError (test 1)', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_throwsIfAsked('SomeError')
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+  it('returns expected failures if the SyncOrderWorkerService throws an Error not DoNotRetryError (test 1)', async () => {
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_throwsIfAsked('SomeError')
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA-THROW', 'BB-THROW', 'CC']
     const { mockSqsRecords, mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await syncOrderWorkerController.syncOrders(mockSqsEvent)
@@ -1619,9 +1625,9 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it('returns expected failures if the SyncOrderService throws an Error not DoNotRetryError (test 2)', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_throwsIfAsked('SomeError')
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+  it('returns expected failures if the SyncOrderWorkerService throws an Error not DoNotRetryError (test 2)', async () => {
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_throwsIfAsked('SomeError')
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA', 'BB-THROW', 'CC', 'DD', 'EE-THROW']
     const { mockSqsRecords, mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await syncOrderWorkerController.syncOrders(mockSqsEvent)
@@ -1634,9 +1640,9 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it('returns expected failures if the SyncOrderService throws an Error not DoNotRetryError (test 3)', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_throwsIfAsked('SomeError')
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+  it('returns expected failures if the SyncOrderWorkerService throws an Error not DoNotRetryError (test 3)', async () => {
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_throwsIfAsked('SomeError')
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA', 'BB-THROW', 'CC-THROW', 'DD-THROW', 'EE-THROW']
     const { mockSqsRecords, mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await syncOrderWorkerController.syncOrders(mockSqsEvent)
@@ -1651,9 +1657,9 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it('returns all failures if the SyncOrderService throws all and only Error not DoNotRetryError', async () => {
-    const mockSyncOrderService = buildMockSyncOrderService_syncOrder_throwsIfAsked('SomeError')
-    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderService)
+  it('returns all failures if the SyncOrderWorkerService throws all and only Error not DoNotRetryError', async () => {
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_throwsIfAsked('SomeError')
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA-THROW', 'BB-THROW', 'CC-THROW']
     const { mockSqsRecords, mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await syncOrderWorkerController.syncOrders(mockSqsEvent)

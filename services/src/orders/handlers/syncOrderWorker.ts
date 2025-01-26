@@ -5,7 +5,7 @@ import { DbCreateOrderClient } from '../SyncOrderWorker/DbCreateOrderClient/DbCr
 import { EsRaiseOrderCreatedEventClient } from '../SyncOrderWorker/EsRaiseOrderCreatedEventClient/EsRaiseOrderCreatedEventClient'
 import { DbUpdateOrderClient } from '../SyncOrderWorker/DbUpdateOrderClient/DbUpdateOrderClient'
 import { SyncOrderWorkerController } from '../SyncOrderWorker/SyncOrderWorkerController/SyncOrderWorkerController'
-import { SyncOrderService } from '../SyncOrderWorker/SyncOrderService/SyncOrderService'
+import { SyncOrderWorkerService } from '../SyncOrderWorker/SyncOrderWorkerService/SyncOrderWorkerService'
 
 function createHandler() {
   const ddbClient = new DynamoDBClient({})
@@ -14,13 +14,13 @@ function createHandler() {
   const createOrderClient = new DbCreateOrderClient(ddbDocClient)
   const updateOrderClient = new DbUpdateOrderClient(ddbDocClient)
   const syncOrderEventClient = new EsRaiseOrderCreatedEventClient(ddbDocClient)
-  const syncOrderService = new SyncOrderService(
+  const syncOrderWorkerService = new SyncOrderWorkerService(
     getOrderClient,
     createOrderClient,
     updateOrderClient,
     syncOrderEventClient,
   )
-  const syncOrderWorkerController = new SyncOrderWorkerController(syncOrderService)
+  const syncOrderWorkerController = new SyncOrderWorkerController(syncOrderWorkerService)
   return syncOrderWorkerController.syncOrders
 }
 

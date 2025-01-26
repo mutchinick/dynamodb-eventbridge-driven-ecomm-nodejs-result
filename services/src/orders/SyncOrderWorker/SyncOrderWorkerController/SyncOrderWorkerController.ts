@@ -1,7 +1,7 @@
 import { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda'
 import { OrderError } from '../../errors/OrderError'
 import { IncomingOrderEvent } from '../model/IncomingOrderEvent'
-import { ISyncOrderService } from '../SyncOrderService/SyncOrderService'
+import { ISyncOrderWorkerService } from '../SyncOrderWorkerService/SyncOrderWorkerService'
 
 export interface ISyncOrderWorkerController {
   syncOrders: (sqsEvent: SQSEvent) => Promise<SQSBatchResponse>
@@ -11,7 +11,7 @@ export class SyncOrderWorkerController implements ISyncOrderWorkerController {
   //
   //
   //
-  constructor(private readonly syncOrderService: ISyncOrderService) {
+  constructor(private readonly syncOrderWorkerService: ISyncOrderWorkerService) {
     this.syncOrders = this.syncOrders.bind(this)
   }
 
@@ -43,7 +43,7 @@ export class SyncOrderWorkerController implements ISyncOrderWorkerController {
     try {
       console.info('SyncOrderWorkerController.syncOrder init:', { sqsRecord })
       const incomingOrderEvent = this.parseValidateEvent(sqsRecord.body)
-      await this.syncOrderService.syncOrder(incomingOrderEvent)
+      await this.syncOrderWorkerService.syncOrder(incomingOrderEvent)
       console.info('SyncOrderWorkerController.syncOrder exit:', { incomingOrderEvent })
     } catch (error) {
       console.error('SyncOrderWorkerController.syncOrder error:', { error })

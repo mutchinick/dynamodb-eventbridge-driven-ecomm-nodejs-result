@@ -10,11 +10,11 @@ import { IncomingOrderEvent } from '../model/IncomingOrderEvent'
 import { OrderCreatedEvent } from '../model/OrderCreatedEvent'
 import { UpdateOrderCommand } from '../model/UpdateOrderCommand'
 
-export interface ISyncOrderService {
+export interface ISyncOrderWorkerService {
   syncOrder: (incomingOrderEvent: IncomingOrderEvent) => Promise<void>
 }
 
-export class SyncOrderService implements ISyncOrderService {
+export class SyncOrderWorkerService implements ISyncOrderWorkerService {
   //
   //
   //
@@ -30,7 +30,7 @@ export class SyncOrderService implements ISyncOrderService {
   //
   public async syncOrder(incomingOrderEvent: IncomingOrderEvent): Promise<void> {
     try {
-      console.info('SyncOrderService.syncOrder init:', { incomingOrderEvent })
+      console.info('SyncOrderWorkerService.syncOrder init:', { incomingOrderEvent })
       const isOrderPlacedEvent = IncomingOrderEvent.isOrderPlacedEvent(incomingOrderEvent)
       if (isOrderPlacedEvent) {
         const orderData = await this.createOrder(incomingOrderEvent)
@@ -38,9 +38,9 @@ export class SyncOrderService implements ISyncOrderService {
       } else {
         await this.updateOrder(incomingOrderEvent)
       }
-      console.info('SyncOrderService.syncOrder exit:')
+      console.info('SyncOrderWorkerService.syncOrder exit:')
     } catch (error) {
-      console.error('SyncOrderService.syncOrder error:', { error })
+      console.error('SyncOrderWorkerService.syncOrder error:', { error })
       throw error
     }
   }
