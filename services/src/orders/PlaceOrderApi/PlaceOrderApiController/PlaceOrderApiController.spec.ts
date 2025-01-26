@@ -2,7 +2,7 @@ import { APIGatewayProxyEventV2 } from 'aws-lambda'
 import { HttpResponse } from '../../../shared/HttpResponse'
 import { OrderError } from '../../errors/OrderError'
 import { IncomingPlaceOrderRequest } from '../model/IncomingPlaceOrderRequest'
-import { IPlaceOrderService, ServiceOutput } from '../PlaceOrderService/PlaceOrderService'
+import { IPlaceOrderApiService, ServiceOutput } from '../PlaceOrderApiService/PlaceOrderApiService'
 import { PlaceOrderApiController } from './PlaceOrderApiController'
 
 const mockOrderId = 'mockOrderId'
@@ -33,16 +33,16 @@ function buildMockApiEvent(incomingPlaceOrderRequest: IncomingPlaceOrderRequest)
   return mockApiEvent
 }
 
-function buildMockPlaceOrderService_placeOrder_resolves(): IPlaceOrderService {
+function buildMockPlaceOrderApiService_placeOrder_resolves(): IPlaceOrderApiService {
   const mockServiceOutput: ServiceOutput = { orderId: mockOrderId }
   return { placeOrder: jest.fn().mockResolvedValue(mockServiceOutput) }
 }
 
-function buildMockPlaceOrderService_placeOrder_throws(): IPlaceOrderService {
+function buildMockPlaceOrderApiService_placeOrder_throws(): IPlaceOrderApiService {
   return { placeOrder: jest.fn().mockRejectedValue(new Error()) }
 }
 
-function buildMockPlaceOrderService_placeOrder_throws_InvalidArgumentsError(): IPlaceOrderService {
+function buildMockPlaceOrderApiService_placeOrder_throws_InvalidArgumentsError(): IPlaceOrderApiService {
   const error = new Error()
   OrderError.addName(error, OrderError.InvalidArgumentsError)
   return { placeOrder: jest.fn().mockRejectedValue(error) }
@@ -53,8 +53,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   // Test APIGatewayProxyEventV2 edge cases
   //
   it('responds with 500 Internal Server Error if the APIGatewayProxyEventV2 is undefined', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.InternalServerError()
     const mockApiEvent = undefined as unknown as APIGatewayProxyEventV2
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
@@ -62,8 +62,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2 is invalid', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEvent = 'mockInvalidValue' as unknown as APIGatewayProxyEventV2
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
@@ -71,8 +71,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body is missing', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEvent = {} as unknown as APIGatewayProxyEventV2
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
@@ -80,8 +80,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body is empty', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEvent = { body: '' } as unknown as APIGatewayProxyEventV2
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
@@ -89,8 +89,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body is not a valid JSON', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEvent = { body: 'mockInvalidValue' } as unknown as APIGatewayProxyEventV2
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
@@ -101,8 +101,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   // Test APIGatewayProxyEventV2.body.orderId edge cases
   //
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.orderId is missing', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     delete mockApiEventBody.orderId
@@ -112,8 +112,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.orderId is undefined', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.orderId = undefined as never
@@ -123,8 +123,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.orderId is null', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.orderId = null as never
@@ -134,8 +134,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.orderId is not a string', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.orderId = 123456 as never
@@ -148,8 +148,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   // Test APIGatewayProxyEventV2.body.sku edge cases
   //
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.sku is missing', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     delete mockApiEventBody.sku
@@ -159,8 +159,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.sku is undefined', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.sku = undefined as never
@@ -170,8 +170,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.sku is null', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.sku = null as never
@@ -181,8 +181,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.sku is not a string', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.sku = 123456 as never
@@ -195,8 +195,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   // Test APIGatewayProxyEventV2.body.quantity edge cases
   //
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.quantity is missing', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     delete mockApiEventBody.quantity
@@ -206,8 +206,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.quantity is undefined', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.quantity = undefined as never
@@ -217,8 +217,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.quantity is null', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.quantity = null as never
@@ -228,8 +228,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.quantity is not a number', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.quantity = '1' as never
@@ -242,8 +242,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   // Test APIGatewayProxyEventV2.body.price edge cases
   //
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.price is missing', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     delete mockApiEventBody.price
@@ -253,8 +253,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.price is undefined', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.price = undefined as never
@@ -264,8 +264,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.price is null', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.price = null as never
@@ -275,8 +275,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.price is not a number', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.price = '1' as never
@@ -289,8 +289,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   // Test APIGatewayProxyEventV2.body.userId edge cases
   //
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.userId is missing', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     delete mockApiEventBody.userId
@@ -300,8 +300,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.userId is undefined', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.userId = undefined as never
@@ -311,8 +311,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.userId is null', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.userId = null as never
@@ -322,8 +322,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.userId is not a string', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
     mockApiEventBody.userId = 123456 as never
@@ -335,28 +335,28 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   //
   // Test internal logic
   //
-  it('calls PlaceOrderService.placeOrder a single time', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+  it('calls PlaceOrderApiService.placeOrder a single time', async () => {
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const mockTestRequest = buildMockApiEventBody()
     const mockApiEvent = buildMockApiEvent(mockTestRequest)
     await placeOrderApiController.placeOrder(mockApiEvent)
-    expect(mockPlaceOrderService.placeOrder).toHaveBeenCalledTimes(1)
+    expect(mockPlaceOrderApiService.placeOrder).toHaveBeenCalledTimes(1)
   })
 
-  it('calls PlaceOrderService.placeOrder with the expected input', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+  it('calls PlaceOrderApiService.placeOrder with the expected input', async () => {
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const mockTestRequest = buildMockApiEventBody()
     const mockApiEvent = buildMockApiEvent(mockTestRequest)
     const expectedServiceInput = { ...mockTestRequest }
     await placeOrderApiController.placeOrder(mockApiEvent)
-    expect(mockPlaceOrderService.placeOrder).toHaveBeenCalledWith(expectedServiceInput)
+    expect(mockPlaceOrderApiService.placeOrder).toHaveBeenCalledWith(expectedServiceInput)
   })
 
-  it('responds with 500 Internal Server Error if PlaceOrderService.placeOrder throws', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_throws()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+  it('responds with 500 Internal Server Error if PlaceOrderApiService.placeOrder throws', async () => {
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_throws()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const mockTestRequest = buildMockApiEventBody()
     const mockApiEvent = buildMockApiEvent(mockTestRequest)
     await placeOrderApiController.placeOrder(mockApiEvent)
@@ -365,9 +365,9 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
     expect(actualResponse).toStrictEqual(expectedErrorResponse)
   })
 
-  it('responds with 400 Bad Request if PlaceOrderService.placeOrder throws and InvalidArgumentsError', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_throws_InvalidArgumentsError()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+  it('responds with 400 Bad Request if PlaceOrderApiService.placeOrder throws and InvalidArgumentsError', async () => {
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_throws_InvalidArgumentsError()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const mockTestRequest = buildMockApiEventBody()
     const mockApiEvent = buildMockApiEvent(mockTestRequest)
     await placeOrderApiController.placeOrder(mockApiEvent)
@@ -380,8 +380,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   // Test expected results
   //
   it('responds with status code 202 Accepted', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const mockTestRequest = buildMockApiEventBody()
     const mockApiEvent = buildMockApiEvent(mockTestRequest)
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
@@ -389,8 +389,8 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   it('responds with the agreed HttpResponse.Accepted response', async () => {
-    const mockPlaceOrderService = buildMockPlaceOrderService_placeOrder_resolves()
-    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderService)
+    const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
+    const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const mockTestRequest = buildMockApiEventBody()
     const mockApiEvent = buildMockApiEvent(mockTestRequest)
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)

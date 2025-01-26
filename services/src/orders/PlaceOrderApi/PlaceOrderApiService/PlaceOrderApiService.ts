@@ -3,7 +3,7 @@ import { IEsRaiseOrderPlacedEventClient } from '../EsRaiseOrderPlacedEventClient
 import { IncomingPlaceOrderRequest } from '../model/IncomingPlaceOrderRequest'
 import { OrderPlacedEvent } from '../model/OrderPlacedEvent'
 
-export interface IPlaceOrderService {
+export interface IPlaceOrderApiService {
   placeOrder: (incomingPlaceOrderRequest: IncomingPlaceOrderRequest) => Promise<ServiceOutput>
 }
 
@@ -11,7 +11,7 @@ export interface ServiceOutput {
   orderId: string
 }
 
-export class PlaceOrderService implements IPlaceOrderService {
+export class PlaceOrderApiService implements IPlaceOrderApiService {
   //
   //
   //
@@ -22,13 +22,13 @@ export class PlaceOrderService implements IPlaceOrderService {
   //
   public async placeOrder(incomingPlaceOrderRequest: IncomingPlaceOrderRequest): Promise<ServiceOutput> {
     try {
-      console.info('PlaceOrderService.placeOrder init:', { incomingPlaceOrderRequest })
+      console.info('PlaceOrderApiService.placeOrder init:', { incomingPlaceOrderRequest })
       await this.raiseOrderPlacedEvent(incomingPlaceOrderRequest)
       const serviceOutput = this.buildServiceOutput(incomingPlaceOrderRequest)
-      console.info('PlaceOrderService.placeOrder exit:', { serviceOutput })
+      console.info('PlaceOrderApiService.placeOrder exit:', { serviceOutput })
       return serviceOutput
     } catch (error) {
-      console.error('PlaceOrderService.placeOrder error:', { error })
+      console.error('PlaceOrderApiService.placeOrder error:', { error })
       if (OrderError.hasName(error, OrderError.InvalidEventRaiseOperationError_Redundant)) {
         const response = this.buildServiceOutput(incomingPlaceOrderRequest)
         return response

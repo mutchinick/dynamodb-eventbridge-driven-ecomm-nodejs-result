@@ -1,7 +1,7 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda'
 import { HttpResponse } from '../../../shared/HttpResponse'
 import { OrderError } from '../../errors/OrderError'
-import { IPlaceOrderService } from '../PlaceOrderService/PlaceOrderService'
+import { IPlaceOrderApiService } from '../PlaceOrderApiService/PlaceOrderApiService'
 import { IncomingPlaceOrderRequest, IncomingPlaceOrderRequestInput } from '../model/IncomingPlaceOrderRequest'
 
 export interface IPlaceOrderApiController {
@@ -12,7 +12,7 @@ export class PlaceOrderApiController implements IPlaceOrderApiController {
   //
   //
   //
-  constructor(private readonly placeOrderService: IPlaceOrderService) {
+  constructor(private readonly placeOrderApiService: IPlaceOrderApiService) {
     this.placeOrder = this.placeOrder.bind(this)
   }
 
@@ -23,7 +23,7 @@ export class PlaceOrderApiController implements IPlaceOrderApiController {
     try {
       console.info('PlaceOrderApiController.placeOrder init:', { apiEvent })
       const incomingPlaceOrderRequest = this.parseValidateRequest(apiEvent.body)
-      const placeOrderOutput = await this.placeOrderService.placeOrder(incomingPlaceOrderRequest)
+      const placeOrderOutput = await this.placeOrderApiService.placeOrder(incomingPlaceOrderRequest)
       const apiResponse = HttpResponse.Accepted(placeOrderOutput)
       console.info('PlaceOrderApiController.placeOrder exit:', { apiResponse })
       return apiResponse
