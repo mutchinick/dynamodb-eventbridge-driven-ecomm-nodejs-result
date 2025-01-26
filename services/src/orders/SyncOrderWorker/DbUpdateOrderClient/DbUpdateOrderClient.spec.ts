@@ -168,8 +168,8 @@ describe('Orders Service SyncOrderWorker DbUpdateOrderClient tests', () => {
   //
   it('returns the expected OrderData existing in the database if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException error', async () => {
     const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException()
-    const dbCreateOrderEventClient = new DbUpdateOrderClient(mockDdbDocClient)
-    const existingOrderData = await dbCreateOrderEventClient.updateOrder(mockValidCommand)
+    const dbUpdateOrderClient = new DbUpdateOrderClient(mockDdbDocClient)
+    const existingOrderData = await dbUpdateOrderClient.updateOrder(mockValidCommand)
     expect(existingOrderData).toStrictEqual(expectedUpdatedOrderData)
   })
 
