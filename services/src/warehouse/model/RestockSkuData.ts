@@ -1,4 +1,4 @@
-export type SkuLotData = {
+export type RestockSkuData = {
   sku: string
   units: number
   lotId: string

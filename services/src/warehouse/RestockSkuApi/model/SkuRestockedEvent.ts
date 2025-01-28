@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { SkuLotData } from '../../model/SkuLotData'
+import { RestockSkuData } from '../../model/RestockSkuData'
 import { ValueValidators } from '../../model/ValueValidators'
 import { WarehouseEvent } from '../../model/WarehouseEvent'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
 
-export type SkuRestockedEventData = Pick<SkuLotData, 'sku' | 'units' | 'lotId'>
+export type SkuRestockedEventData = Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>
 
 export type SkuRestockedEventInput = SkuRestockedEventData
 

@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import { WarehouseError } from '../../errors/WarehouseError'
-import { SkuLotData } from '../../model/SkuLotData'
+import { RestockSkuData } from '../../model/RestockSkuData'
 import { ValueValidators } from '../../model/ValueValidators'
 
-export type IncomingRestockSkuRequestInput = Pick<SkuLotData, 'sku' | 'units' | 'lotId'>
+export type IncomingRestockSkuRequestInput = Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>
 
-type IncomingRestockSkuRequestProps = Pick<SkuLotData, 'sku' | 'units' | 'lotId'>
+type IncomingRestockSkuRequestProps = Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>
 
 export class IncomingRestockSkuRequest implements IncomingRestockSkuRequestProps {
   //
