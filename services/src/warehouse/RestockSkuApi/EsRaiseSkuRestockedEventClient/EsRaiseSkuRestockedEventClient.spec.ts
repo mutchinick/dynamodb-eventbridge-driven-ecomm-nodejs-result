@@ -27,7 +27,7 @@ const expectedDdbDocClientInput = new PutCommand({
   TableName: mockEventStoreTableName,
   Item: {
     pk: `SKU#${mockValidEvent.eventData.sku}`,
-    sk: `EVENT#${mockValidEvent.eventName}#LOT_ID${mockValidEvent.eventData.lotId}`,
+    sk: `EVENT#${mockValidEvent.eventName}#LOT_ID#${mockValidEvent.eventData.lotId}`,
     _tn: 'EVENT',
     ...mockValidEvent,
   },

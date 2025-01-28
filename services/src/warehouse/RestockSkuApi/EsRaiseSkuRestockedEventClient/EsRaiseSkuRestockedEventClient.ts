@@ -39,7 +39,7 @@ export class EsRaiseSkuRestockedEventClient implements IEsRaiseSkuRestockedEvent
       TableName: process.env.EVENT_STORE_TABLE_NAME,
       Item: {
         pk: `SKU#${skuRestockedEvent.eventData.sku}`,
-        sk: `EVENT#${skuRestockedEvent.eventName}#LOT_ID${skuRestockedEvent.eventData.lotId}`,
+        sk: `EVENT#${skuRestockedEvent.eventName}#LOT_ID#${skuRestockedEvent.eventData.lotId}`,
         _tn: 'EVENT',
         ...skuRestockedEvent,
       },
