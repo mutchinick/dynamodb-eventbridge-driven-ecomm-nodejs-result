@@ -6,6 +6,7 @@ import { PlaceOrderApiConstruct } from './orders/PlaceOrderApiConstruct'
 import { SyncOrderWorkerConstruct } from './orders/SyncOrderWorkerConstruct'
 import { SimulateRawEventApiConstruct } from './testing/SimulateRawEventApiConstruct'
 import { RestockSkuApiConstruct } from './warehouse/RestockSkuApiConstruct'
+import { RestockSkuWorkerConstruct } from './warehouse/RestockSkuWorkerConstruct'
 
 export interface IMainStackProps extends StackProps {
   config: {
@@ -48,6 +49,12 @@ export class MainStack extends Stack {
     const restockSkuApiConstructName = `${id}-RestockSkuApi`
     new RestockSkuApiConstruct(this, restockSkuApiConstructName, {
       dynamoDbTable: ddbConstruct.dynamoDbTable,
+    })
+
+    const restockSkuWorkerConstructName = `${id}-RestockSkuWorker`
+    new RestockSkuWorkerConstruct(this, restockSkuWorkerConstructName, {
+      dynamoDbTable: ddbConstruct.dynamoDbTable,
+      eventBus: eventBusConstruct.eventBus,
     })
   }
 }
