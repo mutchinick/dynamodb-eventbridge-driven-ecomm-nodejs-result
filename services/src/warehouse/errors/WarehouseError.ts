@@ -4,6 +4,8 @@ export class WarehouseError {
   public static InvalidArgumentsError = 'InvalidArgumentsError'
   public static InvalidEventRaiseOperationError_Redundant = 'InvalidEventRaiseOperationError_Redundant'
   public static InvalidRestockOperationError_Redundant = 'InvalidRestockOperationError_Redundant'
+  public static InvalidStockAllocationOperationError_Depleted = 'InvalidStockAllocationOperationError_Depleted'
+  public static InvalidStockAllocationOperationError_Redundant = 'InvalidStockAllocationOperationError_Redundant'
   public static DoNotRetryError = 'DoNotRetryError'
 
   //

@@ -5,6 +5,7 @@ import { EventBusConstruct } from './EventBusConstruct'
 import { PlaceOrderApiConstruct } from './orders/PlaceOrderApiConstruct'
 import { SyncOrderWorkerConstruct } from './orders/SyncOrderWorkerConstruct'
 import { SimulateRawEventApiConstruct } from './testing/SimulateRawEventApiConstruct'
+import { AllocateOrderStockWorkerConstruct } from './warehouse/AllocateOrderStockWorkerConstruct'
 import { RestockSkuApiConstruct } from './warehouse/RestockSkuApiConstruct'
 import { RestockSkuWorkerConstruct } from './warehouse/RestockSkuWorkerConstruct'
 
@@ -53,6 +54,12 @@ export class MainStack extends Stack {
 
     const restockSkuWorkerConstructName = `${id}-RestockSkuWorker`
     new RestockSkuWorkerConstruct(this, restockSkuWorkerConstructName, {
+      dynamoDbTable: ddbConstruct.dynamoDbTable,
+      eventBus: eventBusConstruct.eventBus,
+    })
+
+    const allocateOrderStockWorkerConstructName = `${id}-AllocateOrderStockWorker`
+    new AllocateOrderStockWorkerConstruct(this, allocateOrderStockWorkerConstructName, {
       dynamoDbTable: ddbConstruct.dynamoDbTable,
       eventBus: eventBusConstruct.eventBus,
     })

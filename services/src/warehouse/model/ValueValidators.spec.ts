@@ -13,9 +13,26 @@ describe('Warehouse Service ValueValidators tests', () => {
       expect(() => ValueValidators.validSkuRestockedEventName().parse(testValue)).toThrow()
     })
 
-    it('is valid if eventName is a WareHouseEventName', () => {
+    it('is valid if eventName is a WarehouseEventName.SKU_RESTOCKED_EVENT', () => {
       const testValue = WarehouseEventName.SKU_RESTOCKED_EVENT
       expect(() => ValueValidators.validSkuRestockedEventName().parse(testValue)).not.toThrow()
+    })
+  })
+
+  describe('validOrderCreatedEventName tests', () => {
+    it('throws if eventName is undefined', () => {
+      const testValue = undefined as string
+      expect(() => ValueValidators.validOrderCreatedEventName().parse(testValue)).toThrow()
+    })
+
+    it('throws if eventName is not a WareHouseEventName', () => {
+      const testValue = 'mockInvalidValue'
+      expect(() => ValueValidators.validOrderCreatedEventName().parse(testValue)).toThrow()
+    })
+
+    it('is valid if eventName is a WarehouseEventName.ORDER_CREATED_EVENT', () => {
+      const testValue = WarehouseEventName.ORDER_CREATED_EVENT
+      expect(() => ValueValidators.validOrderCreatedEventName().parse(testValue)).not.toThrow()
     })
   })
 
@@ -77,6 +94,23 @@ describe('Warehouse Service ValueValidators tests', () => {
     it('is valid if lotId length >= 4', () => {
       const testValue = '1234'
       expect(() => ValueValidators.validLotId().parse(testValue)).not.toThrow()
+    })
+  })
+
+  describe('validOrderId tests', () => {
+    it('throws if orderId is undefined', () => {
+      const testValue = undefined as string
+      expect(() => ValueValidators.validOrderId().parse(testValue)).toThrow()
+    })
+
+    it('throws if orderId length < 4', () => {
+      const testValue = '123'
+      expect(() => ValueValidators.validOrderId().parse(testValue)).toThrow()
+    })
+
+    it('is valid if orderId length >= 4', () => {
+      const testValue = '1234'
+      expect(() => ValueValidators.validOrderId().parse(testValue)).not.toThrow()
     })
   })
 
