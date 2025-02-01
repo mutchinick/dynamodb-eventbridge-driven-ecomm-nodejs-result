@@ -18,7 +18,7 @@ const mockValidEvent: RawSimulatedEvent = {
   eventData: {},
   createdAt: mockDate,
   updatedAt: mockDate,
-  _tn: 'EVENT',
+  _tn: '#EVENT',
 }
 
 const expectedDdbDocClientInput = new PutCommand({

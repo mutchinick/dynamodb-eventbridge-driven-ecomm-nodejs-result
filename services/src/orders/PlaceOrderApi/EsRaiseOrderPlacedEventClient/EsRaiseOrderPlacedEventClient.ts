@@ -40,7 +40,7 @@ export class EsRaiseOrderPlacedEventClient implements IEsRaiseOrderPlacedEventCl
       Item: {
         pk: `ORDER_ID#${orderPlacedEvent.eventData.orderId}`,
         sk: `EVENT#${orderPlacedEvent.eventName}`,
-        _tn: 'EVENT',
+        _tn: '#EVENT',
         ...orderPlacedEvent,
       },
       ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',

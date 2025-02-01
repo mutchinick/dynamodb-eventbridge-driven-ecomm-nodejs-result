@@ -3,7 +3,7 @@ import { EventProps } from './EventProps'
 
 export type RawSimulatedEventInput = EventProps
 
-type RawSimulatedEventProps = EventProps & { _tn: 'EVENT' }
+type RawSimulatedEventProps = EventProps & { _tn: '#EVENT' }
 
 export class RawSimulatedEvent implements RawSimulatedEventProps {
   //
@@ -16,7 +16,7 @@ export class RawSimulatedEvent implements RawSimulatedEventProps {
     readonly eventData: unknown,
     readonly createdAt: string,
     readonly updatedAt: string,
-    readonly _tn: 'EVENT',
+    readonly _tn: '#EVENT',
   ) {}
 
   //
@@ -56,7 +56,7 @@ export class RawSimulatedEvent implements RawSimulatedEventProps {
       eventData,
       createdAt: createdAt?.trim() || date,
       updatedAt: updatedAt?.trim() || date,
-      _tn: 'EVENT',
+      _tn: '#EVENT',
     }
   }
 }

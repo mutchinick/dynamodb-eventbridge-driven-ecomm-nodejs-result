@@ -40,7 +40,7 @@ export class EsRaiseSkuRestockedEventClient implements IEsRaiseSkuRestockedEvent
       Item: {
         pk: `SKU#${skuRestockedEvent.eventData.sku}`,
         sk: `EVENT#${skuRestockedEvent.eventName}#LOT_ID#${skuRestockedEvent.eventData.lotId}`,
-        _tn: 'EVENT',
+        _tn: '#EVENT',
         ...skuRestockedEvent,
       },
       ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',

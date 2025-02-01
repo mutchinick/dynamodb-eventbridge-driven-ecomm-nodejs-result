@@ -40,7 +40,7 @@ export class EsRaiseOrderCreatedEventClient implements IEsRaiseOrderCreatedEvent
       Item: {
         pk: `ORDER_ID#${orderCreatedEvent.eventData.orderId}`,
         sk: `EVENT#${orderCreatedEvent.eventName}`,
-        _tn: 'EVENT',
+        _tn: '#EVENT',
         ...orderCreatedEvent,
       },
       ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',

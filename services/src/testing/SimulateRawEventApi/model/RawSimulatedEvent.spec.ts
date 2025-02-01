@@ -208,7 +208,7 @@ describe('Testing Service SimulateRawEventApi RawSimulatedEvent tests', () => {
       eventData: {},
       createdAt: mockDate,
       updatedAt: mockDate,
-      _tn: 'EVENT',
+      _tn: '#EVENT',
     }
     const rawSimulatedEvent = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
     expect(rawSimulatedEvent).toMatchObject(expected)

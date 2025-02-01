@@ -30,7 +30,7 @@ const expectedDdbDocClientInput = new PutCommand({
   Item: {
     pk: `ORDER_ID#${mockValidEvent.eventData.orderId}`,
     sk: `EVENT#${mockValidEvent.eventName}`,
-    _tn: 'EVENT',
+    _tn: '#EVENT',
     ...mockValidEvent,
   },
   ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
