@@ -90,7 +90,7 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
               lotId,
               createdAt,
               updatedAt,
-              _tn: 'RESTOCK',
+              _tn: 'WAREHOUSE#LOT',
             },
             ConditionExpression: 'attribute_not_exists(pk)',
           },

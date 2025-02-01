@@ -69,7 +69,7 @@ const expectedTransactWriteCommand = new TransactWriteCommand({
           lotId: mockRestockSkuCommand.restockSkuData.lotId,
           createdAt: mockRestockSkuCommand.restockSkuData.createdAt,
           updatedAt: mockRestockSkuCommand.restockSkuData.updatedAt,
-          _tn: 'RESTOCK',
+          _tn: 'WAREHOUSE#LOT',
         },
         ConditionExpression: 'attribute_not_exists(pk)',
       },
