@@ -70,7 +70,7 @@ const expectedTransactWriteCommand = new TransactWriteCommand({
           status,
           createdAt,
           updatedAt,
-          _tn: 'STOCK_ALLOCATION',
+          _tn: 'WAREHOUSE#STOCK_ALLOCATION',
         },
         ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
       },
