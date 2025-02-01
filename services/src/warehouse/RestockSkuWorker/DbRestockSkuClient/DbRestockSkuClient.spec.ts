@@ -54,7 +54,7 @@ const expectedTransactWriteCommand = new TransactWriteCommand({
           ':createdAt': mockRestockSkuCommand.restockSkuData.createdAt,
           ':updatedAt': mockRestockSkuCommand.restockSkuData.updatedAt,
           ':zero': 0,
-          ':_tn': 'STOCK',
+          ':_tn': 'WAREHOUSE#SKU',
         },
       },
     },

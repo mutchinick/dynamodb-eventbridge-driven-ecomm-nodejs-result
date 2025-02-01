@@ -76,7 +76,7 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
               ':units': units,
               ':createdAt': createdAt,
               ':updatedAt': updatedAt,
-              ':_tn': 'STOCK',
+              ':_tn': 'WAREHOUSE#SKU',
             },
             ConditionExpression: 'attribute_exists(pk) AND attribute_exists(sk) and #units >= :units',
           },

@@ -75,7 +75,7 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
               ':createdAt': createdAt,
               ':updatedAt': updatedAt,
               ':zero': 0,
-              ':_tn': 'STOCK',
+              ':_tn': 'WAREHOUSE#SKU',
             },
           },
         },
