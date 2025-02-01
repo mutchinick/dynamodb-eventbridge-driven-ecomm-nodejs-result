@@ -9,7 +9,7 @@ function buildMockValidOrderPlacedEventInput() {
   const mockValidInput: OrderPlacedEventInput = {
     orderId: 'mockOrderId',
     sku: 'mockSku',
-    quantity: 2,
+    units: 2,
     price: 23.45,
     userId: 'mockUserId',
   }
@@ -114,47 +114,47 @@ describe('Orders Service PlaceOrderApi OrderPlacedEvent tests', () => {
   })
 
   //
-  // Test OrderPlacedEventData.quantity edge cases
+  // Test OrderPlacedEventData.units edge cases
   //
-  it('throws if the input OrderPlacedEventInput.quantity is missing', () => {
+  it('throws if the input OrderPlacedEventInput.units is missing', () => {
     const mockOrderPlacedEventInput = buildMockValidOrderPlacedEventInput()
-    delete mockOrderPlacedEventInput.quantity
+    delete mockOrderPlacedEventInput.units
     expect(() => OrderPlacedEvent.validateAndBuild(mockOrderPlacedEventInput)).toThrow()
   })
 
-  it('throws if the input OrderPlacedEventInput.quantity is undefined', () => {
+  it('throws if the input OrderPlacedEventInput.units is undefined', () => {
     const mockOrderPlacedEventInput = buildMockValidOrderPlacedEventInput()
-    mockOrderPlacedEventInput.quantity = undefined
+    mockOrderPlacedEventInput.units = undefined
     expect(() => OrderPlacedEvent.validateAndBuild(mockOrderPlacedEventInput)).toThrow()
   })
 
-  it('throws if the input OrderPlacedEventInput.quantity is null', () => {
+  it('throws if the input OrderPlacedEventInput.units is null', () => {
     const mockOrderPlacedEventInput = buildMockValidOrderPlacedEventInput()
-    mockOrderPlacedEventInput.quantity = null
+    mockOrderPlacedEventInput.units = null
     expect(() => OrderPlacedEvent.validateAndBuild(mockOrderPlacedEventInput)).toThrow()
   })
 
-  it('throws if the input OrderPlacedEventInput.quantity < 0', () => {
+  it('throws if the input OrderPlacedEventInput.units < 0', () => {
     const mockOrderPlacedEventInput = buildMockValidOrderPlacedEventInput()
-    mockOrderPlacedEventInput.quantity = -1
+    mockOrderPlacedEventInput.units = -1
     expect(() => OrderPlacedEvent.validateAndBuild(mockOrderPlacedEventInput)).toThrow()
   })
 
-  it('throws if the input OrderPlacedEventInput.quantity == 0', () => {
+  it('throws if the input OrderPlacedEventInput.units == 0', () => {
     const mockOrderPlacedEventInput = buildMockValidOrderPlacedEventInput()
-    mockOrderPlacedEventInput.quantity = 0
+    mockOrderPlacedEventInput.units = 0
     expect(() => OrderPlacedEvent.validateAndBuild(mockOrderPlacedEventInput)).toThrow()
   })
 
-  it('throws if the input OrderPlacedEventInput.quantity is not an integer', () => {
+  it('throws if the input OrderPlacedEventInput.units is not an integer', () => {
     const mockOrderPlacedEventInput = buildMockValidOrderPlacedEventInput()
-    mockOrderPlacedEventInput.quantity = 3.45
+    mockOrderPlacedEventInput.units = 3.45
     expect(() => OrderPlacedEvent.validateAndBuild(mockOrderPlacedEventInput)).toThrow()
   })
 
-  it('throws if the input OrderPlacedEventInput.quantity is not a number', () => {
+  it('throws if the input OrderPlacedEventInput.units is not a number', () => {
     const mockOrderPlacedEventInput = buildMockValidOrderPlacedEventInput()
-    mockOrderPlacedEventInput.quantity = '1' as unknown as number
+    mockOrderPlacedEventInput.units = '1' as unknown as number
     expect(() => OrderPlacedEvent.validateAndBuild(mockOrderPlacedEventInput)).toThrow()
   })
 
@@ -240,7 +240,7 @@ describe('Orders Service PlaceOrderApi OrderPlacedEvent tests', () => {
       eventData: {
         orderId: mockOrderPlacedEventInput.orderId,
         sku: mockOrderPlacedEventInput.sku,
-        quantity: mockOrderPlacedEventInput.quantity,
+        units: mockOrderPlacedEventInput.units,
         price: mockOrderPlacedEventInput.price,
         userId: mockOrderPlacedEventInput.userId,
       },

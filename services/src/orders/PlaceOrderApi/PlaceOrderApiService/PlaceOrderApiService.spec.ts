@@ -9,7 +9,7 @@ jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 const mockValidIncomingPlaceOrderRequestInput: IncomingPlaceOrderRequestInput = {
   orderId: 'mockOrderId',
   sku: 'mockSku',
-  quantity: 2,
+  units: 2,
   price: 3.98,
   userId: 'mockUserId',
 }

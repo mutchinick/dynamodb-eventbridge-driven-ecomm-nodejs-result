@@ -54,7 +54,7 @@ export class DbGetOrderClient implements IDbGetOrderClient {
       orderId: attributes.orderId,
       orderStatus: attributes.orderStatus,
       sku: attributes.sku,
-      quantity: attributes.quantity,
+      units: attributes.units,
       price: attributes.price,
       userId: attributes.userId,
       createdAt: attributes.createdAt,

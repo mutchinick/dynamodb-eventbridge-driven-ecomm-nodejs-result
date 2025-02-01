@@ -22,7 +22,7 @@ function buildMockValidIncomingOrderEvent(): Mutable_IncomingOrderEvent {
     eventData: {
       orderId: 'mockOrderId',
       sku: 'mockSku',
-      quantity: 12,
+      units: 12,
       price: 149.99,
       userId: 'mockUserId',
     },
@@ -176,47 +176,47 @@ describe('Orders Service SyncOrderWorker CreateOrderCommand tests', () => {
   })
 
   //
-  // Test CreateOrderCommandInput.incomingOrderEvent.eventData.quantity edge cases
+  // Test CreateOrderCommandInput.incomingOrderEvent.eventData.units edge cases
   //
-  it('throws if the input CreateOrderCommandInput.incomingOrderEvent.eventData.quantity is missing', () => {
+  it('throws if the input CreateOrderCommandInput.incomingOrderEvent.eventData.units is missing', () => {
     const mockCreateOrderCommandInput = buildMockValidCreateOrderCommandInput()
-    delete mockCreateOrderCommandInput.incomingOrderEvent.eventData.quantity
+    delete mockCreateOrderCommandInput.incomingOrderEvent.eventData.units
     expect(() => CreateOrderCommand.validateAndBuild(mockCreateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input CreateOrderCommandInput.incomingOrderEvent.eventData.quantity is undefined', () => {
+  it('throws if the input CreateOrderCommandInput.incomingOrderEvent.eventData.units is undefined', () => {
     const mockCreateOrderCommandInput = buildMockValidCreateOrderCommandInput()
-    mockCreateOrderCommandInput.incomingOrderEvent.eventData.quantity = undefined
+    mockCreateOrderCommandInput.incomingOrderEvent.eventData.units = undefined
     expect(() => CreateOrderCommand.validateAndBuild(mockCreateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input CreateOrderCommandInput.incomingOrderEvent.eventData.quantity is null', () => {
+  it('throws if the input CreateOrderCommandInput.incomingOrderEvent.eventData.units is null', () => {
     const mockCreateOrderCommandInput = buildMockValidCreateOrderCommandInput()
-    mockCreateOrderCommandInput.incomingOrderEvent.eventData.quantity = null
+    mockCreateOrderCommandInput.incomingOrderEvent.eventData.units = null
     expect(() => CreateOrderCommand.validateAndBuild(mockCreateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input CreateOrderCommandInput.incomingOrderEvent.eventData.quantity < 0', () => {
+  it('throws if the input CreateOrderCommandInput.incomingOrderEvent.eventData.units < 0', () => {
     const mockCreateOrderCommandInput = buildMockValidCreateOrderCommandInput()
-    mockCreateOrderCommandInput.incomingOrderEvent.eventData.quantity = -1
+    mockCreateOrderCommandInput.incomingOrderEvent.eventData.units = -1
     expect(() => CreateOrderCommand.validateAndBuild(mockCreateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input CreateOrderCommandInput.incomingOrderEvent.eventData.quantity == 0', () => {
+  it('throws if the input CreateOrderCommandInput.incomingOrderEvent.eventData.units == 0', () => {
     const mockCreateOrderCommandInput = buildMockValidCreateOrderCommandInput()
-    mockCreateOrderCommandInput.incomingOrderEvent.eventData.quantity = 0
+    mockCreateOrderCommandInput.incomingOrderEvent.eventData.units = 0
     expect(() => CreateOrderCommand.validateAndBuild(mockCreateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input CreateOrderCommandInput.incomingOrderEvent.eventData.quantity is not an integer', () => {
+  it('throws if the input CreateOrderCommandInput.incomingOrderEvent.eventData.units is not an integer', () => {
     const mockCreateOrderCommandInput = buildMockValidCreateOrderCommandInput()
-    mockCreateOrderCommandInput.incomingOrderEvent.eventData.quantity = 3.45
+    mockCreateOrderCommandInput.incomingOrderEvent.eventData.units = 3.45
     expect(() => CreateOrderCommand.validateAndBuild(mockCreateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input CreateOrderCommandInput.incomingOrderEvent.eventData.quantity is not a number', () => {
+  it('throws if the input CreateOrderCommandInput.incomingOrderEvent.eventData.units is not a number', () => {
     const mockCreateOrderCommandInput = buildMockValidCreateOrderCommandInput()
-    mockCreateOrderCommandInput.incomingOrderEvent.eventData.quantity = '1' as unknown as number
+    mockCreateOrderCommandInput.incomingOrderEvent.eventData.units = '1' as unknown as number
     expect(() => CreateOrderCommand.validateAndBuild(mockCreateOrderCommandInput)).toThrow()
   })
 
@@ -408,7 +408,7 @@ describe('Orders Service SyncOrderWorker CreateOrderCommand tests', () => {
         orderId: mockCreateOrderCommandInput.incomingOrderEvent.eventData.orderId,
         orderStatus: OrderStatus.ORDER_CREATED_STATUS,
         sku: mockCreateOrderCommandInput.incomingOrderEvent.eventData.sku,
-        quantity: mockCreateOrderCommandInput.incomingOrderEvent.eventData.quantity,
+        units: mockCreateOrderCommandInput.incomingOrderEvent.eventData.units,
         price: mockCreateOrderCommandInput.incomingOrderEvent.eventData.price,
         userId: mockCreateOrderCommandInput.incomingOrderEvent.eventData.userId,
         createdAt: mockDate,

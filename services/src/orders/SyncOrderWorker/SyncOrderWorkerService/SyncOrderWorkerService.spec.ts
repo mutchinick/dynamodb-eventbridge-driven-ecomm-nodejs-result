@@ -20,7 +20,7 @@ const mockValidExistingOrderData: OrderData = {
   orderId: 'mockOrderId',
   orderStatus: OrderStatus.ORDER_CREATED_STATUS,
   sku: 'mockSku',
-  quantity: 2,
+  units: 2,
   price: 3.98,
   userId: 'mockUserId',
   createdAt: 'mockCreatedAt',
@@ -99,7 +99,7 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerService tests', () => {
       eventData: {
         orderId: 'mockOrderId',
         sku: 'mockSku',
-        quantity: 2,
+        units: 2,
         price: 3.98,
         userId: 'mockUserId',
       },

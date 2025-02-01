@@ -56,7 +56,7 @@ function buildMockValidIncomingOrderEvent(): Mutable_IncomingOrderEvent {
       orderId: 'mockOrderId',
       orderStatus: OrderStatus.ORDER_CREATED_STATUS,
       sku: 'mockSku',
-      quantity: 4,
+      units: 4,
       price: 1432,
       userId: 'mockUserId',
       createdAt: 'mockCreatedAt',
@@ -381,53 +381,53 @@ describe('Orders Service SyncOrderWorker IncomingOrderEvent tests', () => {
   })
 
   //
-  // Test IncomingOrderEvent.eventData.quantity edge cases
+  // Test IncomingOrderEvent.eventData.units edge cases
   //
-  it('does not throw if the input IncomingOrderEvent.eventData.quantity is missing', async () => {
+  it('does not throw if the input IncomingOrderEvent.eventData.units is missing', async () => {
     const mockIncomingOrderEvent = buildMockValidIncomingOrderEvent()
-    delete mockIncomingOrderEvent.eventData.quantity
+    delete mockIncomingOrderEvent.eventData.units
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     expect(() => IncomingOrderEvent.validateAndBuild(mockEventBridgeEvent)).not.toThrow()
   })
 
-  it('does not throw if the input IncomingOrderEvent.eventData.quantity is undefined', async () => {
+  it('does not throw if the input IncomingOrderEvent.eventData.units is undefined', async () => {
     const mockIncomingOrderEvent = buildMockValidIncomingOrderEvent()
-    mockIncomingOrderEvent.eventData.quantity = undefined as never
+    mockIncomingOrderEvent.eventData.units = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     expect(() => IncomingOrderEvent.validateAndBuild(mockEventBridgeEvent)).not.toThrow()
   })
 
-  it('throws if the input IncomingOrderEvent.eventData.quantity is null', async () => {
+  it('throws if the input IncomingOrderEvent.eventData.units is null', async () => {
     const mockIncomingOrderEvent = buildMockValidIncomingOrderEvent()
-    mockIncomingOrderEvent.eventData.quantity = null as never
+    mockIncomingOrderEvent.eventData.units = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     expect(() => IncomingOrderEvent.validateAndBuild(mockEventBridgeEvent)).toThrow()
   })
 
-  it('throws if the input IncomingOrderEvent.eventData.quantity is empty', async () => {
+  it('throws if the input IncomingOrderEvent.eventData.units is empty', async () => {
     const mockIncomingOrderEvent = buildMockValidIncomingOrderEvent()
-    mockIncomingOrderEvent.eventData.quantity = '' as never
+    mockIncomingOrderEvent.eventData.units = '' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     expect(() => IncomingOrderEvent.validateAndBuild(mockEventBridgeEvent)).toThrow()
   })
 
-  it('throws if the input IncomingOrderEvent.eventData.quantity is not a number', async () => {
+  it('throws if the input IncomingOrderEvent.eventData.units is not a number', async () => {
     const mockIncomingOrderEvent = buildMockValidIncomingOrderEvent()
-    mockIncomingOrderEvent.eventData.quantity = '1' as never
+    mockIncomingOrderEvent.eventData.units = '1' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     expect(() => IncomingOrderEvent.validateAndBuild(mockEventBridgeEvent)).toThrow()
   })
 
-  it('throws if the input IncomingOrderEvent.eventData.quantity < 1', async () => {
+  it('throws if the input IncomingOrderEvent.eventData.units < 1', async () => {
     const mockIncomingOrderEvent = buildMockValidIncomingOrderEvent()
-    mockIncomingOrderEvent.eventData.quantity = 0
+    mockIncomingOrderEvent.eventData.units = 0
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     expect(() => IncomingOrderEvent.validateAndBuild(mockEventBridgeEvent)).toThrow()
   })
 
-  it('throws if the input IncomingOrderEvent.eventData.quantity is not an integer', async () => {
+  it('throws if the input IncomingOrderEvent.eventData.units is not an integer', async () => {
     const mockIncomingOrderEvent = buildMockValidIncomingOrderEvent()
-    mockIncomingOrderEvent.eventData.quantity = 3.45
+    mockIncomingOrderEvent.eventData.units = 3.45
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     expect(() => IncomingOrderEvent.validateAndBuild(mockEventBridgeEvent)).toThrow()
   })
@@ -722,9 +722,9 @@ describe('Orders Service SyncOrderWorker IncomingOrderEvent tests', () => {
     expect(result).toMatchObject(expected)
   })
 
-  it('returns the expected IncomingOrderEvent if the input is valid and quantity is missing', async () => {
+  it('returns the expected IncomingOrderEvent if the input is valid and units is missing', async () => {
     const mockIncomingOrderEvent = buildMockValidIncomingOrderEvent()
-    delete mockIncomingOrderEvent.eventData.quantity
+    delete mockIncomingOrderEvent.eventData.units
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     const result = IncomingOrderEvent.validateAndBuild(mockEventBridgeEvent)
     const expected = mockIncomingOrderEvent

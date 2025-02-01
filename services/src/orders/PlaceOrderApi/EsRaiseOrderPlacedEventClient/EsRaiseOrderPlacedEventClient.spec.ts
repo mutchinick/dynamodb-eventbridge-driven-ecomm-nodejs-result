@@ -19,7 +19,7 @@ const mockValidEvent: OrderPlacedEvent = {
   eventData: {
     orderId: 'mockOrderId',
     sku: 'mockSku',
-    quantity: 2,
+    units: 2,
     price: 3.98,
     userId: 'mockUserId',
   },

@@ -22,7 +22,7 @@ function buildMockIncomingOrderEvent(id: string): Mutable_IncomingOrderEvent {
       orderId: `mockOrderId-${id}`,
       orderStatus: OrderStatus.ORDER_CREATED_STATUS,
       sku: `mockSku-${id}`,
-      quantity: 2,
+      units: 2,
       price: 99.99,
       userId: `mockUserId-${id}`,
       createdAt: `mockCreatedAt-${id}`,
@@ -955,26 +955,26 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
   })
 
   //
-  // Test IncomingOrderEvent.eventData.quantity edge cases
+  // Test IncomingOrderEvent.eventData.units edge cases
   //
-  it('does not throw if an input IncomingOrderEvent.eventData.quantity is missing', async () => {
+  it('does not throw if an input IncomingOrderEvent.eventData.units is missing', async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
-    delete mockIncomingOrderEvent.eventData.quantity
+    delete mockIncomingOrderEvent.eventData.units
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
     const mockSqsRecord = buildMockSqsRecord(mockId, mockEventBridgeEvent)
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingOrderEvent.eventData.quantity is missing', async () => {
+  it('returns no failures if an input IncomingOrderEvent.eventData.units is missing', async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
-    delete mockIncomingOrderEvent.eventData.quantity
+    delete mockIncomingOrderEvent.eventData.units
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
     const mockSqsRecord = buildMockSqsRecord(mockId, mockEventBridgeEvent)
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
@@ -983,24 +983,24 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingOrderEvent.eventData.quantity is undefined', async () => {
+  it('does not throw if an input IncomingOrderEvent.eventData.units is undefined', async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
-    mockIncomingOrderEvent.eventData.quantity = undefined
+    mockIncomingOrderEvent.eventData.units = undefined
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
     const mockSqsRecord = buildMockSqsRecord(mockId, mockEventBridgeEvent)
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingOrderEvent.eventData.quantity is undefined', async () => {
+  it('returns no failures if an input IncomingOrderEvent.eventData.units is undefined', async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
-    mockIncomingOrderEvent.eventData.quantity = undefined
+    mockIncomingOrderEvent.eventData.units = undefined
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
     const mockSqsRecord = buildMockSqsRecord(mockId, mockEventBridgeEvent)
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
@@ -1009,24 +1009,24 @@ describe('Orders Service SyncOrderWorker SyncOrderWorkerController tests', () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingOrderEvent.eventData.quantity is null', async () => {
+  it('does not throw if an input IncomingOrderEvent.eventData.units is null', async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
-    mockIncomingOrderEvent.eventData.quantity = null
+    mockIncomingOrderEvent.eventData.units = null
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
     const mockSqsRecord = buildMockSqsRecord(mockId, mockEventBridgeEvent)
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingOrderEvent.eventData.quantity is null', async () => {
+  it('returns no failures if an input IncomingOrderEvent.eventData.units is null', async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_resolves()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent(mockId)
-    mockIncomingOrderEvent.eventData.quantity = null
+    mockIncomingOrderEvent.eventData.units = null
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockId, mockIncomingOrderEvent)
     const mockSqsRecord = buildMockSqsRecord(mockId, mockEventBridgeEvent)
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])

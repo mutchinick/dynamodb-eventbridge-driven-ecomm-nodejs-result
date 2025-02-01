@@ -4,7 +4,7 @@ export type OrderData = {
   orderId: string
   orderStatus: OrderStatus
   sku: string
-  quantity: number
+  units: number
   price: number
   userId: string
   createdAt: string

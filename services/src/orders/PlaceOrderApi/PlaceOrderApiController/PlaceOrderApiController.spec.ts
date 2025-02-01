@@ -10,7 +10,7 @@ const mockOrderId = 'mockOrderId'
 type MockApiEventBody = {
   orderId: string
   sku: string
-  quantity: number
+  units: number
   price: number
   userId: string
 }
@@ -19,7 +19,7 @@ function buildMockApiEventBody(): MockApiEventBody {
   const mockValidRequest: MockApiEventBody = {
     orderId: mockOrderId,
     sku: 'mockSku',
-    quantity: 2,
+    units: 2,
     price: 3.98,
     userId: 'mockUserId',
   }
@@ -193,58 +193,58 @@ describe('Orders Service PlaceOrderApi PlaceOrderApiController tests', () => {
   })
 
   //
-  // Test APIGatewayProxyEventV2.body.quantity edge cases
+  // Test APIGatewayProxyEventV2.body.units edge cases
   //
-  it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.quantity is missing', async () => {
+  it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.units is missing', async () => {
     const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
     const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
-    delete mockApiEventBody.quantity
+    delete mockApiEventBody.units
     const mockApiEvent = buildMockApiEvent(mockApiEventBody)
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
     expect(actualResponse).toStrictEqual(expectedErrorResponse)
   })
 
-  it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.quantity is undefined', async () => {
+  it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.units is undefined', async () => {
     const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
     const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
-    mockApiEventBody.quantity = undefined as never
+    mockApiEventBody.units = undefined as never
     const mockApiEvent = buildMockApiEvent(mockApiEventBody)
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
     expect(actualResponse).toStrictEqual(expectedErrorResponse)
   })
 
-  it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.quantity is null', async () => {
+  it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.units is null', async () => {
     const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
     const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
-    mockApiEventBody.quantity = null as never
+    mockApiEventBody.units = null as never
     const mockApiEvent = buildMockApiEvent(mockApiEventBody)
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
     expect(actualResponse).toStrictEqual(expectedErrorResponse)
   })
 
-  it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.quantity is not a number', async () => {
+  it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.units is not a number', async () => {
     const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
     const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
-    mockApiEventBody.quantity = '1' as never
+    mockApiEventBody.units = '1' as never
     const mockApiEvent = buildMockApiEvent(mockApiEventBody)
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
     expect(actualResponse).toStrictEqual(expectedErrorResponse)
   })
 
-  it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.quantity is not an integer', async () => {
+  it('responds with 400 Bad Request if the APIGatewayProxyEventV2.body.units is not an integer', async () => {
     const mockPlaceOrderApiService = buildMockPlaceOrderApiService_placeOrder_resolves()
     const placeOrderApiController = new PlaceOrderApiController(mockPlaceOrderApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
     const mockApiEventBody = buildMockApiEventBody()
-    mockApiEventBody.quantity = 3.45
+    mockApiEventBody.units = 3.45
     const mockApiEvent = buildMockApiEvent(mockApiEventBody)
     const actualResponse = await placeOrderApiController.placeOrder(mockApiEvent)
     expect(actualResponse).toStrictEqual(expectedErrorResponse)

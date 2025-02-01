@@ -27,7 +27,7 @@ const mockValidOrderData: OrderData = {
   orderId: mockOrderId,
   orderStatus: OrderStatus.ORDER_CREATED_STATUS,
   sku: 'mockSku',
-  quantity: 2,
+  units: 2,
   price: 5.55,
   userId: 'mockUserId',
   createdAt: 'mockCreatedAt',

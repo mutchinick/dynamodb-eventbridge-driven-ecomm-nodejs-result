@@ -3,9 +3,9 @@ import { OrderError } from '../../errors/OrderError'
 import { OrderData } from '../../model/OrderData'
 import { ValueValidators } from '../../model/ValueValidators'
 
-export type IncomingPlaceOrderRequestInput = Pick<OrderData, 'orderId' | 'sku' | 'quantity' | 'price' | 'userId'>
+export type IncomingPlaceOrderRequestInput = Pick<OrderData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
 
-type IncomingPlaceOrderRequestProps = Pick<OrderData, 'orderId' | 'sku' | 'quantity' | 'price' | 'userId'>
+type IncomingPlaceOrderRequestProps = Pick<OrderData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
 
 export class IncomingPlaceOrderRequest implements IncomingPlaceOrderRequestProps {
   //
@@ -14,7 +14,7 @@ export class IncomingPlaceOrderRequest implements IncomingPlaceOrderRequestProps
   private constructor(
     public readonly orderId: string,
     public readonly sku: string,
-    public readonly quantity: number,
+    public readonly units: number,
     public readonly price: number,
     public readonly userId: string,
   ) {}
@@ -24,9 +24,9 @@ export class IncomingPlaceOrderRequest implements IncomingPlaceOrderRequestProps
   //
   public static validateAndBuild(incomingPlaceOrderRequestInput: IncomingPlaceOrderRequestInput) {
     try {
-      const { orderId, sku, quantity, price, userId } =
+      const { orderId, sku, units, price, userId } =
         this.buildIncomingPlaceOrderRequestProps(incomingPlaceOrderRequestInput)
-      return new IncomingPlaceOrderRequest(orderId, sku, quantity, price, userId)
+      return new IncomingPlaceOrderRequest(orderId, sku, units, price, userId)
     } catch (error) {
       console.error('IncomingPlaceOrderRequest.validateAndBuild', { error, incomingPlaceOrderRequestInput })
       throw error
@@ -44,7 +44,7 @@ export class IncomingPlaceOrderRequest implements IncomingPlaceOrderRequestProps
         .object({
           orderId: ValueValidators.validOrderId(),
           sku: ValueValidators.validSku(),
-          quantity: ValueValidators.validQuantity(),
+          units: ValueValidators.validUnits(),
           price: ValueValidators.validPrice(),
           userId: ValueValidators.validUserId(),
         })

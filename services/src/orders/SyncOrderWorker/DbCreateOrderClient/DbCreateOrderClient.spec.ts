@@ -18,7 +18,7 @@ const mockValidCommand: CreateOrderCommand = {
     orderId: 'mockOrderId',
     orderStatus: OrderStatus.ORDER_CREATED_STATUS,
     sku: 'mockSku',
-    quantity: 2,
+    units: 2,
     price: 3.98,
     userId: 'mockUserId',
     createdAt: mockDate,
@@ -39,7 +39,7 @@ const expectedDdbDocClientInput = new UpdateCommand({
     '#orderId = :orderId, ' +
     '#orderStatus = :orderStatus, ' +
     '#sku = :sku, ' +
-    '#quantity = :quantity, ' +
+    '#units = :units, ' +
     '#price = :price, ' +
     '#userId = :userId, ' +
     '#createdAt = :createdAt, ' +
@@ -49,7 +49,7 @@ const expectedDdbDocClientInput = new UpdateCommand({
     '#orderId': 'orderId',
     '#orderStatus': 'orderStatus',
     '#sku': 'sku',
-    '#quantity': 'quantity',
+    '#units': 'units',
     '#price': 'price',
     '#userId': 'userId',
     '#createdAt': 'createdAt',
@@ -60,7 +60,7 @@ const expectedDdbDocClientInput = new UpdateCommand({
     ':orderId': mockValidCommand.orderData.orderId,
     ':orderStatus': mockValidCommand.orderData.orderStatus,
     ':sku': mockValidCommand.orderData.sku,
-    ':quantity': mockValidCommand.orderData.quantity,
+    ':units': mockValidCommand.orderData.units,
     ':price': mockValidCommand.orderData.price,
     ':userId': mockValidCommand.orderData.userId,
     ':createdAt': mockValidCommand.orderData.createdAt,
@@ -75,7 +75,7 @@ const expectedCreatedOrderData: OrderData = {
   orderId: mockValidCommand.orderData.orderId,
   orderStatus: mockValidCommand.orderData.orderStatus,
   sku: mockValidCommand.orderData.sku,
-  quantity: mockValidCommand.orderData.quantity,
+  units: mockValidCommand.orderData.units,
   price: mockValidCommand.orderData.price,
   userId: mockValidCommand.orderData.userId,
   createdAt: mockValidCommand.orderData.createdAt,
@@ -88,7 +88,7 @@ function buildMockDdbDocClient_send_resolves(): DynamoDBDocumentClient {
       orderId: mockValidCommand.orderData.orderId,
       orderStatus: mockValidCommand.orderData.orderStatus,
       sku: mockValidCommand.orderData.sku,
-      quantity: mockValidCommand.orderData.quantity,
+      units: mockValidCommand.orderData.units,
       price: mockValidCommand.orderData.price,
       userId: mockValidCommand.orderData.userId,
       createdAt: mockValidCommand.orderData.createdAt,
@@ -106,7 +106,7 @@ const expectedExistingOrderData: OrderData = {
   orderId: 'mockOrderId-Existing',
   orderStatus: OrderStatus.ORDER_CREATED_STATUS,
   sku: 'mockOrderId-Existing',
-  quantity: 10,
+  units: 10,
   price: 77.77,
   userId: 'mockUserId-Existing',
   createdAt: 'mockCreatedAt-Existing',

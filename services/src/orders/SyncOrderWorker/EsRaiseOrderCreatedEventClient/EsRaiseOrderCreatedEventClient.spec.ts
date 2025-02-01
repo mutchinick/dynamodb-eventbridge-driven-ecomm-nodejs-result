@@ -19,7 +19,7 @@ const mockValidEvent: OrderCreatedEvent = {
     orderId: 'mockOrderId',
     orderStatus: 'mockOrderStatus' as never,
     sku: 'mockSku',
-    quantity: 2,
+    units: 2,
     price: 3.98,
     userId: 'mockUserId',
     createdAt: mockDate,

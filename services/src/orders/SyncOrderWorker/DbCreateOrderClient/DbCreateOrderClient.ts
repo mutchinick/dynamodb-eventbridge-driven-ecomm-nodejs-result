@@ -46,7 +46,7 @@ export class DbCreateOrderClient implements IDbCreateOrderClient {
       orderId: attributes.orderId,
       orderStatus: attributes.orderStatus,
       sku: attributes.sku,
-      quantity: attributes.quantity,
+      units: attributes.units,
       price: attributes.price,
       userId: attributes.userId,
       createdAt: attributes.createdAt,
@@ -71,7 +71,7 @@ export class DbCreateOrderClient implements IDbCreateOrderClient {
         '#orderId = :orderId, ' +
         '#orderStatus = :orderStatus, ' +
         '#sku = :sku, ' +
-        '#quantity = :quantity, ' +
+        '#units = :units, ' +
         '#price = :price, ' +
         '#userId = :userId, ' +
         '#createdAt = :createdAt, ' +
@@ -81,7 +81,7 @@ export class DbCreateOrderClient implements IDbCreateOrderClient {
         '#orderId': 'orderId',
         '#orderStatus': 'orderStatus',
         '#sku': 'sku',
-        '#quantity': 'quantity',
+        '#units': 'units',
         '#price': 'price',
         '#userId': 'userId',
         '#createdAt': 'createdAt',
@@ -92,7 +92,7 @@ export class DbCreateOrderClient implements IDbCreateOrderClient {
         ':orderId': createOrderCommand.orderData.orderId,
         ':orderStatus': createOrderCommand.orderData.orderStatus,
         ':sku': createOrderCommand.orderData.sku,
-        ':quantity': createOrderCommand.orderData.quantity,
+        ':units': createOrderCommand.orderData.units,
         ':price': createOrderCommand.orderData.price,
         ':userId': createOrderCommand.orderData.userId,
         ':createdAt': createOrderCommand.orderData.createdAt,

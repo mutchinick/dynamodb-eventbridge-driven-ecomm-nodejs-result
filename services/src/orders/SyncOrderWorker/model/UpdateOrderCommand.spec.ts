@@ -25,7 +25,7 @@ function buildMockValidIncomingOrderEvent(): Mutable_IncomingOrderEvent {
       orderId: 'mockOrderId',
       orderStatus: OrderStatus.ORDER_CREATED_STATUS,
       sku: 'mockSku',
-      quantity: 12,
+      units: 12,
       price: 1440,
       userId: 'mockUserId',
       createdAt: mockDate,
@@ -42,7 +42,7 @@ function buildMockValidOrderData() {
     orderId: 'mockOrderId',
     orderStatus: OrderStatus.ORDER_CREATED_STATUS,
     sku: 'mockSku',
-    quantity: 12,
+    units: 12,
     price: 1440,
     userId: 'mockUserId',
     createdAt: mockDate,
@@ -196,41 +196,41 @@ describe('Orders Service SyncOrderWorker UpdateOrderCommand tests', () => {
   })
 
   //
-  // Test UpdateOrderCommandInput.existingOrderData.quantity edge cases
+  // Test UpdateOrderCommandInput.existingOrderData.units edge cases
   //
-  it('throws if the input UpdateOrderCommandInput.existingOrderData.quantity is missing', () => {
+  it('throws if the input UpdateOrderCommandInput.existingOrderData.units is missing', () => {
     const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
-    delete mockUpdateOrderCommandInput.existingOrderData.quantity
+    delete mockUpdateOrderCommandInput.existingOrderData.units
     expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input UpdateOrderCommandInput.existingOrderData.quantity is undefined', () => {
+  it('throws if the input UpdateOrderCommandInput.existingOrderData.units is undefined', () => {
     const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.existingOrderData.quantity = undefined
+    mockUpdateOrderCommandInput.existingOrderData.units = undefined
     expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input UpdateOrderCommandInput.existingOrderData.quantity is null', () => {
+  it('throws if the input UpdateOrderCommandInput.existingOrderData.units is null', () => {
     const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.existingOrderData.quantity = null
+    mockUpdateOrderCommandInput.existingOrderData.units = null
     expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input UpdateOrderCommandInput.existingOrderData.quantity < 0', () => {
+  it('throws if the input UpdateOrderCommandInput.existingOrderData.units < 0', () => {
     const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.existingOrderData.quantity = -1
+    mockUpdateOrderCommandInput.existingOrderData.units = -1
     expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input UpdateOrderCommandInput.existingOrderData.quantity == 0', () => {
+  it('throws if the input UpdateOrderCommandInput.existingOrderData.units == 0', () => {
     const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.existingOrderData.quantity = 0
+    mockUpdateOrderCommandInput.existingOrderData.units = 0
     expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input UpdateOrderCommandInput.existingOrderData.quantity is not a number', () => {
+  it('throws if the input UpdateOrderCommandInput.existingOrderData.units is not a number', () => {
     const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.existingOrderData.quantity = '1' as unknown as number
+    mockUpdateOrderCommandInput.existingOrderData.units = '1' as unknown as number
     expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).toThrow()
   })
 
@@ -541,47 +541,47 @@ describe('Orders Service SyncOrderWorker UpdateOrderCommand tests', () => {
   })
 
   //
-  // Test UpdateOrderCommandInput.incomingOrderEvent.eventData.quantity edge cases
+  // Test UpdateOrderCommandInput.incomingOrderEvent.eventData.units edge cases
   //
-  it('does not throw if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.quantity is missing', () => {
+  it('does not throw if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.units is missing', () => {
     const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
-    delete mockUpdateOrderCommandInput.incomingOrderEvent.eventData.quantity
+    delete mockUpdateOrderCommandInput.incomingOrderEvent.eventData.units
     expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).not.toThrow()
   })
 
-  it('does not throw if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.quantity is undefined', () => {
+  it('does not throw if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.units is undefined', () => {
     const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.incomingOrderEvent.eventData.quantity = undefined
+    mockUpdateOrderCommandInput.incomingOrderEvent.eventData.units = undefined
     expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).not.toThrow()
   })
 
-  it('throws if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.quantity is null', () => {
+  it('throws if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.units is null', () => {
     const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.incomingOrderEvent.eventData.quantity = null
+    mockUpdateOrderCommandInput.incomingOrderEvent.eventData.units = null
     expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.quantity < 0', () => {
+  it('throws if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.units < 0', () => {
     const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.incomingOrderEvent.eventData.quantity = -1
+    mockUpdateOrderCommandInput.incomingOrderEvent.eventData.units = -1
     expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.quantity == 0', () => {
+  it('throws if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.units == 0', () => {
     const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.incomingOrderEvent.eventData.quantity = 0
+    mockUpdateOrderCommandInput.incomingOrderEvent.eventData.units = 0
     expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.quantity is not an integer', () => {
+  it('throws if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.units is not an integer', () => {
     const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.incomingOrderEvent.eventData.quantity = 3.45
+    mockUpdateOrderCommandInput.incomingOrderEvent.eventData.units = 3.45
     expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).toThrow()
   })
 
-  it('throws if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.quantity is not a number', () => {
+  it('throws if the input UpdateOrderCommandInput.incomingOrderEvent.eventData.units is not a number', () => {
     const mockUpdateOrderCommandInput = buildMockValidUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.incomingOrderEvent.eventData.quantity = '1' as unknown as number
+    mockUpdateOrderCommandInput.incomingOrderEvent.eventData.units = '1' as unknown as number
     expect(() => UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)).toThrow()
   })
 

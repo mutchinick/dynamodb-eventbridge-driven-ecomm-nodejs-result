@@ -4,7 +4,7 @@ function buildMockValidIncomingPlaceOrderRequestInput(): IncomingPlaceOrderReque
   const mockValidRequestInput: IncomingPlaceOrderRequestInput = {
     orderId: 'mockOrderId',
     sku: 'mockSku',
-    quantity: 2,
+    units: 2,
     price: 3.98,
     userId: 'mockUserId',
   }
@@ -114,47 +114,47 @@ describe('Orders Service PlaceOrderApi IncomingPlaceOrderRequest tests', () => {
   })
 
   //
-  // Test IncomingPlaceOrderRequestInput.quantity edge cases
+  // Test IncomingPlaceOrderRequestInput.units edge cases
   //
-  it('throws if the input IncomingPlaceOrderRequestInput.quantity is missing', async () => {
+  it('throws if the input IncomingPlaceOrderRequestInput.units is missing', async () => {
     const mockIncomingPlaceOrderRequestInput = buildMockValidIncomingPlaceOrderRequestInput()
-    delete mockIncomingPlaceOrderRequestInput.quantity
+    delete mockIncomingPlaceOrderRequestInput.units
     expect(() => IncomingPlaceOrderRequest.validateAndBuild(mockIncomingPlaceOrderRequestInput)).toThrow()
   })
 
-  it('throws if the input IncomingPlaceOrderRequestInput.quantity is undefined', async () => {
+  it('throws if the input IncomingPlaceOrderRequestInput.units is undefined', async () => {
     const mockIncomingPlaceOrderRequestInput = buildMockValidIncomingPlaceOrderRequestInput()
-    mockIncomingPlaceOrderRequestInput.quantity = undefined as never
+    mockIncomingPlaceOrderRequestInput.units = undefined as never
     expect(() => IncomingPlaceOrderRequest.validateAndBuild(mockIncomingPlaceOrderRequestInput)).toThrow()
   })
 
-  it('throws if the input IncomingPlaceOrderRequestInput.quantity is null', async () => {
+  it('throws if the input IncomingPlaceOrderRequestInput.units is null', async () => {
     const mockIncomingPlaceOrderRequestInput = buildMockValidIncomingPlaceOrderRequestInput()
-    mockIncomingPlaceOrderRequestInput.quantity = null as never
+    mockIncomingPlaceOrderRequestInput.units = null as never
     expect(() => IncomingPlaceOrderRequest.validateAndBuild(mockIncomingPlaceOrderRequestInput)).toThrow()
   })
 
-  it('throws if the input IncomingPlaceOrderRequestInput.quantity is empty', async () => {
+  it('throws if the input IncomingPlaceOrderRequestInput.units is empty', async () => {
     const mockIncomingPlaceOrderRequestInput = buildMockValidIncomingPlaceOrderRequestInput()
-    mockIncomingPlaceOrderRequestInput.quantity = '' as never
+    mockIncomingPlaceOrderRequestInput.units = '' as never
     expect(() => IncomingPlaceOrderRequest.validateAndBuild(mockIncomingPlaceOrderRequestInput)).toThrow()
   })
 
-  it('throws if the input IncomingPlaceOrderRequestInput.quantity is not a number', async () => {
+  it('throws if the input IncomingPlaceOrderRequestInput.units is not a number', async () => {
     const mockIncomingPlaceOrderRequestInput = buildMockValidIncomingPlaceOrderRequestInput()
-    mockIncomingPlaceOrderRequestInput.quantity = '1' as never
+    mockIncomingPlaceOrderRequestInput.units = '1' as never
     expect(() => IncomingPlaceOrderRequest.validateAndBuild(mockIncomingPlaceOrderRequestInput)).toThrow()
   })
 
-  it('throws if the input IncomingPlaceOrderRequestInput.quantity < 1', async () => {
+  it('throws if the input IncomingPlaceOrderRequestInput.units < 1', async () => {
     const mockIncomingPlaceOrderRequestInput = buildMockValidIncomingPlaceOrderRequestInput()
-    mockIncomingPlaceOrderRequestInput.quantity = 0
+    mockIncomingPlaceOrderRequestInput.units = 0
     expect(() => IncomingPlaceOrderRequest.validateAndBuild(mockIncomingPlaceOrderRequestInput)).toThrow()
   })
 
-  it('throws if the input IncomingPlaceOrderRequestInput.quantity is not an integer', async () => {
+  it('throws if the input IncomingPlaceOrderRequestInput.units is not an integer', async () => {
     const mockIncomingPlaceOrderRequestInput = buildMockValidIncomingPlaceOrderRequestInput()
-    mockIncomingPlaceOrderRequestInput.quantity = 3.45
+    mockIncomingPlaceOrderRequestInput.units = 3.45
     expect(() => IncomingPlaceOrderRequest.validateAndBuild(mockIncomingPlaceOrderRequestInput)).toThrow()
   })
 

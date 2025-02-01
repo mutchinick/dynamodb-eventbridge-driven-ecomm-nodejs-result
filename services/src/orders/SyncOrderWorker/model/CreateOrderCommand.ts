@@ -48,7 +48,7 @@ export class CreateOrderCommand implements CreateOrderCommandProps {
 
     const incomingEventData = incomingOrderEvent.eventData
     const incomingEventName = incomingOrderEvent.eventName
-    const { orderId, sku, quantity, price, userId } = incomingEventData
+    const { orderId, sku, units, price, userId } = incomingEventData
     const newOrderStatus = this.getNewOrderStatus(incomingEventName)
     const currentDate = new Date().toISOString()
 
@@ -57,7 +57,7 @@ export class CreateOrderCommand implements CreateOrderCommandProps {
         orderId,
         orderStatus: newOrderStatus,
         sku,
-        quantity,
+        units,
         price,
         userId,
         createdAt: currentDate,
@@ -78,7 +78,7 @@ export class CreateOrderCommand implements CreateOrderCommandProps {
         eventData: z.object({
           orderId: ValueValidators.validOrderId(),
           sku: ValueValidators.validSku(),
-          quantity: ValueValidators.validQuantity(),
+          units: ValueValidators.validUnits(),
           price: ValueValidators.validPrice(),
           userId: ValueValidators.validUserId(),
         }),

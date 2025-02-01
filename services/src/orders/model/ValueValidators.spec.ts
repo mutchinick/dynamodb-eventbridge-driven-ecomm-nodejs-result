@@ -93,30 +93,30 @@ describe('Orders Service ValueValidators tests', () => {
     })
   })
 
-  describe('validQuantity tests', () => {
-    it('throws if quantity is undefined', () => {
+  describe('validUnits tests', () => {
+    it('throws if units is undefined', () => {
       const testValue = undefined as string
-      expect(() => ValueValidators.validQuantity().parse(testValue)).toThrow()
+      expect(() => ValueValidators.validUnits().parse(testValue)).toThrow()
     })
 
-    it('throws if quantity = 0', () => {
+    it('throws if units = 0', () => {
       const testValue = 0
-      expect(() => ValueValidators.validQuantity().parse(testValue)).toThrow()
+      expect(() => ValueValidators.validUnits().parse(testValue)).toThrow()
     })
 
-    it('throws if quantity < 0', () => {
+    it('throws if units < 0', () => {
       const testValue = -1
-      expect(() => ValueValidators.validQuantity().parse(testValue)).toThrow()
+      expect(() => ValueValidators.validUnits().parse(testValue)).toThrow()
     })
 
-    it('throws if quantity is not an integer', () => {
+    it('throws if units is not an integer', () => {
       const testValue = 3.45
-      expect(() => ValueValidators.validQuantity().parse(testValue)).toThrow()
+      expect(() => ValueValidators.validUnits().parse(testValue)).toThrow()
     })
 
-    it('is valid if quantity >= 1', () => {
+    it('is valid if units >= 1', () => {
       const testValue = 1
-      expect(() => ValueValidators.validQuantity().parse(testValue)).not.toThrow()
+      expect(() => ValueValidators.validUnits().parse(testValue)).not.toThrow()
     })
   })
 

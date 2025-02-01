@@ -4,7 +4,7 @@ import { OrderEvent } from '../../model/OrderEvent'
 import { OrderEventName } from '../../model/OrderEventName'
 import { ValueValidators } from '../../model/ValueValidators'
 
-export type OrderPlacedEventData = Pick<OrderData, 'orderId' | 'sku' | 'quantity' | 'price' | 'userId'>
+export type OrderPlacedEventData = Pick<OrderData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
 
 export type OrderPlacedEventInput = OrderPlacedEventData
 
@@ -42,18 +42,18 @@ export class OrderPlacedEvent implements OrderPlacedEventProps {
       .object({
         orderId: ValueValidators.validOrderId(),
         sku: ValueValidators.validSku(),
-        quantity: ValueValidators.validQuantity(),
+        units: ValueValidators.validUnits(),
         price: ValueValidators.validPrice(),
         userId: ValueValidators.validUserId(),
       })
       .parse(orderPlacedEventInput) as OrderPlacedEventData
 
-    const { orderId, sku, quantity, price, userId } = validInput
+    const { orderId, sku, units, price, userId } = validInput
     const date = new Date().toISOString()
     const orderPlacedEventData: OrderPlacedEventData = {
       orderId,
       sku,
-      quantity,
+      units,
       price,
       userId,
     }

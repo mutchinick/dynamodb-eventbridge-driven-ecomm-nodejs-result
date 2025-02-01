@@ -13,7 +13,7 @@ export class ValueValidators {
 
   public static validSku = () => z.string().trim().min(4)
 
-  public static validQuantity = () => z.number().int().min(1)
+  public static validUnits = () => z.number().int().min(1)
 
   public static validPrice = () => z.number().min(0)
 

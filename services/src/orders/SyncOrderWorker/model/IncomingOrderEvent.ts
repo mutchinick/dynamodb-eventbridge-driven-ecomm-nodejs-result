@@ -56,7 +56,7 @@ export class IncomingOrderEvent implements IncomingOrderEventProps {
             orderId: ValueValidators.validOrderId(),
             orderStatus: ValueValidators.validOrderStatus().optional(),
             sku: ValueValidators.validSku().optional(),
-            quantity: ValueValidators.validQuantity().optional(),
+            units: ValueValidators.validUnits().optional(),
             price: ValueValidators.validPrice().optional(),
             userId: ValueValidators.validUserId().optional(),
             createdAt: ValueValidators.validCreatedAt().optional(),
