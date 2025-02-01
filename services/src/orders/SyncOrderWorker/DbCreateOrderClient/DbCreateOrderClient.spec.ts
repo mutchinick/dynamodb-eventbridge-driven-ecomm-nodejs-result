@@ -56,7 +56,7 @@ const expectedDdbDocClientInput = new UpdateCommand({
     '#updatedAt': 'updatedAt',
   },
   ExpressionAttributeValues: {
-    ':_tn': 'ORDER',
+    ':_tn': 'ORDERS#ORDER',
     ':orderId': mockValidCommand.orderData.orderId,
     ':orderStatus': mockValidCommand.orderData.orderStatus,
     ':sku': mockValidCommand.orderData.sku,

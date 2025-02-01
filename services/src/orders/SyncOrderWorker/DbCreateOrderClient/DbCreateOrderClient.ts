@@ -88,7 +88,7 @@ export class DbCreateOrderClient implements IDbCreateOrderClient {
         '#updatedAt': 'updatedAt',
       },
       ExpressionAttributeValues: {
-        ':_tn': 'ORDER',
+        ':_tn': 'ORDERS#ORDER',
         ':orderId': createOrderCommand.orderData.orderId,
         ':orderStatus': createOrderCommand.orderData.orderStatus,
         ':sku': createOrderCommand.orderData.sku,
