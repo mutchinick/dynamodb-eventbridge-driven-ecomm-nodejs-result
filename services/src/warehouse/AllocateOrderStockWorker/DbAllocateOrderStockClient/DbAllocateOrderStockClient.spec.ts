@@ -28,6 +28,23 @@ const status = 'ALLOCATED'
 const expectedTransactWriteCommand = new TransactWriteCommand({
   TransactItems: [
     {
+      Put: {
+        TableName: mockWarehouseTableName,
+        Item: {
+          pk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
+          sk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
+          sku,
+          units,
+          orderId,
+          status,
+          createdAt,
+          updatedAt,
+          _tn: 'WAREHOUSE#STOCK_ALLOCATION',
+        },
+        ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
+      },
+    },
+    {
       Update: {
         TableName: mockWarehouseTableName,
         Key: {
@@ -58,23 +75,6 @@ const expectedTransactWriteCommand = new TransactWriteCommand({
         ConditionExpression: 'attribute_exists(pk) AND attribute_exists(sk) and #units >= :units',
       },
     },
-    {
-      Put: {
-        TableName: mockWarehouseTableName,
-        Item: {
-          pk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
-          sk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
-          sku,
-          units,
-          orderId,
-          status,
-          createdAt,
-          updatedAt,
-          _tn: 'WAREHOUSE#STOCK_ALLOCATION',
-        },
-        ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
-      },
-    },
   ],
 })
 
@@ -86,7 +86,7 @@ function buildMockDdbDocClient_send_throws(): DynamoDBDocumentClient {
   return { send: jest.fn().mockRejectedValue(new Error()) } as unknown as DynamoDBDocumentClient
 }
 
-function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Depleted(): DynamoDBDocumentClient {
+function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Redundant(): DynamoDBDocumentClient {
   const error: Error = new TransactionCanceledException({
     $metadata: {},
     message: '',
@@ -98,7 +98,22 @@ function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Deple
   } as unknown as DynamoDBDocumentClient
 }
 
-function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Redundant(): DynamoDBDocumentClient {
+function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Redundant_Depleted(): DynamoDBDocumentClient {
+  const error: Error = new TransactionCanceledException({
+    $metadata: {},
+    message: '',
+    CancellationReasons: [
+      { Code: WarehouseError.ConditionalCheckFailedException },
+      { Code: WarehouseError.ConditionalCheckFailedException },
+    ],
+  })
+  error.name = WarehouseError.TransactionCanceledException
+  return {
+    send: jest.fn().mockRejectedValue(error),
+  } as unknown as DynamoDBDocumentClient
+}
+
+function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Depleted(): DynamoDBDocumentClient {
   const error: Error = new TransactionCanceledException({
     $metadata: {},
     message: '',
@@ -195,38 +210,6 @@ describe('Warehouse Service AllocateOrderStockWorker DbAllocateOrderStockClient 
   // Test transaction errors
   //
   it(
-    'throws an InvalidStockAllocationOperationError_Depleted if DynamoDBDocumentClient.send throws ' +
-      'a ConditionalCheckFailedException error when subtracting the sku stock',
-    async () => {
-      try {
-        const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Depleted()
-        const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
-        await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
-      } catch (error) {
-        expect(WarehouseError.hasName(error, WarehouseError.InvalidStockAllocationOperationError_Depleted)).toBe(true)
-        return
-      }
-      throw new Error('Test failed because no error was thrown')
-    },
-  )
-
-  it(
-    'throws an DoNotRetryError if DynamoDBDocumentClient.send throws ' +
-      'a ConditionalCheckFailedException error when subtracting the sku stock',
-    async () => {
-      try {
-        const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Depleted()
-        const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
-        await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
-      } catch (error) {
-        expect(WarehouseError.hasName(error, WarehouseError.DoNotRetryError)).toBe(true)
-        return
-      }
-      throw new Error('Test failed because no error was thrown')
-    },
-  )
-
-  it(
     'throws an InvalidStockAllocationOperationError_Redundant if DynamoDBDocumentClient.send throws ' +
       'a ConditionalCheckFailedException error when allocating the stock',
     async () => {
@@ -248,6 +231,70 @@ describe('Warehouse Service AllocateOrderStockWorker DbAllocateOrderStockClient 
     async () => {
       try {
         const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Redundant()
+        const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
+        await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
+      } catch (error) {
+        expect(WarehouseError.hasName(error, WarehouseError.DoNotRetryError)).toBe(true)
+        return
+      }
+      throw new Error('Test failed because no error was thrown')
+    },
+  )
+
+  it(
+    'throws an InvalidStockAllocationOperationError_Redundant if DynamoDBDocumentClient.send throws ' +
+      'a ConditionalCheckFailedException error when both allocating and subtracting the stock',
+    async () => {
+      try {
+        const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Redundant_Depleted()
+        const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
+        await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
+      } catch (error) {
+        expect(WarehouseError.hasName(error, WarehouseError.InvalidStockAllocationOperationError_Redundant)).toBe(true)
+        return
+      }
+      throw new Error('Test failed because no error was thrown')
+    },
+  )
+
+  it(
+    'does not throw an InvalidStockAllocationOperationError_Depleted if DynamoDBDocumentClient.send throws ' +
+      'a ConditionalCheckFailedException error when both allocating and subtracting the stock',
+    async () => {
+      try {
+        const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Redundant_Depleted()
+        const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
+        await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
+      } catch (error) {
+        expect(WarehouseError.hasName(error, WarehouseError.InvalidStockAllocationOperationError_Depleted)).toBe(false)
+        return
+      }
+      throw new Error('Test failed because no error was thrown')
+    },
+  )
+
+  it(
+    'throws an InvalidStockAllocationOperationError_Depleted if DynamoDBDocumentClient.send throws ' +
+      'a ConditionalCheckFailedException error when subtracting the sku stock',
+    async () => {
+      try {
+        const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Depleted()
+        const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
+        await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
+      } catch (error) {
+        expect(WarehouseError.hasName(error, WarehouseError.InvalidStockAllocationOperationError_Depleted)).toBe(true)
+        return
+      }
+      throw new Error('Test failed because no error was thrown')
+    },
+  )
+
+  it(
+    'throws an DoNotRetryError if DynamoDBDocumentClient.send throws ' +
+      'a ConditionalCheckFailedException error when subtracting the sku stock',
+    async () => {
+      try {
+        const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Depleted()
         const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
         await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
       } catch (error) {

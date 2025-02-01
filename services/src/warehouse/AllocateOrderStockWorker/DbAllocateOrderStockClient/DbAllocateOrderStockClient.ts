@@ -29,12 +29,13 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
         WarehouseError.addName(error, WarehouseError.DoNotRetryError)
       }
 
-      if (this.isStockDepletedError(error)) {
-        WarehouseError.addName(error, WarehouseError.InvalidStockAllocationOperationError_Depleted)
-      }
-
+      // When possible multiple transaction errors:
+      // Prioritize tagging the "Redundancy Errors", because if we get one, this means that the operation
+      // has already executed successfully, thus we don't care about other possible transaction errors
       if (this.isAllocationRedundantError(error)) {
         WarehouseError.addName(error, WarehouseError.InvalidStockAllocationOperationError_Redundant)
+      } else if (this.isStockDepletedError(error)) {
+        WarehouseError.addName(error, WarehouseError.InvalidStockAllocationOperationError_Depleted)
       }
 
       throw error
@@ -50,6 +51,23 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
     const status = 'ALLOCATED'
     return new TransactWriteCommand({
       TransactItems: [
+        {
+          Put: {
+            TableName: tableName,
+            Item: {
+              pk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
+              sk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
+              sku,
+              units,
+              orderId,
+              status,
+              createdAt,
+              updatedAt,
+              _tn: 'WAREHOUSE#STOCK_ALLOCATION',
+            },
+            ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
+          },
+        },
         {
           Update: {
             TableName: tableName,
@@ -81,23 +99,6 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
             ConditionExpression: 'attribute_exists(pk) AND attribute_exists(sk) and #units >= :units',
           },
         },
-        {
-          Put: {
-            TableName: tableName,
-            Item: {
-              pk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
-              sk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
-              sku,
-              units,
-              orderId,
-              status,
-              createdAt,
-              updatedAt,
-              _tn: 'WAREHOUSE#STOCK_ALLOCATION',
-            },
-            ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
-          },
-        },
       ],
     })
   }
@@ -105,7 +106,7 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
   //
   //
   //
-  private isStockDepletedError(error: unknown): boolean {
+  private isAllocationRedundantError(error: unknown): boolean {
     const errorCode = getDdbTransactionCancellationCode(error, 0)
     return errorCode === WarehouseError.ConditionalCheckFailedException
   }
@@ -113,7 +114,7 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
   //
   //
   //
-  private isAllocationRedundantError(error: unknown): boolean {
+  private isStockDepletedError(error: unknown): boolean {
     const errorCode = getDdbTransactionCancellationCode(error, 1)
     return errorCode === WarehouseError.ConditionalCheckFailedException
   }
