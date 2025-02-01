@@ -35,14 +35,12 @@ const expectedTransactWriteCommand = new TransactWriteCommand({
           `SET ` +
           `#sku = :sku, ` +
           `#units = if_not_exists(#units, :zero) + :units, ` +
-          `#lotId = :lotId, ` +
           `#createdAt = if_not_exists(#createdAt, :createdAt), ` +
           `#updatedAt = :updatedAt, ` +
           `#_tn = :_tn`,
         ExpressionAttributeNames: {
           '#sku': 'sku',
           '#units': 'units',
-          '#lotId': 'lotId',
           '#createdAt': 'createdAt',
           '#updatedAt': 'updatedAt',
           '#_tn': '_tn',
@@ -50,7 +48,6 @@ const expectedTransactWriteCommand = new TransactWriteCommand({
         ExpressionAttributeValues: {
           ':sku': mockRestockSkuCommand.restockSkuData.sku,
           ':units': mockRestockSkuCommand.restockSkuData.units,
-          ':lotId': mockRestockSkuCommand.restockSkuData.lotId,
           ':createdAt': mockRestockSkuCommand.restockSkuData.createdAt,
           ':updatedAt': mockRestockSkuCommand.restockSkuData.updatedAt,
           ':zero': 0,

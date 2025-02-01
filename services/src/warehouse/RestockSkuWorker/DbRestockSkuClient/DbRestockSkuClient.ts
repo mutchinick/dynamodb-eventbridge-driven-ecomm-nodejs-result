@@ -56,14 +56,12 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
               `SET ` +
               `#sku = :sku, ` +
               `#units = if_not_exists(#units, :zero) + :units, ` +
-              `#lotId = :lotId, ` +
               `#createdAt = if_not_exists(#createdAt, :createdAt), ` +
               `#updatedAt = :updatedAt, ` +
               `#_tn = :_tn`,
             ExpressionAttributeNames: {
               '#sku': 'sku',
               '#units': 'units',
-              '#lotId': 'lotId',
               '#createdAt': 'createdAt',
               '#updatedAt': 'updatedAt',
               '#_tn': '_tn',
@@ -71,7 +69,6 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
             ExpressionAttributeValues: {
               ':sku': sku,
               ':units': units,
-              ':lotId': lotId,
               ':createdAt': createdAt,
               ':updatedAt': updatedAt,
               ':zero': 0,
