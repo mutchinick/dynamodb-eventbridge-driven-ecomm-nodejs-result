@@ -25,6 +25,22 @@ const mockRestockSkuCommand: RestockSkuCommand = {
 const expectedTransactWriteCommand = new TransactWriteCommand({
   TransactItems: [
     {
+      Put: {
+        TableName: mockWarehouseTableName,
+        Item: {
+          pk: `LOT_ID#${mockRestockSkuCommand.restockSkuData.lotId}`,
+          sk: `LOT_ID#${mockRestockSkuCommand.restockSkuData.lotId}`,
+          sku: mockRestockSkuCommand.restockSkuData.sku,
+          units: mockRestockSkuCommand.restockSkuData.units,
+          lotId: mockRestockSkuCommand.restockSkuData.lotId,
+          createdAt: mockRestockSkuCommand.restockSkuData.createdAt,
+          updatedAt: mockRestockSkuCommand.restockSkuData.updatedAt,
+          _tn: 'WAREHOUSE#LOT',
+        },
+        ConditionExpression: 'attribute_not_exists(pk)',
+      },
+    },
+    {
       Update: {
         TableName: mockWarehouseTableName,
         Key: {
@@ -55,22 +71,6 @@ const expectedTransactWriteCommand = new TransactWriteCommand({
         },
       },
     },
-    {
-      Put: {
-        TableName: mockWarehouseTableName,
-        Item: {
-          pk: `LOT_ID#${mockRestockSkuCommand.restockSkuData.lotId}`,
-          sk: `LOT_ID#${mockRestockSkuCommand.restockSkuData.lotId}`,
-          sku: mockRestockSkuCommand.restockSkuData.sku,
-          units: mockRestockSkuCommand.restockSkuData.units,
-          lotId: mockRestockSkuCommand.restockSkuData.lotId,
-          createdAt: mockRestockSkuCommand.restockSkuData.createdAt,
-          updatedAt: mockRestockSkuCommand.restockSkuData.updatedAt,
-          _tn: 'WAREHOUSE#LOT',
-        },
-        ConditionExpression: 'attribute_not_exists(pk)',
-      },
-    },
   ],
 })
 
@@ -86,9 +86,8 @@ function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Redun
   const error: Error = new TransactionCanceledException({
     $metadata: {},
     message: '',
-    CancellationReasons: [null, { Code: WarehouseError.ConditionalCheckFailedException }],
+    CancellationReasons: [{ Code: WarehouseError.ConditionalCheckFailedException }, null],
   })
-  // error.name = WarehouseError.TransactionCanceledException
   return {
     send: jest.fn().mockRejectedValue(error),
   } as unknown as DynamoDBDocumentClient
@@ -99,7 +98,6 @@ function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Unkno
     $metadata: {},
     message: '',
   })
-  // error.name = WarehouseError.TransactionCanceledException
   return {
     send: jest.fn().mockRejectedValue(error),
   } as unknown as DynamoDBDocumentClient

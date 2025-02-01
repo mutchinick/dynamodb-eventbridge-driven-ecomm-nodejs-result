@@ -29,6 +29,9 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
         WarehouseError.addName(error, WarehouseError.DoNotRetryError)
       }
 
+      // When possible multiple transaction errors:
+      // Prioritize tagging the "Redundancy Errors", because if we get one, this means that the operation
+      // has already executed successfully, thus we don't care about other possible transaction errors
       if (this.isRestockRedundantError(error)) {
         WarehouseError.addName(error, WarehouseError.InvalidRestockOperationError_Redundant)
       }
@@ -45,6 +48,22 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
     const { sku, units, lotId, createdAt, updatedAt } = restockSkuCommand.restockSkuData
     return new TransactWriteCommand({
       TransactItems: [
+        {
+          Put: {
+            TableName: tableName,
+            Item: {
+              pk: `LOT_ID#${lotId}`,
+              sk: `LOT_ID#${lotId}`,
+              sku,
+              units,
+              lotId,
+              createdAt,
+              updatedAt,
+              _tn: 'WAREHOUSE#LOT',
+            },
+            ConditionExpression: 'attribute_not_exists(pk)',
+          },
+        },
         {
           Update: {
             TableName: tableName,
@@ -76,22 +95,6 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
             },
           },
         },
-        {
-          Put: {
-            TableName: tableName,
-            Item: {
-              pk: `LOT_ID#${lotId}`,
-              sk: `LOT_ID#${lotId}`,
-              sku,
-              units,
-              lotId,
-              createdAt,
-              updatedAt,
-              _tn: 'WAREHOUSE#LOT',
-            },
-            ConditionExpression: 'attribute_not_exists(pk)',
-          },
-        },
       ],
     })
   }
@@ -100,7 +103,7 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
   //
   //
   private isRestockRedundantError(error: unknown): boolean {
-    const errorCode = getDdbTransactionCancellationCode(error, 1)
+    const errorCode = getDdbTransactionCancellationCode(error, 0)
     return errorCode === WarehouseError.ConditionalCheckFailedException
   }
 }
