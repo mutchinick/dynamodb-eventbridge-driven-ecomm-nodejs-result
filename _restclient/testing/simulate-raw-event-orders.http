@@ -1,6 +1,6 @@
 @simulateRawEventBaseUrl = {{$dotenv SIMULATE_RAW_EVENT_BASE_URL}}
 
-@orderId = QWE357
+@orderId = LLL100
 
 ### POST ###
 POST {{simulateRawEventBaseUrl}}/api/v1/testing/simulateRawEvent
@@ -13,9 +13,9 @@ Content-Type: application/json
  "eventName": "ORDER_PLACED_EVENT",
  "eventData": {
   "orderId": "{{orderId}}",
-  "sku": "PUMPKINS",
-  "price": 10.98,
+  "sku": "ORANGES",
   "units": 2,
+  "price": 22.99,
   "userId": "123456"
  }
 }
