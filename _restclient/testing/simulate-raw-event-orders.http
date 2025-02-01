@@ -15,7 +15,7 @@ Content-Type: application/json
   "orderId": "{{orderId}}",
   "sku": "PUMPKINS",
   "price": 10.98,
-  "quantity": 2,
+  "units": 2,
   "userId": "123456"
  }
 }
