@@ -92,7 +92,6 @@ function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Redun
     message: '',
     CancellationReasons: [{ Code: WarehouseError.ConditionalCheckFailedException }, null],
   })
-  error.name = WarehouseError.TransactionCanceledException
   return {
     send: jest.fn().mockRejectedValue(error),
   } as unknown as DynamoDBDocumentClient
@@ -107,7 +106,6 @@ function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Redun
       { Code: WarehouseError.ConditionalCheckFailedException },
     ],
   })
-  error.name = WarehouseError.TransactionCanceledException
   return {
     send: jest.fn().mockRejectedValue(error),
   } as unknown as DynamoDBDocumentClient
@@ -119,18 +117,6 @@ function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Deple
     message: '',
     CancellationReasons: [null, { Code: WarehouseError.ConditionalCheckFailedException }],
   })
-  error.name = WarehouseError.TransactionCanceledException
-  return {
-    send: jest.fn().mockRejectedValue(error),
-  } as unknown as DynamoDBDocumentClient
-}
-
-function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Unknown(): DynamoDBDocumentClient {
-  const error: Error = new TransactionCanceledException({
-    $metadata: {},
-    message: '',
-  })
-  error.name = WarehouseError.TransactionCanceledException
   return {
     send: jest.fn().mockRejectedValue(error),
   } as unknown as DynamoDBDocumentClient
@@ -295,38 +281,6 @@ describe('Warehouse Service AllocateOrderStockWorker DbAllocateOrderStockClient 
     async () => {
       try {
         const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Depleted()
-        const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
-        await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
-      } catch (error) {
-        expect(WarehouseError.hasName(error, WarehouseError.DoNotRetryError)).toBe(true)
-        return
-      }
-      throw new Error('Test failed because no error was thrown')
-    },
-  )
-
-  it(
-    'throws a TransactionCanceledException if DynamoDBDocumentClient.send throws ' +
-      'a ConditionalCheckFailedException error with no cancellation reasons',
-    async () => {
-      try {
-        const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Unknown()
-        const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
-        await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
-      } catch (error) {
-        expect(WarehouseError.hasName(error, WarehouseError.TransactionCanceledException)).toBe(true)
-        return
-      }
-      throw new Error('Test failed because no error was thrown')
-    },
-  )
-
-  it(
-    'throws a DoNotRetryError if DynamoDBDocumentClient.send throws ' +
-      'a ConditionalCheckFailedException error with no cancellation reasons',
-    async () => {
-      try {
-        const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Unknown()
         const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
         await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
       } catch (error) {

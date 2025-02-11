@@ -1,6 +1,5 @@
 export class WarehouseError {
   public static ConditionalCheckFailedException = 'ConditionalCheckFailedException'
-  public static TransactionCanceledException = 'TransactionCanceledException'
   public static InvalidArgumentsError = 'InvalidArgumentsError'
   public static InvalidEventRaiseOperationError_Redundant = 'InvalidEventRaiseOperationError_Redundant'
   public static InvalidRestockOperationError_Redundant = 'InvalidRestockOperationError_Redundant'

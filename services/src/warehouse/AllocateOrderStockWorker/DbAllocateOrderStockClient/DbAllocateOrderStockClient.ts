@@ -1,6 +1,6 @@
 import { DynamoDBDocumentClient, TransactWriteCommand } from '@aws-sdk/lib-dynamodb'
 import { WarehouseError } from '../../errors/WarehouseError'
-import { getDdbTransactionCancellationCode } from '../../shared/getDdbTransactionCancellationCode'
+import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { AllocateOrderStockCommand } from '../model/AllocateOrderStockCommand'
 
 export interface IDbAllocateOrderStockClient {
@@ -25,17 +25,19 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
     } catch (error) {
       console.error('DbAllocateOrderStockClient.updateWarehouse error:', { error })
 
-      if (WarehouseError.hasName(error, WarehouseError.TransactionCanceledException)) {
-        WarehouseError.addName(error, WarehouseError.DoNotRetryError)
-      }
-
       // When possible multiple transaction errors:
       // Prioritize tagging the "Redundancy Errors", because if we get one, this means that the operation
       // has already executed successfully, thus we don't care about other possible transaction errors
       if (this.isAllocationRedundantError(error)) {
         WarehouseError.addName(error, WarehouseError.InvalidStockAllocationOperationError_Redundant)
-      } else if (this.isStockDepletedError(error)) {
+        WarehouseError.addName(error, WarehouseError.DoNotRetryError)
+        throw error
+      }
+
+      if (this.isStockDepletedError(error)) {
         WarehouseError.addName(error, WarehouseError.InvalidStockAllocationOperationError_Depleted)
+        WarehouseError.addName(error, WarehouseError.DoNotRetryError)
+        throw error
       }
 
       throw error
@@ -107,7 +109,7 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
   //
   //
   private isAllocationRedundantError(error: unknown): boolean {
-    const errorCode = getDdbTransactionCancellationCode(error, 0)
+    const errorCode = DynamoDbUtils.getTransactionCancellationCode(error, 0)
     return errorCode === WarehouseError.ConditionalCheckFailedException
   }
 
@@ -115,7 +117,7 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
   //
   //
   private isStockDepletedError(error: unknown): boolean {
-    const errorCode = getDdbTransactionCancellationCode(error, 1)
+    const errorCode = DynamoDbUtils.getTransactionCancellationCode(error, 1)
     return errorCode === WarehouseError.ConditionalCheckFailedException
   }
 }

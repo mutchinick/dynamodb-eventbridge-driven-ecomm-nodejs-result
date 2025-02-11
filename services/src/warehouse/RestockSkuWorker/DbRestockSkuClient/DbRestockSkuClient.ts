@@ -1,6 +1,6 @@
 import { DynamoDBDocumentClient, TransactWriteCommand } from '@aws-sdk/lib-dynamodb'
 import { WarehouseError } from '../../errors/WarehouseError'
-import { getDdbTransactionCancellationCode } from '../../shared/getDdbTransactionCancellationCode'
+import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { RestockSkuCommand } from '../model/RestockSkuCommand'
 
 export interface IDbRestockSkuClient {
@@ -25,15 +25,13 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
     } catch (error) {
       console.error('DbRestockSkuClient.updateWarehouse error:', { error })
 
-      if (WarehouseError.hasName(error, WarehouseError.TransactionCanceledException)) {
-        WarehouseError.addName(error, WarehouseError.DoNotRetryError)
-      }
-
       // When possible multiple transaction errors:
       // Prioritize tagging the "Redundancy Errors", because if we get one, this means that the operation
       // has already executed successfully, thus we don't care about other possible transaction errors
       if (this.isRestockRedundantError(error)) {
         WarehouseError.addName(error, WarehouseError.InvalidRestockOperationError_Redundant)
+        WarehouseError.addName(error, WarehouseError.DoNotRetryError)
+        throw error
       }
 
       throw error
@@ -103,7 +101,7 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
   //
   //
   private isRestockRedundantError(error: unknown): boolean {
-    const errorCode = getDdbTransactionCancellationCode(error, 0)
+    const errorCode = DynamoDbUtils.getTransactionCancellationCode(error, 0)
     return errorCode === WarehouseError.ConditionalCheckFailedException
   }
 }

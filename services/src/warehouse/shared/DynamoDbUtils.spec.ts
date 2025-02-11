@@ -1,10 +1,10 @@
 import { TransactionCanceledException } from '@aws-sdk/client-dynamodb'
-import { getDdbTransactionCancellationCode } from './getDdbTransactionCancellationCode'
+import { DynamoDbUtils } from './DynamoDbUtils'
 
-describe('getDdbTransactionCancellationCode', () => {
+describe('DynamoDbUtils.getTransactionCancellationCode', () => {
   it('returns null if the input Error is not a TransactionCanceledException', () => {
     const error = Error()
-    expect(getDdbTransactionCancellationCode(error)).toBeNull()
+    expect(DynamoDbUtils.getTransactionCancellationCode(error, 0)).toBeNull()
   })
 
   it('returns null if the input Error CancellationReasons is not defined', () => {
@@ -12,7 +12,7 @@ describe('getDdbTransactionCancellationCode', () => {
       $metadata: {},
       message: '',
     })
-    expect(getDdbTransactionCancellationCode(error)).toBeNull()
+    expect(DynamoDbUtils.getTransactionCancellationCode(error, 0)).toBeNull()
   })
 
   it('returns null if the input Error does not contain the requested CancellationReasons[0].Code', () => {
@@ -21,7 +21,7 @@ describe('getDdbTransactionCancellationCode', () => {
       message: '',
       CancellationReasons: [],
     })
-    expect(getDdbTransactionCancellationCode(error)).toBeNull()
+    expect(DynamoDbUtils.getTransactionCancellationCode(error, 0)).toBeNull()
   })
 
   it('returns the requested Code if the input Error contains the requested CancellationReasons[0].Code', () => {
@@ -31,7 +31,7 @@ describe('getDdbTransactionCancellationCode', () => {
       message: '',
       CancellationReasons: [{ Code: mockCancellationReasonCode }],
     })
-    expect(getDdbTransactionCancellationCode(error)).toBe(mockCancellationReasonCode)
+    expect(DynamoDbUtils.getTransactionCancellationCode(error, 0)).toBe(mockCancellationReasonCode)
   })
 
   it('returns the requested Code if the input Error contains the requested CancellationReasons[n].Code', () => {
@@ -41,6 +41,6 @@ describe('getDdbTransactionCancellationCode', () => {
       message: '',
       CancellationReasons: [null, null, { Code: mockCancellationReasonCode }],
     })
-    expect(getDdbTransactionCancellationCode(error, 2)).toBe(mockCancellationReasonCode)
+    expect(DynamoDbUtils.getTransactionCancellationCode(error, 2)).toBe(mockCancellationReasonCode)
   })
 })

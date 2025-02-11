@@ -93,16 +93,6 @@ function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Redun
   } as unknown as DynamoDBDocumentClient
 }
 
-function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Unknown(): DynamoDBDocumentClient {
-  const error: Error = new TransactionCanceledException({
-    $metadata: {},
-    message: '',
-  })
-  return {
-    send: jest.fn().mockRejectedValue(error),
-  } as unknown as DynamoDBDocumentClient
-}
-
 describe('Warehouse Service RestockSkuWorker DbRestockSkuClient tests', () => {
   //
   // Test RestockSkuCommand edge cases
@@ -198,38 +188,6 @@ describe('Warehouse Service RestockSkuWorker DbRestockSkuClient tests', () => {
     async () => {
       try {
         const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Redundant()
-        const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
-        await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
-      } catch (error) {
-        expect(WarehouseError.hasName(error, WarehouseError.DoNotRetryError)).toBe(true)
-        return
-      }
-      throw new Error('Test failed because no error was thrown')
-    },
-  )
-
-  it(
-    'throws a TransactionCanceledException if DynamoDBDocumentClient.send throws ' +
-      'a ConditionalCheckFailedException error with no cancellation reasons',
-    async () => {
-      try {
-        const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Unknown()
-        const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
-        await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
-      } catch (error) {
-        expect(WarehouseError.hasName(error, WarehouseError.TransactionCanceledException)).toBe(true)
-        return
-      }
-      throw new Error('Test failed because no error was thrown')
-    },
-  )
-
-  it(
-    'throws a DoNotRetryError if DynamoDBDocumentClient.send throws ' +
-      'a ConditionalCheckFailedException error with no cancellation reasons',
-    async () => {
-      try {
-        const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Unknown()
         const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
         await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
       } catch (error) {
