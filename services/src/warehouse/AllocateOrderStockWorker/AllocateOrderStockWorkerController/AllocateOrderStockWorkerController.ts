@@ -1,7 +1,7 @@
-import { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda'
-import { WarehouseError } from '../../errors/WarehouseError'
-import { IncomingOrderCreatedEvent } from '../model/IncomingOrderCreatedEvent'
+import { SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda'
+import { Failure, Result, Success } from '../../errors/Result'
 import { IAllocateOrderStockWorkerService } from '../AllocateOrderStockWorkerService/AllocateOrderStockWorkerService'
+import { IncomingOrderCreatedEvent } from '../model/IncomingOrderCreatedEvent'
 
 export interface IAllocateOrderStockWorkerController {
   allocateOrdersStock: (sqsEvent: SQSEvent) => Promise<SQSBatchResponse>
@@ -19,53 +19,74 @@ export class AllocateOrderStockWorkerController implements IAllocateOrderStockWo
   //
   //
   public async allocateOrdersStock(sqsEvent: SQSEvent): Promise<SQSBatchResponse> {
-    console.info('AllocateOrderStockWorkerController.allocateOrderStock init:', { sqsEvent })
-    const batchItemFailures: SQSBatchItemFailure[] = []
+    const logContext = 'AllocateOrderStockWorkerController.allocateSingleOrder'
+    console.info(`${logContext} init:`, { sqsEvent })
+
+    const sqsBatchResponse: SQSBatchResponse = { batchItemFailures: [] }
     for (const record of sqsEvent.Records) {
-      try {
-        await this.allocateOrderStock(record)
-      } catch (error) {
-        if (WarehouseError.doNotRetry(error)) {
-          continue
-        }
-        batchItemFailures.push({ itemIdentifier: record.messageId })
+      const allocateOrderStockResult = await this.allocateSingleOrder(record)
+      // If the failure is transient then we add it to the batch errors to re-queue and retry
+      // If the failure is not transient then we ignore it to remove it from the queue
+      if (Result.isFailure(allocateOrderStockResult) && allocateOrderStockResult.transient) {
+        sqsBatchResponse.batchItemFailures.push({ itemIdentifier: record.messageId })
       }
     }
-    const sqsBatchResponse: SQSBatchResponse = { batchItemFailures }
-    console.info('AllocateOrderStockWorkerController.allocateOrderStock exit:', { sqsBatchResponse })
+    console.info(`${logContext} exit:`, { sqsBatchResponse })
     return sqsBatchResponse
   }
 
   //
   //
   //
-  private async allocateOrderStock(sqsRecord: SQSRecord) {
-    try {
-      console.info('AllocateOrderStockWorkerController.allocateOrderStock init:', { sqsRecord })
-      const incomingOrderCreatedEvent = this.parseValidateEvent(sqsRecord.body)
-      await this.allocateOrderStockWorkerService.allocateOrderStock(incomingOrderCreatedEvent)
-      console.info('AllocateOrderStockWorkerController.allocateOrderStock exit:', { incomingOrderCreatedEvent })
-    } catch (error) {
-      console.error('AllocateOrderStockWorkerController.allocateOrderStock error:', { error })
-      throw error
+  private async allocateSingleOrder(
+    sqsRecord: SQSRecord,
+  ): Promise<
+    | Success<void>
+    | Failure<'InvalidArgumentsError'>
+    | Failure<'InvalidEventRaiseOperationError_Redundant'>
+    | Failure<'UnrecognizedError'>
+  > {
+    const logContext = 'AllocateOrderStockWorkerController.allocateSingleOrder'
+    console.info(`${logContext} init:`, { sqsRecord })
+
+    const sqsRecordBody = sqsRecord.body
+    const eventBridgeEventResult = this.parseEventBrideEventSafe(sqsRecordBody)
+    if (Result.isFailure(eventBridgeEventResult)) {
+      console.error(`${logContext} exit failure:`, { eventBridgeEventResult, sqsRecordBody })
+      return eventBridgeEventResult
     }
+
+    const eventBridgeEvent = eventBridgeEventResult.value
+    const incomingOrderCreatedEventResult = IncomingOrderCreatedEvent.validateAndBuild(eventBridgeEvent as never)
+    if (Result.isFailure(incomingOrderCreatedEventResult)) {
+      console.error(`${logContext} exit failure:`, { incomingOrderCreatedEventResult, eventBridgeEvent })
+      return incomingOrderCreatedEventResult
+    }
+
+    const incomingOrderCreatedEvent = incomingOrderCreatedEventResult.value
+    const allocateOrderStockResult =
+      await this.allocateOrderStockWorkerService.allocateOrderStock(incomingOrderCreatedEvent)
+
+    Result.isSuccess(allocateOrderStockResult)
+      ? console.info(`${logContext} exit success:`, { allocateOrderStockResult })
+      : console.error(`${logContext} exit failure:`, { allocateOrderStockResult, incomingOrderCreatedEvent })
+
+    return allocateOrderStockResult
   }
 
   //
   //
   //
-  private parseValidateEvent(bodyText: string): IncomingOrderCreatedEvent {
+  private parseEventBrideEventSafe(eventBodyText: string): Success<unknown> | Failure<'InvalidArgumentsError'> {
     try {
-      console.info('AllocateOrderStockWorkerController.parseValidateEvent init:', { bodyText })
-      const eventBridgeEvent = JSON.parse(bodyText)
-      const incomingOrderCreatedEvent = IncomingOrderCreatedEvent.validateAndBuild(eventBridgeEvent)
-      console.info('AllocateOrderStockWorkerController.parseValidateEvent exit:', { incomingOrderCreatedEvent })
-      return incomingOrderCreatedEvent
+      const eventBridgeEvent = JSON.parse(eventBodyText)
+      return Result.makeSuccess(eventBridgeEvent) as Success<unknown>
     } catch (error) {
-      console.error('AllocateOrderStockWorkerController.parseValidateEvent error:', { error })
-      WarehouseError.addName(error, WarehouseError.InvalidArgumentsError)
-      WarehouseError.addName(error, WarehouseError.DoNotRetryError)
-      throw error
+      const logContext = 'AllocateOrderStockWorkerController.parseEventBrideEventSafe'
+      console.error(`${logContext} error:`, { error })
+      const invalidArgsResult = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsResult, eventBodyText })
+      return invalidArgsResult
     }
   }
 }
