@@ -8,6 +8,7 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import { Queue } from 'aws-cdk-lib/aws-sqs'
 import { Construct } from 'constructs'
 import { join } from 'path'
+import { settings } from '../settings'
 
 export interface IAllocateOrderStockWorkerConstructProps {
   dynamoDbTable: Table
@@ -34,11 +35,13 @@ export class AllocateOrderStockWorkerConstruct extends Construct {
 
   private createAllocateOrderStockWorkerQueue(scope: Construct, id: string, dlq: Queue) {
     const queueName = `${id}-Queue`
+    const { maxReceiveCount, receiveMessageWaitTime, visibilityTimeout } = settings.SQS
     const queue = new Queue(scope, queueName, {
       queueName,
-      visibilityTimeout: Duration.seconds(10),
+      visibilityTimeout,
+      receiveMessageWaitTime,
       deadLetterQueue: {
-        maxReceiveCount: 360,
+        maxReceiveCount,
         queue: dlq,
       },
     })
@@ -60,10 +63,13 @@ export class AllocateOrderStockWorkerConstruct extends Construct {
       timeout: Duration.seconds(10),
     })
 
+    const { batchSize, maxBatchingWindow, maxConcurrency, reportBatchItemFailures } = settings.LambdaSQS
     lambdaFunc.addEventSource(
       new SqsEventSource(queue, {
-        batchSize: 10,
-        reportBatchItemFailures: true,
+        batchSize,
+        reportBatchItemFailures,
+        maxBatchingWindow,
+        maxConcurrency,
       }),
     )
 
