@@ -34,14 +34,13 @@ export class OrderStockDepletedEvent implements OrderStockDepletedEventProps {
     const logContext = 'OrderStockDepletedEvent.validateAndBuild'
     console.info(`${logContext} init:`, { orderStockDepletedEventInput })
 
-    const propsResult = this.buildPropsSafe(orderStockDepletedEventInput)
+    const propsResult = this.buildProps(orderStockDepletedEventInput)
     if (Result.isFailure(propsResult)) {
       console.error(`${logContext} exit failure:`, { propsResult, orderStockDepletedEventInput })
       return propsResult
     }
 
-    const props = propsResult.value
-    const { eventName, eventData, createdAt, updatedAt } = props
+    const { eventName, eventData, createdAt, updatedAt } = propsResult.value
     const orderStockDepletedEvent = new OrderStockDepletedEvent(eventName, eventData, createdAt, updatedAt)
     const orderStockDepletedEventResult = Result.makeSuccess(orderStockDepletedEvent)
     console.info(`${logContext} exit success:`, { orderStockDepletedEventResult })
@@ -51,18 +50,14 @@ export class OrderStockDepletedEvent implements OrderStockDepletedEventProps {
   //
   //
   //
-  private static buildPropsSafe(
+  private static buildProps(
     orderStockDepletedEventInput: OrderStockDepletedEventInput,
   ): Success<OrderStockDepletedEventProps> | Failure<'InvalidArgumentsError'> {
     try {
-      z.object({
-        orderId: ValueValidators.validOrderId(),
-        sku: ValueValidators.validSku(),
-        units: ValueValidators.validUnits(),
-      }).parse(orderStockDepletedEventInput)
+      this.validateInput(orderStockDepletedEventInput)
     } catch (error) {
-      const logContext = 'OrderStockDepletedEvent.buildPropsSafe'
-      console.error(`${logContext} error:`, { error })
+      const logContext = 'OrderStockDepletedEvent.buildProps'
+      console.error(`${logContext} error caught:`, { error })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, orderStockDepletedEventInput })
       return invalidArgsFailure
@@ -70,12 +65,7 @@ export class OrderStockDepletedEvent implements OrderStockDepletedEventProps {
 
     const { orderId, sku, units } = orderStockDepletedEventInput
     const date = new Date().toISOString()
-    const orderStockDepletedEventData: OrderStockDepletedEventData = {
-      orderId,
-      sku,
-      units,
-    }
-
+    const orderStockDepletedEventData: OrderStockDepletedEventData = { orderId, sku, units }
     const orderStockDepletedEventProps: OrderStockDepletedEventProps = {
       eventName: WarehouseEventName.ORDER_STOCK_DEPLETED_EVENT,
       eventData: orderStockDepletedEventData,
@@ -83,5 +73,16 @@ export class OrderStockDepletedEvent implements OrderStockDepletedEventProps {
       updatedAt: date,
     }
     return Result.makeSuccess(orderStockDepletedEventProps)
+  }
+
+  //
+  //
+  //
+  private static validateInput(orderStockDepletedEventInput: OrderStockDepletedEventData): void {
+    z.object({
+      orderId: ValueValidators.validOrderId(),
+      sku: ValueValidators.validSku(),
+      units: ValueValidators.validUnits(),
+    }).parse(orderStockDepletedEventInput)
   }
 }

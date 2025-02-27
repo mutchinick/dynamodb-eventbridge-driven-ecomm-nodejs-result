@@ -1,6 +1,10 @@
 import { TransactionCanceledException } from '@aws-sdk/client-dynamodb'
 
 export class DynamoDbUtils {
+  public static readonly CancellationReasons = {
+    ConditionalCheckFailed: 'ConditionalCheckFailed',
+  } as const
+
   //
   //
   //

@@ -34,14 +34,13 @@ export class OrderStockAllocatedEvent implements OrderStockAllocatedEventProps {
     const logContext = 'OrderStockAllocatedEvent.validateAndBuild'
     console.info(`${logContext} init:`, { orderStockAllocatedEventInput })
 
-    const propsResult = this.buildPropsSafe(orderStockAllocatedEventInput)
+    const propsResult = this.buildProps(orderStockAllocatedEventInput)
     if (Result.isFailure(propsResult)) {
       console.error(`${logContext} exit failure:`, { propsResult, orderStockAllocatedEventInput })
       return propsResult
     }
 
-    const props = propsResult.value
-    const { eventName, eventData, createdAt, updatedAt } = props
+    const { eventName, eventData, createdAt, updatedAt } = propsResult.value
     const orderStockAllocatedEvent = new OrderStockAllocatedEvent(eventName, eventData, createdAt, updatedAt)
     const orderStockAllocatedEventResult = Result.makeSuccess(orderStockAllocatedEvent)
     console.info(`${logContext} exit success:`, { orderStockAllocatedEventResult })
@@ -51,18 +50,14 @@ export class OrderStockAllocatedEvent implements OrderStockAllocatedEventProps {
   //
   //
   //
-  private static buildPropsSafe(
+  private static buildProps(
     orderStockAllocatedEventInput: OrderStockAllocatedEventInput,
   ): Success<OrderStockAllocatedEventProps> | Failure<'InvalidArgumentsError'> {
     try {
-      z.object({
-        orderId: ValueValidators.validOrderId(),
-        sku: ValueValidators.validSku(),
-        units: ValueValidators.validUnits(),
-      }).parse(orderStockAllocatedEventInput)
+      this.validateInput(orderStockAllocatedEventInput)
     } catch (error) {
-      const logContext = 'OrderStockAllocatedEvent.buildPropsSafe'
-      console.error(`${logContext} error:`, { error })
+      const logContext = 'OrderStockAllocatedEvent.buildProps'
+      console.error(`${logContext} error caught:`, { error })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, orderStockAllocatedEventInput })
       return invalidArgsFailure
@@ -70,12 +65,7 @@ export class OrderStockAllocatedEvent implements OrderStockAllocatedEventProps {
 
     const { orderId, sku, units } = orderStockAllocatedEventInput
     const date = new Date().toISOString()
-    const orderStockAllocatedEventData: OrderStockAllocatedEventData = {
-      orderId,
-      sku,
-      units,
-    }
-
+    const orderStockAllocatedEventData: OrderStockAllocatedEventData = { orderId, sku, units }
     const orderStockAllocatedEventProps: OrderStockAllocatedEventProps = {
       eventName: WarehouseEventName.ORDER_STOCK_ALLOCATED_EVENT,
       eventData: orderStockAllocatedEventData,
@@ -83,5 +73,16 @@ export class OrderStockAllocatedEvent implements OrderStockAllocatedEventProps {
       updatedAt: date,
     }
     return Result.makeSuccess(orderStockAllocatedEventProps)
+  }
+
+  //
+  //
+  //
+  private static validateInput(orderStockAllocatedEventInput: OrderStockAllocatedEventData): void {
+    z.object({
+      orderId: ValueValidators.validOrderId(),
+      sku: ValueValidators.validSku(),
+      units: ValueValidators.validUnits(),
+    }).parse(orderStockAllocatedEventInput)
   }
 }

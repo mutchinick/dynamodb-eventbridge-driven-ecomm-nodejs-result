@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { WarehouseError } from '../../errors/WarehouseError'
+import { Failure, Result, Success } from '../../errors/Result'
 import { RestockSkuData } from '../../model/RestockSkuData'
 import { ValueValidators } from '../../model/ValueValidators'
 
@@ -20,36 +20,54 @@ export class IncomingRestockSkuRequest implements IncomingRestockSkuRequestProps
   //
   //
   //
-  public static validateAndBuild(incomingRestockSkuRequestInput: IncomingRestockSkuRequestInput) {
-    try {
-      const { sku, units, lotId } = this.buildIncomingRestockSkuRequestProps(incomingRestockSkuRequestInput)
-      return new IncomingRestockSkuRequest(sku, units, lotId)
-    } catch (error) {
-      console.error('IncomingRestockSkuRequest.validateAndBuild', { error, incomingRestockSkuRequestInput })
-      throw error
+  public static validateAndBuild(
+    incomingRestockSkuRequestInput: IncomingRestockSkuRequestInput,
+  ): Success<IncomingRestockSkuRequest> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'IncomingRestockSkuRequest.validateAndBuild'
+    console.info(`${logContext} init:`, { incomingRestockSkuRequestInput })
+
+    const propsResult = this.buildProps(incomingRestockSkuRequestInput)
+    if (Result.isFailure(propsResult)) {
+      console.error(`${logContext} exit failure:`, { propsResult, incomingRestockSkuRequestInput })
+      return propsResult
     }
+
+    const { sku, units, lotId } = propsResult.value
+    const incomingRestockSkuRequest = new IncomingRestockSkuRequest(sku, units, lotId)
+    const incomingRestockSkuRequestResult = Result.makeSuccess(incomingRestockSkuRequest)
+    console.info(`${logContext} exit success:`, { incomingRestockSkuRequestResult })
+    return incomingRestockSkuRequestResult
   }
 
   //
   //
   //
-  private static buildIncomingRestockSkuRequestProps(
+  private static buildProps(
     incomingRestockSkuRequestInput: IncomingRestockSkuRequestInput,
-  ): IncomingRestockSkuRequestProps {
+  ): Success<IncomingRestockSkuRequestProps> | Failure<'InvalidArgumentsError'> {
     try {
-      const incomingRestockSkuRequest = z
-        .object({
-          sku: ValueValidators.validSku(),
-          units: ValueValidators.validUnits(),
-          lotId: ValueValidators.validLotId(),
-        })
-        .parse(incomingRestockSkuRequestInput) as IncomingRestockSkuRequestProps
-      return incomingRestockSkuRequest
+      this.validateInput(incomingRestockSkuRequestInput)
     } catch (error) {
-      console.error('RestockSkuApiController.buildIncomingRestockSkuRequest error:', { error })
-      WarehouseError.addName(error, WarehouseError.InvalidArgumentsError)
-      WarehouseError.addName(error, WarehouseError.DoNotRetryError)
-      throw error
+      const logContext = 'IncomingRestockSkuRequest.buildProps'
+      console.error(`${logContext} error caught:`, { error })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingRestockSkuRequestInput })
+      return invalidArgsFailure
     }
+
+    const { sku, units, lotId } = incomingRestockSkuRequestInput
+    const incomingRestockSkuRequestProps: IncomingRestockSkuRequestProps = { sku, units, lotId }
+    return Result.makeSuccess(incomingRestockSkuRequestProps)
+  }
+
+  //
+  //
+  //
+  private static validateInput(incomingRestockSkuRequestInput: IncomingRestockSkuRequestInput): void {
+    z.object({
+      sku: ValueValidators.validSku(),
+      units: ValueValidators.validUnits(),
+      lotId: ValueValidators.validLotId(),
+    }).parse(incomingRestockSkuRequestInput)
   }
 }

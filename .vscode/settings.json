@@ -15,5 +15,6 @@
     "**/node_modules": true,
     "**/coverage": true
   },
-  "explorerExclude.backup": {}
+  "explorerExclude.backup": {},
+  "eslint.workingDirectories": ["services", "infra"]
 }

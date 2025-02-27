@@ -1,6 +1,5 @@
 import { DynamoDBDocumentClient, TransactWriteCommand } from '@aws-sdk/lib-dynamodb'
 import { Failure, Result, Success } from '../../errors/Result'
-import { WarehouseError } from '../../errors/WarehouseError'
 import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { AllocateOrderStockCommand } from '../model/AllocateOrderStockCommand'
 
@@ -10,8 +9,8 @@ export interface IDbAllocateOrderStockClient {
   ) => Promise<
     | Success<void>
     | Failure<'InvalidArgumentsError'>
-    | Failure<'InvalidStockAllocationOperationError_Redundant'>
-    | Failure<'InvalidStockAllocationOperationError_Depleted'>
+    | Failure<'DuplicateStockAllocationError'>
+    | Failure<'DepletedStockAllocationError'>
     | Failure<'UnrecognizedError'>
   >
 }
@@ -30,47 +29,26 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
   ): Promise<
     | Success<void>
     | Failure<'InvalidArgumentsError'>
-    | Failure<'InvalidStockAllocationOperationError_Redundant'>
-    | Failure<'InvalidStockAllocationOperationError_Depleted'>
+    | Failure<'DuplicateStockAllocationError'>
+    | Failure<'DepletedStockAllocationError'>
     | Failure<'UnrecognizedError'>
   > {
     const logContext = 'DbAllocateOrderStockClient.allocateOrderStock'
     console.info(`${logContext} init:`, { allocateOrderStockCommand })
 
-    const ddbUpdateCommandResult = this.buildDdbUpdateCommand(allocateOrderStockCommand)
-    if (Result.isFailure(ddbUpdateCommandResult)) {
-      console.error(`${logContext} exit failure:`, { ddbUpdateCommandResult, allocateOrderStockCommand })
-      return ddbUpdateCommandResult
+    const buildCommandResult = this.buildDdbUpdateCommand(allocateOrderStockCommand)
+    if (Result.isFailure(buildCommandResult)) {
+      console.error(`${logContext} exit failure:`, { buildCommandResult, allocateOrderStockCommand })
+      return buildCommandResult
     }
 
-    const ddbUpdateCommand = ddbUpdateCommandResult.value
-    try {
-      await this.ddbDocClient.send(ddbUpdateCommand)
-      const allocateOrderResult = Result.makeSuccess()
-      console.info(`${logContext} exit success:`, { allocateOrderResult })
-      return allocateOrderResult
-    } catch (error) {
-      console.error(`${logContext} error:`, { error })
+    const ddbUpdateCommand = buildCommandResult.value
+    const sendCommandResult = await this.sendDdbUpdateCommand(ddbUpdateCommand)
+    Result.isFailure(sendCommandResult)
+      ? console.error(`${logContext} exit failure:`, { sendCommandResult, allocateOrderStockCommand })
+      : console.info(`${logContext} exit success:`, { sendCommandResult, allocateOrderStockCommand })
 
-      // When possible multiple transaction errors:
-      // Prioritize tagging the "Redundancy Errors", because if we get one, this means that the operation
-      // has already executed successfully, thus we don't care about other possible transaction errors
-      if (this.isAllocationRedundantError(error)) {
-        const redundantErrorResult = Result.makeFailure('InvalidStockAllocationOperationError_Redundant', error, false)
-        console.error(`${logContext} exit failure:`, { redundantErrorResult, ddbUpdateCommand })
-        return redundantErrorResult
-      }
-
-      if (this.isStockDepletedError(error)) {
-        const depletedErrorResult = Result.makeFailure('InvalidStockAllocationOperationError_Depleted', error, false)
-        console.error(`${logContext} exit failure:`, { depletedErrorResult, ddbUpdateCommand })
-        return depletedErrorResult
-      }
-
-      const unrecognizedErrorResult = Result.makeFailure('UnrecognizedError', error, true)
-      console.error(`${logContext} exit failure:`, { unrecognizedErrorResult, ddbUpdateCommand })
-      return unrecognizedErrorResult
-    }
+    return sendCommandResult
   }
 
   //
@@ -79,7 +57,7 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
   private buildDdbUpdateCommand(
     allocateOrderStockCommand: AllocateOrderStockCommand,
   ): Success<TransactWriteCommand> | Failure<'InvalidArgumentsError'> {
-    // Perhaps we can prevent all errors by asserting AllocateOrderStockCommand, but TransactWriteCommand
+    // Perhaps we can prevent all errors by validating the arguments, but TransactWriteCommand
     // is an external dependency and we don't know what happens internally, so we try-catch
     try {
       const tableName = process.env.WAREHOUSE_TABLE_NAME
@@ -140,26 +118,69 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
       return Result.makeSuccess(ddbTransactWriteCommand)
     } catch (error) {
       const logContext = 'DbAllocateOrderStockClient.buildDdbUpdateCommand'
-      console.error(`${logContext} error:`, { error })
-      const invalidArgsResult = Result.makeFailure('InvalidArgumentsError', error, false)
-      console.error(`${logContext} exit failure:`, { invalidArgsResult, allocateOrderStockCommand })
-      return invalidArgsResult
+      console.error(`${logContext} error caught:`, { error })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, allocateOrderStockCommand })
+      return invalidArgsFailure
     }
   }
 
   //
   //
   //
-  private isAllocationRedundantError(error: unknown): boolean {
-    const errorCode = DynamoDbUtils.getTransactionCancellationCode(error, 0)
-    return errorCode === WarehouseError.ConditionalCheckFailedException
+  private async sendDdbUpdateCommand(
+    ddbUpdateCommand: TransactWriteCommand,
+  ): Promise<
+    | Success<void>
+    | Failure<'DuplicateStockAllocationError'>
+    | Failure<'DepletedStockAllocationError'>
+    | Failure<'UnrecognizedError'>
+  > {
+    const logContext = 'DbAllocateOrderStockClient.sendDdbUpdateCommand'
+    console.info(`${logContext} init:`, { ddbUpdateCommand })
+
+    try {
+      await this.ddbDocClient.send(ddbUpdateCommand)
+      const sendCommandResult = Result.makeSuccess()
+      console.info(`${logContext} exit success:`, { sendCommandResult })
+      return sendCommandResult
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error })
+
+      // When possible multiple transaction errors:
+      // Prioritize tagging the "Duplication Errors", because if we get one, this means that the operation
+      // has already executed successfully, thus we don't care about other possible transaction errors
+      if (this.DuplicateStockAllocationError(error)) {
+        const duplicationFailure = Result.makeFailure('DuplicateStockAllocationError', error, false)
+        console.error(`${logContext} exit failure:`, { duplicationFailure, ddbUpdateCommand })
+        return duplicationFailure
+      }
+
+      if (this.isDepletedStockAllocationError(error)) {
+        const depletionFailure = Result.makeFailure('DepletedStockAllocationError', error, false)
+        console.error(`${logContext} exit failure:`, { depletionFailure, ddbUpdateCommand })
+        return depletionFailure
+      }
+
+      const unrecognizedFailure = Result.makeFailure('UnrecognizedError', error, true)
+      console.error(`${logContext} exit failure:`, { unrecognizedFailure, ddbUpdateCommand })
+      return unrecognizedFailure
+    }
   }
 
   //
   //
   //
-  private isStockDepletedError(error: unknown): boolean {
+  private DuplicateStockAllocationError(error: unknown): boolean {
+    const errorCode = DynamoDbUtils.getTransactionCancellationCode(error, 0)
+    return errorCode === DynamoDbUtils.CancellationReasons.ConditionalCheckFailed
+  }
+
+  //
+  //
+  //
+  private isDepletedStockAllocationError(error: unknown): boolean {
     const errorCode = DynamoDbUtils.getTransactionCancellationCode(error, 1)
-    return errorCode === WarehouseError.ConditionalCheckFailedException
+    return errorCode === DynamoDbUtils.CancellationReasons.ConditionalCheckFailed
   }
 }

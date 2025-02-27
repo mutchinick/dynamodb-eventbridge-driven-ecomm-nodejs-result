@@ -1,8 +1,8 @@
 export type FailureKind =
-  | 'ConditionalCheckFailedException'
+  | 'InvalidOperationError'
   | 'UnrecognizedError'
   | 'InvalidArgumentsError'
-  | 'InvalidEventRaiseOperationError_Redundant'
-  | 'InvalidRestockOperationError_Redundant'
-  | 'InvalidStockAllocationOperationError_Depleted'
-  | 'InvalidStockAllocationOperationError_Redundant'
+  | 'DuplicateEventRaisedError'
+  | 'DuplicateRestockOperationError'
+  | 'DuplicateStockAllocationError'
+  | 'DepletedStockAllocationError'

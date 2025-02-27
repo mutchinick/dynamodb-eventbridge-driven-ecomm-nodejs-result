@@ -13,7 +13,7 @@ export interface IAllocateOrderStockWorkerService {
   ) => Promise<
     | Success<void>
     | Failure<'InvalidArgumentsError'>
-    | Failure<'InvalidEventRaiseOperationError_Redundant'>
+    | Failure<'DuplicateEventRaisedError'>
     | Failure<'UnrecognizedError'>
   >
 }
@@ -36,7 +36,7 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
   ): Promise<
     | Success<void>
     | Failure<'InvalidArgumentsError'>
-    | Failure<'InvalidEventRaiseOperationError_Redundant'>
+    | Failure<'DuplicateEventRaisedError'>
     | Failure<'UnrecognizedError'>
   > {
     const logContext = 'AllocateOrderStockWorkerService.allocateOrderStock'
@@ -46,7 +46,7 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
 
     if (
       Result.isSuccess(allocateOrderResult) ||
-      Result.isFailureOfKind(allocateOrderResult, 'InvalidStockAllocationOperationError_Redundant')
+      Result.isFailureOfKind(allocateOrderResult, 'DuplicateStockAllocationError')
     ) {
       const raiseAllocatedEventResult = await this.raiseAllocatedEvent(incomingOrderCreatedEvent)
       Result.isSuccess(raiseAllocatedEventResult)
@@ -55,7 +55,7 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
       return raiseAllocatedEventResult
     }
 
-    if (Result.isFailureOfKind(allocateOrderResult, 'InvalidStockAllocationOperationError_Depleted')) {
+    if (Result.isFailureOfKind(allocateOrderResult, 'DepletedStockAllocationError')) {
       const raiseDepletedEventResult = await this.raiseDepletedEvent(incomingOrderCreatedEvent)
       Result.isSuccess(raiseDepletedEventResult)
         ? console.info(`${logContext} exit success:`, { raiseDepletedEventResult })
@@ -75,8 +75,8 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
   ): Promise<
     | Success<void>
     | Failure<'InvalidArgumentsError'>
-    | Failure<'InvalidStockAllocationOperationError_Redundant'>
-    | Failure<'InvalidStockAllocationOperationError_Depleted'>
+    | Failure<'DuplicateStockAllocationError'>
+    | Failure<'DepletedStockAllocationError'>
     | Failure<'UnrecognizedError'>
   > {
     const logContext = 'AllocateOrderStockWorkerService.allocateOrder'
@@ -108,7 +108,7 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
   ): Promise<
     | Success<void>
     | Failure<'InvalidArgumentsError'>
-    | Failure<'InvalidEventRaiseOperationError_Redundant'>
+    | Failure<'DuplicateEventRaisedError'>
     | Failure<'UnrecognizedError'>
   > {
     const logContext = 'AllocateOrderStockWorkerService.raiseAllocatedEvent'
@@ -141,7 +141,7 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
   ): Promise<
     | Success<void>
     | Failure<'InvalidArgumentsError'>
-    | Failure<'InvalidEventRaiseOperationError_Redundant'>
+    | Failure<'DuplicateEventRaisedError'>
     | Failure<'UnrecognizedError'>
   > {
     const logContext = 'AllocateOrderStockWorkerService.raiseDepletedEvent'

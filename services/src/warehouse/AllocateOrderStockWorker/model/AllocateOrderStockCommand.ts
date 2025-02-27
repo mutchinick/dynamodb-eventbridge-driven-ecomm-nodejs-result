@@ -33,14 +33,13 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
     const logContext = 'AllocateOrderStockCommand.validateAndBuild'
     console.info(`${logContext} init:`, { allocateOrderStockCommandInput })
 
-    const propsResult = this.buildPropsSafe(allocateOrderStockCommandInput)
+    const propsResult = this.buildProps(allocateOrderStockCommandInput)
     if (Result.isFailure(propsResult)) {
       console.error(`${logContext} exit failure:`, { propsResult, allocateOrderStockCommandInput })
       return propsResult
     }
 
-    const props = propsResult.value
-    const { allocateOrderStockData, options } = props
+    const { allocateOrderStockData, options } = propsResult.value
     const allocateOrderStockCommand = new AllocateOrderStockCommand(allocateOrderStockData, options)
     const allocateOrderStockCommandResult = Result.makeSuccess(allocateOrderStockCommand)
     console.info(`${logContext} exit success:`, { allocateOrderStockCommandResult })
@@ -50,14 +49,14 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
   //
   //
   //
-  private static buildPropsSafe(
+  private static buildProps(
     allocateOrderStockCommandInput: AllocateOrderStockCommandInput,
   ): Success<AllocateOrderStockCommandProps> | Failure<'InvalidArgumentsError'> {
     try {
       this.validateInput(allocateOrderStockCommandInput)
     } catch (error) {
-      const logContext = 'IncomingOrderCreatedEvent.buildPropsSafe'
-      console.error(`${logContext} error:`, { error })
+      const logContext = 'AllocateOrderStockCommand.buildProps'
+      console.error(`${logContext} error caught:`, { error })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, allocateOrderStockCommandInput })
       return invalidArgsFailure

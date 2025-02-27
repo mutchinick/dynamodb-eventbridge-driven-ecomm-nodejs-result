@@ -1,6 +1,6 @@
 import { marshall } from '@aws-sdk/util-dynamodb'
 import { AttributeValue, EventBridgeEvent, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda'
-import { WarehouseError } from '../../errors/WarehouseError'
+import { Result } from '../../errors/Result'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
 import { IncomingSkuRestockedEvent } from '../model/IncomingSkuRestockedEvent'
 import { IRestockSkuWorkerService } from '../RestockSkuWorkerService/RestockSkuWorkerService'
@@ -28,7 +28,7 @@ function buildMockIncomingSkuRestockedEvent(id: string): Mutable_IncomingSkuRest
   return incomingSkuRestockedEvent
 }
 
-function buildMockIncomingSkuRestockedEvents(ids: string[]) {
+function buildMockIncomingSkuRestockedEvents(ids: string[]): Mutable_IncomingSkuRestockedEvent[] {
   return ids.map((id) => buildMockIncomingSkuRestockedEvent(id))
 }
 
@@ -40,7 +40,10 @@ type MockEventDetail = {
   }
 }
 
-function buildMockEventBrideEvent(id: string, incomingSkuRestockedEvent: IncomingSkuRestockedEvent) {
+function buildMockEventBrideEvent(
+  id: string,
+  incomingSkuRestockedEvent: IncomingSkuRestockedEvent,
+): EventBridgeEvent<string, MockEventDetail> {
   const mockEventBridgeEvent: EventBridgeEvent<string, MockEventDetail> = {
     id: `mockId-${id}`,
     version: '0',
@@ -62,7 +65,10 @@ function buildMockEventBrideEvent(id: string, incomingSkuRestockedEvent: Incomin
   return mockEventBridgeEvent
 }
 
-function buildMockEventBrideEvents(ids: string[], incomingSkuRestockedEvents: IncomingSkuRestockedEvent[]) {
+function buildMockEventBrideEvents(
+  ids: string[],
+  incomingSkuRestockedEvents: IncomingSkuRestockedEvent[],
+): EventBridgeEvent<string, MockEventDetail>[] {
   return ids.map((id, index) => buildMockEventBrideEvent(id, incomingSkuRestockedEvents[index]))
 }
 
@@ -73,7 +79,10 @@ function buildMockSqsRecord(id: string, eventBridgeEvent: EventBridgeEvent<strin
   } as unknown as SQSRecord
 }
 
-function buildMockSqsRecords(ids: string[], eventBridgeEvents: EventBridgeEvent<string, MockEventDetail>[]) {
+function buildMockSqsRecords(
+  ids: string[],
+  eventBridgeEvents: EventBridgeEvent<string, MockEventDetail>[],
+): SQSRecord[] {
   return ids.map((id, index) => buildMockSqsRecord(id, eventBridgeEvents[index]))
 }
 
@@ -81,7 +90,12 @@ function buildMockSqsEvent(sqsRecords: SQSRecord[]): SQSEvent {
   return { Records: sqsRecords }
 }
 
-function buildMockTestObjects(ids: string[]) {
+function buildMockTestObjects(ids: string[]): {
+  mockIncomingSkuRestockedEvents: Mutable_IncomingSkuRestockedEvent[]
+  mockEventBrideEvents: EventBridgeEvent<string, MockEventDetail>[]
+  mockSqsRecords: SQSRecord[]
+  mockSqsEvent: SQSEvent
+} {
   const mockIncomingSkuRestockedEvents = buildMockIncomingSkuRestockedEvents(ids)
   const mockEventBrideEvents = buildMockEventBrideEvents(ids, mockIncomingSkuRestockedEvents)
   const mockSqsRecords = buildMockSqsRecords(ids, mockEventBrideEvents)
@@ -94,54 +108,57 @@ function buildMockTestObjects(ids: string[]) {
   }
 }
 
-function buildMockRestockSkuWorkerService_restockSku_resolves(): IRestockSkuWorkerService {
-  return { restockSku: jest.fn() }
+//
+// Mock clients
+//
+function buildMockRestockSkuWorkerService_restockSku_succeeds(): IRestockSkuWorkerService {
+  return { restockSku: jest.fn().mockResolvedValue(Result.makeSuccess()) }
 }
 
-function buildMockRestockSkuWorkerService_restockSku_throwsIfAsked(errorName: string): IRestockSkuWorkerService {
+function buildMockRestockSkuWorkerService_restockSku_failsOnData(transient: boolean): IRestockSkuWorkerService {
   return {
     restockSku: jest.fn().mockImplementation((incomingSkuRestockedEvent: IncomingSkuRestockedEvent) => {
-      const shouldThrow = Object.values(incomingSkuRestockedEvent.eventData).reduce(
-        (acc, cur) => (acc = acc || String(cur).endsWith('-THROW')),
+      const shouldFail = Object.values(incomingSkuRestockedEvent.eventData).reduce(
+        (acc, cur) => (acc = acc || String(cur).endsWith('-FAILURE')),
         false,
       )
-      if (shouldThrow) {
-        const error = new Error()
-        WarehouseError.addName(error, errorName)
-        return Promise.reject(error)
+      if (shouldFail) {
+        const failure = Result.makeFailure('mockFailureKind' as never, 'Error message', transient)
+        return Promise.resolve(failure)
       }
-      return Promise.resolve()
+      const success = Result.makeSuccess()
+      return Promise.resolve(success)
     }),
   }
 }
 
-describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', () => {
+describe(`Warehouse Service RestockSkuWorker RestockSkuWorkerController tests`, () => {
   //
   // Test SQSEvent edge cases
   //
-  it('throws if the input SQSEvent is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`throws if the input SQSEvent is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockApiEvent = undefined as unknown as SQSEvent
     await expect(restockSkuWorkerController.restockSkus(mockApiEvent)).rejects.toThrow()
   })
 
-  it('throws if the input SQSEvent records are missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`throws if the input SQSEvent records are missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockApiEvent = {} as unknown as SQSEvent
     await expect(restockSkuWorkerController.restockSkus(mockApiEvent)).rejects.toThrow()
   })
 
-  it('does not throw if the input SQSEvent records are empty', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input SQSEvent records are empty`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockSqsEvent = buildMockSqsEvent([])
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input SQSEvent records are empty', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input SQSEvent records are empty`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockSqsEvent = buildMockSqsEvent([])
     const result = await restockSkuWorkerController.restockSkus(mockSqsEvent)
@@ -152,16 +169,16 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   //
   // Test SQSRecord edge cases
   //
-  it('does not throw if the input SQSRecord.body is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input SQSRecord.body is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockSqsRecord = {} as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input SQSRecord.body is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input SQSRecord.body is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockSqsRecord = {} as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
@@ -170,16 +187,16 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if the input SQSRecord.body is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input SQSRecord.body is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockSqsRecord = { body: undefined } as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input SQSRecord.body is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input SQSRecord.body is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockSqsRecord = { body: undefined } as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
@@ -188,8 +205,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if the input SQSRecord.body is not a valid JSON', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input SQSRecord.body is not a valid JSON`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockSqsRecord = {} as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
@@ -197,8 +214,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input SQSRecord.body is not a valid JSON', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input SQSRecord.body is not a valid JSON`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockSqsRecord = {} as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
@@ -211,8 +228,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   //
   // Test EventBridgeEvent edge cases
   //
-  it('does not throw if the input EventBridgeEvent is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input EventBridgeEvent is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockEventBridgeEvent = undefined as unknown as EventBridgeEvent<string, MockEventDetail>
     const mockSqsRecord = buildMockSqsRecord('AA', mockEventBridgeEvent)
@@ -220,8 +237,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input EventBridgeEvent is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input EventBridgeEvent is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockEventBridgeEvent = undefined as unknown as EventBridgeEvent<string, MockEventDetail>
     const mockSqsRecord = buildMockSqsRecord('AA', mockEventBridgeEvent)
@@ -231,8 +248,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if the input EventBridgeEvent is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input EventBridgeEvent is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockEventBridgeEvent = undefined as unknown as EventBridgeEvent<string, MockEventDetail>
     const mockSqsRecord = buildMockSqsRecord('AA', mockEventBridgeEvent)
@@ -240,8 +257,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input EventBridgeEvent is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input EventBridgeEvent is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockEventBridgeEvent = undefined as unknown as EventBridgeEvent<string, MockEventDetail>
     const mockSqsRecord = buildMockSqsRecord('AA', mockEventBridgeEvent)
@@ -251,8 +268,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if the input EventBridgeEvent is invalid', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input EventBridgeEvent is invalid`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockEventBridgeEvent = 'mockInvalidValue' as unknown as EventBridgeEvent<string, MockEventDetail>
     const mockSqsRecord = buildMockSqsRecord('AA', mockEventBridgeEvent)
@@ -260,8 +277,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input EventBridgeEvent is invalid', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input EventBridgeEvent is invalid`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockEventBridgeEvent = 'mockInvalidValue' as unknown as EventBridgeEvent<string, MockEventDetail>
     const mockSqsRecord = buildMockSqsRecord('AA', mockEventBridgeEvent)
@@ -274,8 +291,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   //
   // Test EventBridgeEvent.detail edge cases
   //
-  it('does not throw if the input EventBridgeEvent.detail is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input EventBridgeEvent.detail is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -286,8 +303,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input EventBridgeEvent.detail is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input EventBridgeEvent.detail is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -300,8 +317,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if the input EventBridgeEvent.detail is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input EventBridgeEvent.detail is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -312,8 +329,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input EventBridgeEvent.detail is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input EventBridgeEvent.detail is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -326,8 +343,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if the input EventBridgeEvent.detail is invalid', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input EventBridgeEvent.detail is invalid`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -338,8 +355,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input EventBridgeEvent.detail is invalid', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input EventBridgeEvent.detail is invalid`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -355,8 +372,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   //
   // Test EventBridgeEvent.detail.dynamodb edge cases
   //
-  it('does not throw if the input EventBridgeEvent.detail.dynamodb is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input EventBridgeEvent.detail.dynamodb is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -367,8 +384,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input EventBridgeEvent.detail.dynamodb is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input EventBridgeEvent.detail.dynamodb is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -381,8 +398,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if the input EventBridgeEvent.detail.dynamodb is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input EventBridgeEvent.detail.dynamodb is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -393,8 +410,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input EventBridgeEvent.detail.dynamodb is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input EventBridgeEvent.detail.dynamodb is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -407,8 +424,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if the input EventBridgeEvent.detail.dynamodb is invalid', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input EventBridgeEvent.detail.dynamodb is invalid`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -419,8 +436,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input EventBridgeEvent.detail.dynamodb is invalid', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input EventBridgeEvent.detail.dynamodb is invalid`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -436,8 +453,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   //
   // Test EventBridgeEvent.detail.dynamodb.newImage edge cases
   //
-  it('does not throw if the input EventBridgeEvent.detail.dynamodb.newImage is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input EventBridgeEvent.detail.dynamodb.newImage is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -448,8 +465,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input EventBridgeEvent.detail.dynamodb.newImage is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input EventBridgeEvent.detail.dynamodb.newImage is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -462,8 +479,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if the input EventBridgeEvent.detail.dynamodb.newImage is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input EventBridgeEvent.detail.dynamodb.newImage is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -474,8 +491,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input EventBridgeEvent.detail.dynamodb.newImage is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input EventBridgeEvent.detail.dynamodb.newImage is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -488,8 +505,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if the input EventBridgeEvent.detail.dynamodb.newImage is invalid', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the input EventBridgeEvent.detail.dynamodb.newImage is invalid`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -500,8 +517,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the input EventBridgeEvent.detail.dynamodb.newImage is invalid', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the input EventBridgeEvent.detail.dynamodb.newImage is invalid`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = {} as unknown as IncomingSkuRestockedEvent
@@ -517,8 +534,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   //
   // Test IncomingSkuRestockedEvent edge cases
   //
-  it('does not throw if an input IncomingSkuRestockedEvent is invalid', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent is invalid`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = 'mockInvalidValue' as unknown as IncomingSkuRestockedEvent
@@ -530,8 +547,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent is invalid', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent is invalid`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = 'mockInvalidValue' as unknown as IncomingSkuRestockedEvent
@@ -546,8 +563,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   //
   // Test IncomingSkuRestockedEvent.eventName edge cases
   //
-  it('does not throw if an input IncomingSkuRestockedEvent.eventName is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventName is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -558,8 +575,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventName is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventName is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -572,8 +589,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingSkuRestockedEvent.eventName is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventName is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -584,8 +601,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventName is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventName is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -598,8 +615,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingSkuRestockedEvent.eventName is null', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventName is null`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -610,8 +627,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventName is null', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventName is null`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -627,8 +644,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   //
   // Test IncomingSkuRestockedEvent.eventData edge cases
   //
-  it('does not throw if an input IncomingSkuRestockedEvent.eventData is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventData is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -639,8 +656,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventData is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventData is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -653,8 +670,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingSkuRestockedEvent.eventData is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventData is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -665,8 +682,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventData is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventData is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -679,8 +696,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingSkuRestockedEvent.eventData is null', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventData is null`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -691,8 +708,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventData is null', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventData is null`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -708,8 +725,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   //
   // Test IncomingSkuRestockedEvent.eventData.sku edge cases
   //
-  it('does not throw if an input IncomingSkuRestockedEvent.eventData.sku is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventData.sku is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -720,8 +737,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventData.sku is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventData.sku is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -734,8 +751,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingSkuRestockedEvent.eventData.sku is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventData.sku is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -746,8 +763,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventData.sku is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventData.sku is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -760,8 +777,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingSkuRestockedEvent.eventData.sku is null', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventData.sku is null`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -772,8 +789,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventData.sku is null', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventData.sku is null`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -789,8 +806,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   //
   // Test IncomingSkuRestockedEvent.eventData.units edge cases
   //
-  it('does not throw if an input IncomingSkuRestockedEvent.eventData.units is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventData.units is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -801,8 +818,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventData.units is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventData.units is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -815,8 +832,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingSkuRestockedEvent.eventData.units is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventData.units is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -827,8 +844,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventData.units is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventData.units is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -841,8 +858,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingSkuRestockedEvent.eventData.units is null', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventData.units is null`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -853,8 +870,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventData.units is null', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventData.units is null`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -870,8 +887,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   //
   // Test IncomingSkuRestockedEvent.eventData.lotId edge cases
   //
-  it('does not throw if an input IncomingSkuRestockedEvent.eventData.lotId is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventData.lotId is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -882,8 +899,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventData.lotId is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventData.lotId is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -896,8 +913,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingSkuRestockedEvent.eventData.lotId is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventData.lotId is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -908,8 +925,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventData.lotId is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventData.lotId is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -922,8 +939,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingSkuRestockedEvent.eventData.lotId is null', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.eventData.lotId is null`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -934,8 +951,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.eventData.lotId is null', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.eventData.lotId is null`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -951,8 +968,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   //
   // Test IncomingSkuRestockedEvent.createdAt edge cases
   //
-  it('does not throw if an input IncomingSkuRestockedEvent.createdAt is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.createdAt is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -963,8 +980,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.createdAt is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.createdAt is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -977,8 +994,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingSkuRestockedEvent.createdAt is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.createdAt is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -989,8 +1006,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.createdAt is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.createdAt is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -1003,8 +1020,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingSkuRestockedEvent.createdAt is null', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.createdAt is null`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -1015,8 +1032,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.createdAt is null', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.createdAt is null`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -1032,8 +1049,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   //
   // Test IncomingSkuRestockedEvent.updatedAt edge cases
   //
-  it('does not throw if an input IncomingSkuRestockedEvent.updatedAt is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.updatedAt is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -1044,8 +1061,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.updatedAt is missing', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.updatedAt is missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -1058,8 +1075,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingSkuRestockedEvent.updatedAt is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.updatedAt is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -1070,8 +1087,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.updatedAt is undefined', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.updatedAt is undefined`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -1084,8 +1101,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('does not throw if an input IncomingSkuRestockedEvent.updatedAt is null', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if an input IncomingSkuRestockedEvent.updatedAt is null`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -1096,8 +1113,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('returns no failures if an input IncomingSkuRestockedEvent.updatedAt is null', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if an input IncomingSkuRestockedEvent.updatedAt is null`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockId = 'AA'
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent(mockId)
@@ -1113,8 +1130,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   //
   // Test internal logic
   //
-  it('calls RestockSkuWorkerService.restockSku a single time for an SQSEvent with a single record', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`calls RestockSkuWorkerService.restockSku a single time for an SQSEvent with a single record`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockIds = ['AA']
     const { mockSqsEvent } = buildMockTestObjects(mockIds)
@@ -1122,8 +1139,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(mockRestockSkuWorkerService.restockSku).toHaveBeenCalledTimes(1)
   })
 
-  it('calls RestockSkuWorkerService.restockSku a multiple times for an SQSEvent with a multiple records', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`calls RestockSkuWorkerService.restockSku a multiple times for an SQSEvent with a multiple records`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockIds = ['AA', 'BB', 'CC']
     const { mockSqsRecords, mockSqsEvent } = buildMockTestObjects(mockIds)
@@ -1131,8 +1148,8 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(mockRestockSkuWorkerService.restockSku).toHaveBeenCalledTimes(mockSqsRecords.length)
   })
 
-  it('calls RestockSkuWorkerService.restockSku with the expected input', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`calls RestockSkuWorkerService.restockSku with the expected input`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockIds = ['AA', 'BB', 'CC']
     const { mockIncomingSkuRestockedEvents, mockSqsEvent } = buildMockTestObjects(mockIds)
@@ -1143,18 +1160,18 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
   })
 
   //
-  // Test DoNotRetryError edge cases
+  // Test transient/non-transient edge cases
   //
-  it('does not throw if the RestockSkuWorkerService does not throw', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`does not throw if the RestockSkuWorkerService does not throw`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockIds = ['AA', 'BB', 'CC']
     const { mockSqsEvent } = buildMockTestObjects(mockIds)
     await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it('return no failures if the RestockSkuWorkerService does not throw', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_resolves()
+  it(`returns no failures if the RestockSkuWorkerService does not throw`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockIds = ['AA', 'BB', 'CC']
     const { mockSqsEvent } = buildMockTestObjects(mockIds)
@@ -1163,46 +1180,40 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('return no failures if the RestockSkuWorkerService throws an DoNotRetryError (test 1)', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_throwsIfAsked(
-      WarehouseError.DoNotRetryError,
-    )
+  it(`returns no failures if the RestockSkuWorkerService returns a non-transient Failure (test 1)`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_failsOnData(false)
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
-    const mockIds = ['AA-THROW', 'BB-THROW', 'CC']
+    const mockIds = ['AA-FAILURE', 'BB-FAILURE', 'CC']
     const { mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await restockSkuWorkerController.restockSkus(mockSqsEvent)
     const expected: SQSBatchResponse = { batchItemFailures: [] }
     expect(result).toStrictEqual(expected)
   })
 
-  it('return no failures if the RestockSkuWorkerService throws an DoNotRetryError (test 2)', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_throwsIfAsked(
-      WarehouseError.DoNotRetryError,
-    )
+  it(`returns no failures if the RestockSkuWorkerService returns a non-transient Failure (test 2)`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_failsOnData(false)
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
-    const mockIds = ['AA', 'BB-THROW', 'CC', 'DD', 'EE-THROW']
+    const mockIds = ['AA', 'BB-FAILURE', 'CC', 'DD', 'EE-FAILURE']
     const { mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await restockSkuWorkerController.restockSkus(mockSqsEvent)
     const expected: SQSBatchResponse = { batchItemFailures: [] }
     expect(result).toStrictEqual(expected)
   })
 
-  it('return no failures if the RestockSkuWorkerService throws an DoNotRetryError (test 3)', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_throwsIfAsked(
-      WarehouseError.DoNotRetryError,
-    )
+  it(`returns no failures if the RestockSkuWorkerService returns a non-transient Failure (test 3)`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_failsOnData(false)
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
-    const mockIds = ['AA', 'BB-THROW', 'CC-THROW', 'DD-THROW', 'EE-THROW']
+    const mockIds = ['AA', 'BB-FAILURE', 'CC-FAILURE', 'DD-FAILURE', 'EE-FAILURE']
     const { mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await restockSkuWorkerController.restockSkus(mockSqsEvent)
     const expected: SQSBatchResponse = { batchItemFailures: [] }
     expect(result).toStrictEqual(expected)
   })
 
-  it('returns expected failures if the RestockSkuWorkerService throws an Error not DoNotRetryError (test 1)', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_throwsIfAsked('SomeError')
+  it(`returns expected failures if the RestockSkuWorkerService returns a transient Failure (test 1)`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_failsOnData(true)
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
-    const mockIds = ['AA-THROW', 'BB-THROW', 'CC']
+    const mockIds = ['AA-FAILURE', 'BB-FAILURE', 'CC']
     const { mockSqsRecords, mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await restockSkuWorkerController.restockSkus(mockSqsEvent)
     const expected: SQSBatchResponse = {
@@ -1214,10 +1225,10 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('returns expected failures if the RestockSkuWorkerService throws an Error not DoNotRetryError (test 2)', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_throwsIfAsked('SomeError')
+  it(`returns expected failures if the RestockSkuWorkerService returns a transient Failure (test 2)`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_failsOnData(true)
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
-    const mockIds = ['AA', 'BB-THROW', 'CC', 'DD', 'EE-THROW']
+    const mockIds = ['AA', 'BB-FAILURE', 'CC', 'DD', 'EE-FAILURE']
     const { mockSqsRecords, mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await restockSkuWorkerController.restockSkus(mockSqsEvent)
     const expected: SQSBatchResponse = {
@@ -1229,10 +1240,10 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('returns expected failures if the RestockSkuWorkerService throws an Error not DoNotRetryError (test 3)', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_throwsIfAsked('SomeError')
+  it(`returns expected failures if the RestockSkuWorkerService returns a transient Failure (test 3)`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_failsOnData(true)
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
-    const mockIds = ['AA', 'BB-THROW', 'CC-THROW', 'DD-THROW', 'EE-THROW']
+    const mockIds = ['AA', 'BB-FAILURE', 'CC-FAILURE', 'DD-FAILURE', 'EE-FAILURE']
     const { mockSqsRecords, mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await restockSkuWorkerController.restockSkus(mockSqsEvent)
     const expected: SQSBatchResponse = {
@@ -1246,10 +1257,10 @@ describe('Warehouse Service RestockSkuWorker RestockSkuWorkerController tests', 
     expect(result).toStrictEqual(expected)
   })
 
-  it('returns all failures if the RestockSkuWorkerService throws all and only Error not DoNotRetryError', async () => {
-    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_throwsIfAsked('SomeError')
+  it(`returns all failures if the RestockSkuWorkerService throws all and only transient Failure`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_failsOnData(true)
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
-    const mockIds = ['AA-THROW', 'BB-THROW', 'CC-THROW']
+    const mockIds = ['AA-FAILURE', 'BB-FAILURE', 'CC-FAILURE']
     const { mockSqsRecords, mockSqsEvent } = buildMockTestObjects(mockIds)
     const result = await restockSkuWorkerController.restockSkus(mockSqsEvent)
     const expected: SQSBatchResponse = {

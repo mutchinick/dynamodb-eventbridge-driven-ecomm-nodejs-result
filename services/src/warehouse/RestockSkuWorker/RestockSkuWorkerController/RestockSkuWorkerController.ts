@@ -1,6 +1,6 @@
-import { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda'
-import { WarehouseError } from '../../errors/WarehouseError'
-import { IncomingSkuRestockedEvent } from '../model/IncomingSkuRestockedEvent'
+import { SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda'
+import { Failure, Result, Success } from '../../errors/Result'
+import { IncomingSkuRestockedEvent, IncomingSkuRestockedEventInput } from '../model/IncomingSkuRestockedEvent'
 import { IRestockSkuWorkerService } from '../RestockSkuWorkerService/RestockSkuWorkerService'
 
 export interface IRestockSkuWorkerController {
@@ -19,53 +19,72 @@ export class RestockSkuWorkerController implements IRestockSkuWorkerController {
   //
   //
   public async restockSkus(sqsEvent: SQSEvent): Promise<SQSBatchResponse> {
-    console.info('RestockSkuWorkerController.restockSkus init:', { sqsEvent })
-    const batchItemFailures: SQSBatchItemFailure[] = []
+    const logContext = 'RestockSkuWorkerController.restockSkus'
+    console.info(`${logContext} init:`, { sqsEvent })
+
+    const sqsBatchResponse: SQSBatchResponse = { batchItemFailures: [] }
     for (const record of sqsEvent.Records) {
-      try {
-        await this.restockSku(record)
-      } catch (error) {
-        if (WarehouseError.doNotRetry(error)) {
-          continue
-        }
-        batchItemFailures.push({ itemIdentifier: record.messageId })
+      // If the failure is transient then we add it to the batch errors to requeue and retry
+      // If the failure is non-transient then we ignore it to remove it from the queue
+      const restockSkuResult = await this.restockSingleSkuSafe(record)
+      if (Result.isFailureTransient(restockSkuResult)) {
+        sqsBatchResponse.batchItemFailures.push({ itemIdentifier: record.messageId })
       }
     }
-    const sqsBatchResponse: SQSBatchResponse = { batchItemFailures }
-    console.info('RestockSkuWorkerController.restockSkus exit:', { sqsBatchResponse })
+
+    console.info(`${logContext} exit success:`, { sqsBatchResponse })
     return sqsBatchResponse
   }
 
   //
   //
   //
-  private async restockSku(sqsRecord: SQSRecord) {
-    try {
-      console.info('RestockSkuWorkerController.restockSku init:', { sqsRecord })
-      const incomingSkuRestockedEvent = this.parseValidateEvent(sqsRecord.body)
-      await this.restockSkuWorkerService.restockSku(incomingSkuRestockedEvent)
-      console.info('RestockSkuWorkerController.restockSku exit:', { incomingSkuRestockedEvent })
-    } catch (error) {
-      console.error('RestockSkuWorkerController.restockSku error:', { error })
-      throw error
+  private async restockSingleSkuSafe(
+    sqsRecord: SQSRecord,
+  ): Promise<
+    | Success<void>
+    | Failure<'InvalidArgumentsError'>
+    | Failure<'DuplicateRestockOperationError'>
+    | Failure<'UnrecognizedError'>
+  > {
+    const logContext = 'RestockSkuApiController.restockSingleSkuSafe'
+    console.info(`${logContext} init:`, { sqsRecord })
+
+    const parseEventBodyResult = this.parseValidateEventBody(sqsRecord)
+    if (Result.isFailure(parseEventBodyResult)) {
+      console.error(`${logContext} failure exit:`, { parseEventResult: parseEventBodyResult, sqsRecord })
+      return parseEventBodyResult
     }
+
+    const eventBridgeEvent = parseEventBodyResult.value as IncomingSkuRestockedEventInput
+    const incomingRestockSkuEventResult = IncomingSkuRestockedEvent.validateAndBuild(eventBridgeEvent)
+    if (Result.isFailure(incomingRestockSkuEventResult)) {
+      console.error(`${logContext} failure exit:`, { incomingRestockSkuEventResult, unverifiedEvent: eventBridgeEvent })
+      return incomingRestockSkuEventResult
+    }
+
+    const incomingRestockSkuEvent = incomingRestockSkuEventResult.value
+    const restockSkuResult = await this.restockSkuWorkerService.restockSku(incomingRestockSkuEvent)
+    Result.isFailure(restockSkuResult)
+      ? console.error(`${logContext} exit failure:`, { restockSkuResult, incomingRestockSkuEvent })
+      : console.info(`${logContext} exit success:`, { restockSkuResult, incomingRestockSkuEvent })
+
+    return restockSkuResult
   }
 
   //
   //
   //
-  private parseValidateEvent(bodyText: string): IncomingSkuRestockedEvent {
+  private parseValidateEventBody(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
     try {
-      console.info('RestockSkuWorkerController.parseValidateEvent init:', { bodyText })
-      const eventBridgeEvent = JSON.parse(bodyText)
-      const incomingSkuRestockedEvent = IncomingSkuRestockedEvent.validateAndBuild(eventBridgeEvent)
-      console.info('RestockSkuWorkerController.parseValidateEvent exit:', { incomingSkuRestockedEvent })
-      return incomingSkuRestockedEvent
+      const eventBridgeEvent = JSON.parse(sqsRecord.body)
+      return Result.makeSuccess<unknown>(eventBridgeEvent)
     } catch (error) {
-      console.error('RestockSkuWorkerController.parseValidateEvent error:', { error })
-      WarehouseError.addName(error, WarehouseError.InvalidArgumentsError)
-      WarehouseError.addName(error, WarehouseError.DoNotRetryError)
-      throw error
+      const logContext = 'RestockSkuApiController.parseValidateEventBody'
+      console.error(`${logContext} error caught:`, { error, sqsRecord })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, sqsRecord })
+      return invalidArgsFailure
     }
   }
 }

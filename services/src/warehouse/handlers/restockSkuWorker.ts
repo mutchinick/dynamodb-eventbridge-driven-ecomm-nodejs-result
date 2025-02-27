@@ -1,10 +1,11 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
+import { SQSBatchResponse, SQSEvent } from 'aws-lambda'
+import { DbRestockSkuClient } from '../RestockSkuWorker/DbRestockSkuClient/DbRestockSkuClient'
 import { RestockSkuWorkerController } from '../RestockSkuWorker/RestockSkuWorkerController/RestockSkuWorkerController'
 import { RestockSkuWorkerService } from '../RestockSkuWorker/RestockSkuWorkerService/RestockSkuWorkerService'
-import { DbRestockSkuClient } from '../RestockSkuWorker/DbRestockSkuClient/DbRestockSkuClient'
 
-function createHandler() {
+function createHandler(): (sqsEvent: SQSEvent) => Promise<SQSBatchResponse> {
   const ddbClient = new DynamoDBClient({})
   const ddbDocClient = DynamoDBDocumentClient.from(ddbClient)
   const restockSkuClient = new DbRestockSkuClient(ddbDocClient)

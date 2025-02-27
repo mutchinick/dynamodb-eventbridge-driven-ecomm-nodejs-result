@@ -2,7 +2,7 @@ import { AttributeValue } from '@aws-sdk/client-dynamodb'
 import { unmarshall } from '@aws-sdk/util-dynamodb'
 import { EventBridgeEvent } from 'aws-lambda'
 import { z } from 'zod'
-import { WarehouseError } from '../../errors/WarehouseError'
+import { Failure, Result, Success } from '../../errors/Result'
 import { RestockSkuData } from '../../model/RestockSkuData'
 import { ValueValidators } from '../../model/ValueValidators'
 import { WarehouseEvent } from '../../model/WarehouseEvent'
@@ -29,6 +29,9 @@ type IncomingSkuRestockedEventProps = WarehouseEvent<
 >
 
 export class IncomingSkuRestockedEvent implements IncomingSkuRestockedEventProps {
+  //
+  //
+  //
   private constructor(
     readonly eventName: WarehouseEventName.SKU_RESTOCKED_EVENT,
     readonly eventData: IncomingSkuRestockedEventData,
@@ -36,14 +39,26 @@ export class IncomingSkuRestockedEvent implements IncomingSkuRestockedEventProps
     readonly updatedAt: string,
   ) {}
 
-  public static validateAndBuild(incomingSkuRestockedEventInput: IncomingSkuRestockedEventInput) {
-    try {
-      const { eventName, eventData, createdAt, updatedAt } = this.buildProps(incomingSkuRestockedEventInput)
-      return new IncomingSkuRestockedEvent(eventName, eventData, createdAt, updatedAt)
-    } catch (error) {
-      console.error('IncomingSkuRestockedEvent.validateAndBuild', { error, incomingSkuRestockedEventInput })
-      throw error
+  //
+  //
+  //
+  public static validateAndBuild(
+    incomingSkuRestockedEventInput: IncomingSkuRestockedEventInput,
+  ): Success<IncomingSkuRestockedEvent> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'IncomingSkuRestockedEvent.validateAndBuild'
+    console.info(`${logContext} init:`, { incomingSkuRestockedEventInput })
+
+    const propsResult = this.buildProps(incomingSkuRestockedEventInput)
+    if (Result.isFailure(propsResult)) {
+      console.error(`${logContext} exit failure:`, { propsResult, incomingSkuRestockedEventInput })
+      return propsResult
     }
+
+    const { eventName, eventData, createdAt, updatedAt } = propsResult.value
+    const incomingSkuRestockedEvent = new IncomingSkuRestockedEvent(eventName, eventData, createdAt, updatedAt)
+    const incomingSkuRestockedEventResult = Result.makeSuccess(incomingSkuRestockedEvent)
+    console.info(`${logContext} exit success:`, { incomingSkuRestockedEventResult })
+    return incomingSkuRestockedEventResult
   }
 
   //
@@ -51,29 +66,39 @@ export class IncomingSkuRestockedEvent implements IncomingSkuRestockedEventProps
   //
   private static buildProps(
     incomingSkuRestockedEventInput: IncomingSkuRestockedEventInput,
-  ): IncomingSkuRestockedEventProps {
+  ): Success<IncomingSkuRestockedEventProps> | Failure<'InvalidArgumentsError'> {
     try {
-      const eventDetail = incomingSkuRestockedEventInput.detail
-      const unverifiedIncomingSkuRestockedEvent = unmarshall(
-        eventDetail.dynamodb.NewImage,
-      ) as IncomingSkuRestockedEventProps
-      const incomingSkuRestockedEvent = z
-        .object({
-          eventName: ValueValidators.validSkuRestockedEventName(),
-          eventData: z.object({
-            sku: ValueValidators.validSku(),
-            units: ValueValidators.validUnits(),
-            lotId: ValueValidators.validLotId(),
-          }),
-          createdAt: ValueValidators.validCreatedAt(),
-          updatedAt: ValueValidators.validUpdatedAt(),
-        })
-        .parse(unverifiedIncomingSkuRestockedEvent) as IncomingSkuRestockedEventProps
-      return incomingSkuRestockedEvent
+      const validProps = this.parseValidateInput(incomingSkuRestockedEventInput)
+      return Result.makeSuccess(validProps)
     } catch (error) {
-      WarehouseError.addName(error, WarehouseError.InvalidArgumentsError)
-      WarehouseError.addName(error, WarehouseError.DoNotRetryError)
-      throw error
+      const logContext = 'IncomingSkuRestockedEvent.buildProps'
+      console.error(`${logContext} error caught:`, { error })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingSkuRestockedEventInput })
+      return invalidArgsFailure
     }
+  }
+
+  //
+  //
+  //
+  private static parseValidateInput(
+    incomingSkuRestockedEventInput: IncomingSkuRestockedEventInput,
+  ): IncomingSkuRestockedEventProps {
+    const eventDetail = incomingSkuRestockedEventInput.detail
+    const unverifiedEvent = unmarshall(eventDetail.dynamodb.NewImage)
+    const incomingSkuRestockedEvent = z
+      .object({
+        eventName: ValueValidators.validSkuRestockedEventName(),
+        eventData: z.object({
+          sku: ValueValidators.validSku(),
+          units: ValueValidators.validUnits(),
+          lotId: ValueValidators.validLotId(),
+        }),
+        createdAt: ValueValidators.validCreatedAt(),
+        updatedAt: ValueValidators.validUpdatedAt(),
+      })
+      .parse(unverifiedEvent) as IncomingSkuRestockedEventProps
+    return incomingSkuRestockedEvent
   }
 }

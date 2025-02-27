@@ -19,19 +19,20 @@ export class AllocateOrderStockWorkerController implements IAllocateOrderStockWo
   //
   //
   public async allocateOrdersStock(sqsEvent: SQSEvent): Promise<SQSBatchResponse> {
-    const logContext = 'AllocateOrderStockWorkerController.allocateSingleOrder'
+    const logContext = 'AllocateOrderStockWorkerController.allocateOrdersStock'
     console.info(`${logContext} init:`, { sqsEvent })
 
     const sqsBatchResponse: SQSBatchResponse = { batchItemFailures: [] }
     for (const record of sqsEvent.Records) {
+      // If the failure is transient then we add it to the batch errors to requeue and retry
+      // If the failure is non-transient then we ignore it to remove it from the queue
       const allocateOrderStockResult = await this.allocateSingleOrder(record)
-      // If the failure is transient then we add it to the batch errors to re-queue and retry
-      // If the failure is not transient then we ignore it to remove it from the queue
-      if (Result.isFailure(allocateOrderStockResult) && allocateOrderStockResult.transient) {
+      if (Result.isFailureTransient(allocateOrderStockResult)) {
         sqsBatchResponse.batchItemFailures.push({ itemIdentifier: record.messageId })
       }
     }
-    console.info(`${logContext} exit:`, { sqsBatchResponse })
+
+    console.info(`${logContext} exit success:`, { sqsBatchResponse })
     return sqsBatchResponse
   }
 
@@ -43,16 +44,15 @@ export class AllocateOrderStockWorkerController implements IAllocateOrderStockWo
   ): Promise<
     | Success<void>
     | Failure<'InvalidArgumentsError'>
-    | Failure<'InvalidEventRaiseOperationError_Redundant'>
+    | Failure<'DuplicateEventRaisedError'>
     | Failure<'UnrecognizedError'>
   > {
     const logContext = 'AllocateOrderStockWorkerController.allocateSingleOrder'
     console.info(`${logContext} init:`, { sqsRecord })
 
-    const sqsRecordBody = sqsRecord.body
-    const eventBridgeEventResult = this.parseEventBrideEventSafe(sqsRecordBody)
+    const eventBridgeEventResult = this.parseEventBrideEvent(sqsRecord)
     if (Result.isFailure(eventBridgeEventResult)) {
-      console.error(`${logContext} exit failure:`, { eventBridgeEventResult, sqsRecordBody })
+      console.error(`${logContext} exit failure:`, { eventBridgeEventResult, sqsRecord })
       return eventBridgeEventResult
     }
 
@@ -77,16 +77,16 @@ export class AllocateOrderStockWorkerController implements IAllocateOrderStockWo
   //
   //
   //
-  private parseEventBrideEventSafe(eventBodyText: string): Success<unknown> | Failure<'InvalidArgumentsError'> {
+  private parseEventBrideEvent(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
     try {
-      const eventBridgeEvent = JSON.parse(eventBodyText)
-      return Result.makeSuccess(eventBridgeEvent) as Success<unknown>
+      const eventBridgeEvent = JSON.parse(sqsRecord.body)
+      return Result.makeSuccess<unknown>(eventBridgeEvent)
     } catch (error) {
-      const logContext = 'AllocateOrderStockWorkerController.parseEventBrideEventSafe'
-      console.error(`${logContext} error:`, { error })
-      const invalidArgsResult = Result.makeFailure('InvalidArgumentsError', error, false)
-      console.error(`${logContext} exit failure:`, { invalidArgsResult, eventBodyText })
-      return invalidArgsResult
+      const logContext = 'AllocateOrderStockWorkerController.parseEventBrideEvent'
+      console.error(`${logContext} error caught:`, { error })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, sqsRecord })
+      return invalidArgsFailure
     }
   }
 }

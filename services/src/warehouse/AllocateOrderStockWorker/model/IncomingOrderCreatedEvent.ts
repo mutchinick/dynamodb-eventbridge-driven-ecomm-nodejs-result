@@ -29,6 +29,9 @@ type IncomingOrderCreatedEventProps = WarehouseEvent<
 >
 
 export class IncomingOrderCreatedEvent implements IncomingOrderCreatedEventProps {
+  //
+  //
+  //
   private constructor(
     readonly eventName: WarehouseEventName.ORDER_CREATED_EVENT,
     readonly eventData: IncomingOrderCreatedEventData,
@@ -36,20 +39,22 @@ export class IncomingOrderCreatedEvent implements IncomingOrderCreatedEventProps
     readonly updatedAt: string,
   ) {}
 
+  //
+  //
+  //
   public static validateAndBuild(
     incomingOrderCreatedEventInput: IncomingOrderCreatedEventInput,
   ): Success<IncomingOrderCreatedEvent> | Failure<'InvalidArgumentsError'> {
     const logContext = 'IncomingOrderCreatedEvent.validateAndBuild'
     console.info(`${logContext} init:`, { incomingOrderCreatedEventInput })
 
-    const propsResult = this.buildPropsSafe(incomingOrderCreatedEventInput)
+    const propsResult = this.buildProps(incomingOrderCreatedEventInput)
     if (Result.isFailure(propsResult)) {
       console.error(`${logContext} exit failure:`, { propsResult, incomingOrderCreatedEventInput })
       return propsResult
     }
 
-    const props = propsResult.value
-    const { eventName, eventData, createdAt, updatedAt } = props
+    const { eventName, eventData, createdAt, updatedAt } = propsResult.value
     const incomingOrderCreatedEvent = new IncomingOrderCreatedEvent(eventName, eventData, createdAt, updatedAt)
     const incomingOrderCreatedEventResult = Result.makeSuccess(incomingOrderCreatedEvent)
     console.info(`${logContext} exit success:`, { incomingOrderCreatedEventResult })
@@ -59,31 +64,41 @@ export class IncomingOrderCreatedEvent implements IncomingOrderCreatedEventProps
   //
   //
   //
-  private static buildPropsSafe(
+  private static buildProps(
     incomingOrderCreatedEventInput: IncomingOrderCreatedEventInput,
   ): Success<IncomingOrderCreatedEventProps> | Failure<'InvalidArgumentsError'> {
     try {
-      const eventDetail = incomingOrderCreatedEventInput.detail
-      const unverifiedIncomingOrderCreatedEvent = unmarshall(eventDetail.dynamodb.NewImage)
-      const incomingOrderCreatedEvent = z
-        .object({
-          eventName: ValueValidators.validOrderCreatedEventName(),
-          eventData: z.object({
-            sku: ValueValidators.validSku(),
-            units: ValueValidators.validUnits(),
-            orderId: ValueValidators.validOrderId(),
-          }),
-          createdAt: ValueValidators.validCreatedAt(),
-          updatedAt: ValueValidators.validUpdatedAt(),
-        })
-        .parse(unverifiedIncomingOrderCreatedEvent) as IncomingOrderCreatedEventProps
-      return Result.makeSuccess(incomingOrderCreatedEvent)
+      const validProps = this.parseValidateInput(incomingOrderCreatedEventInput)
+      return Result.makeSuccess(validProps)
     } catch (error) {
-      const logContext = 'IncomingOrderCreatedEvent.buildPropsSafe'
-      console.error(`${logContext} error:`, { error })
+      const logContext = 'IncomingOrderCreatedEvent.buildProps'
+      console.error(`${logContext} error caught:`, { error })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingOrderCreatedEventInput })
       return invalidArgsFailure
     }
+  }
+
+  //
+  //
+  //
+  private static parseValidateInput(
+    incomingOrderCreatedEventInput: IncomingOrderCreatedEventInput,
+  ): IncomingOrderCreatedEventProps {
+    const eventDetail = incomingOrderCreatedEventInput.detail
+    const unverifiedEvent = unmarshall(eventDetail.dynamodb.NewImage)
+    const incomingOrderCreatedEvent = z
+      .object({
+        eventName: ValueValidators.validOrderCreatedEventName(),
+        eventData: z.object({
+          sku: ValueValidators.validSku(),
+          units: ValueValidators.validUnits(),
+          orderId: ValueValidators.validOrderId(),
+        }),
+        createdAt: ValueValidators.validCreatedAt(),
+        updatedAt: ValueValidators.validUpdatedAt(),
+      })
+      .parse(unverifiedEvent) as IncomingOrderCreatedEventProps
+    return incomingOrderCreatedEvent
   }
 }
