@@ -53,7 +53,7 @@ describe(`Warehouse Service RestockSkuApi RestockSkuApiController tests`, () => 
   //
   // Test APIGatewayProxyEventV2 edge cases
   //
-  it(`responds with 400 Internal Server Error if the APIGatewayProxyEventV2 is undefined`, async () => {
+  it(`responds with 400 Bad Request if the APIGatewayProxyEventV2 is undefined`, async () => {
     const mockRestockSkuApiService = buildMockRestockSkuApiService_restockSku_succeeds()
     const restockSkuApiController = new RestockSkuApiController(mockRestockSkuApiService)
     const expectedErrorResponse = HttpResponse.BadRequestError()
@@ -273,7 +273,7 @@ describe(`Warehouse Service RestockSkuApi RestockSkuApiController tests`, () => 
   })
 
   it(`responds with 500 Internal Server Error if RestockSkuApiService.restockSku
-      returns a Failure of kind UnrecognizedError `, async () => {
+      returns a Failure of kind UnrecognizedError`, async () => {
     const mockRestockSkuApiService = buildMockRestockSkuApiService_restockSku_fails()
     const restockSkuApiController = new RestockSkuApiController(mockRestockSkuApiService)
     const mockApiEventBody = buildMockApiEventBody()
