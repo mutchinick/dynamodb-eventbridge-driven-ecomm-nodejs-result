@@ -131,6 +131,9 @@ describe(`Warehouse Service RestockSkuApi EsRaiseSkuRestockedEventClient tests`,
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
+  //
+  // Test expected result
+  //
   it(`returns the expected Success<void>`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_send_resolves()
     const esRaiseSkuRestockedEventClient = new EsRaiseSkuRestockedEventClient(mockDdbDocClient)
