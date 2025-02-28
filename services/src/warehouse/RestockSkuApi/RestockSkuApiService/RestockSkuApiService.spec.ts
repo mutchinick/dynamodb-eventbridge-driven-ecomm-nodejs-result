@@ -105,13 +105,9 @@ describe(`Warehouse Service RestockSkuApi RestockSkuApiService tests`, () => {
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it(`returns a Success if DdbRestockSkuEventClient.restockSku if
+  it(`returns a Success if DdbRestockSkuEventClient.restockSku
       returns a Failure of kind DuplicateEventRaisedError`, async () => {
-    const mockDdbRestockSkuEventClient = buildMockDdbRestockSkuEventClient_raiseEvent_fails(
-      'DuplicateEventRaisedError',
-      'mockError',
-      false,
-    )
+    const mockDdbRestockSkuEventClient = buildMockDdbRestockSkuEventClient_raiseEvent_fails('DuplicateEventRaisedError')
     const restockSkuApiService = new RestockSkuApiService(mockDdbRestockSkuEventClient)
     const result = await restockSkuApiService.restockSku(mockIncomingRestockSkuRequest)
     const expectedValue: RestockSkuServiceOutput = {
@@ -126,7 +122,7 @@ describe(`Warehouse Service RestockSkuApi RestockSkuApiService tests`, () => {
   //
   // Test expected results
   //
-  it(`returns a Success<ServiceOutput> with the expected properties`, async () => {
+  it(`returns a Success<RestockSkuServiceOutput> with the expected data`, async () => {
     const mockDdbRestockSkuEventClient = buildMockDdbRestockSkuEventClient_raiseEvent_succeeds()
     const restockSkuApiService = new RestockSkuApiService(mockDdbRestockSkuEventClient)
     const result = await restockSkuApiService.restockSku(mockIncomingRestockSkuRequest)

@@ -7,7 +7,7 @@ import { SkuRestockedEvent } from '../model/SkuRestockedEvent'
 export interface IRestockSkuApiService {
   restockSku: (
     incomingRestockSkuRequest: IncomingRestockSkuRequest,
-  ) => Promise<Success<IncomingRestockSkuRequest> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>>
+  ) => Promise<Success<RestockSkuServiceOutput> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>>
 }
 
 export type RestockSkuServiceOutput = TypeUtilsPretty<IncomingRestockSkuRequest>
@@ -23,7 +23,7 @@ export class RestockSkuApiService implements IRestockSkuApiService {
   //
   public async restockSku(
     incomingRestockSkuRequest: IncomingRestockSkuRequest,
-  ): Promise<Success<IncomingRestockSkuRequest> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
+  ): Promise<Success<RestockSkuServiceOutput> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
     const logContext = 'RestockSkuApiService.restockSku'
     console.info(`${logContext} init:`, { incomingRestockSkuRequest })
 
