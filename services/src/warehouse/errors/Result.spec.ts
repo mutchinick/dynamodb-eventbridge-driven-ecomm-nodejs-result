@@ -2,7 +2,7 @@ import { FailureKind } from './FailureKind'
 import { Failure, Result, Success } from './Result'
 
 describe(`Warehouse Service Result tests`, () => {
-  describe(`WarehouseError.makeSuccess`, () => {
+  describe(`Result.makeSuccess`, () => {
     it(`returns a void Success when called with no arguments`, () => {
       const result = Result.makeSuccess()
       const expectedResult: Success<void> = { value: undefined }
@@ -17,7 +17,7 @@ describe(`Warehouse Service Result tests`, () => {
     })
   })
 
-  describe(`WarehouseError.makeFailure`, () => {
+  describe(`Result.makeFailure`, () => {
     it(`returns a non-transient Failure with the expected FailureKind and Error`, () => {
       const error = new Error('mockError')
       const failureKind: FailureKind = 'UnrecognizedError'
@@ -58,7 +58,7 @@ describe(`Warehouse Service Result tests`, () => {
     })
   })
 
-  describe(`WarehouseError.isSuccess`, () => {
+  describe(`Result.isSuccess`, () => {
     it(`returns true if the Result is a Success with a value`, () => {
       const mockValue = 'mockValue'
       const result = Result.makeSuccess(mockValue)
@@ -76,7 +76,7 @@ describe(`Warehouse Service Result tests`, () => {
     })
   })
 
-  describe(`WarehouseError.isFailure`, () => {
+  describe(`Result.isFailure`, () => {
     it(`returns true if the Result is a Failure`, () => {
       const result = Result.makeFailure('UnrecognizedError', 'Mock message', false)
       expect(Result.isFailure(result)).toBe(true)
@@ -89,7 +89,7 @@ describe(`Warehouse Service Result tests`, () => {
     })
   })
 
-  describe(`WarehouseError.isFailureOfKind`, () => {
+  describe(`Result.isFailureOfKind`, () => {
     it(`returns true if the Result is a Failure of type FailureKind`, () => {
       const failureKind: FailureKind = 'InvalidArgumentsError'
       const result = Result.makeFailure(failureKind, 'Mock message', false)
@@ -109,7 +109,7 @@ describe(`Warehouse Service Result tests`, () => {
     })
   })
 
-  describe(`WarehouseError.isFailureTransient`, () => {
+  describe(`Result.isFailureTransient`, () => {
     it(`returns true if the Result is a transient Failure`, () => {
       const transient = true
       const result = Result.makeFailure('InvalidArgumentsError', 'Mock message', transient)
