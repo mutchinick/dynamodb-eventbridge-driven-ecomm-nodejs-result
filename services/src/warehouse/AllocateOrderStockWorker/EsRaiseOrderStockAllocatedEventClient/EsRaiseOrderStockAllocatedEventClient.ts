@@ -98,7 +98,7 @@ export class EsRaiseOrderStockAllocatedEventClient implements IEsRaiseOrderStock
       // When possible multiple transaction errors:
       // Prioritize tagging the "Duplication Errors", because if we get one, this means that the operation
       // has already executed successfully, thus we don't care about other possible transaction errors
-      if (this.isDuplicateEventRaisedError(error)) {
+      if (DynamoDbUtils.isConditionalCheckFailedException(error)) {
         const duplicationFailure = Result.makeFailure('DuplicateEventRaisedError', error, false)
         console.error(`${logContext} exit failure:`, { duplicationFailure, ddbPutCommand })
         return duplicationFailure
@@ -108,13 +108,5 @@ export class EsRaiseOrderStockAllocatedEventClient implements IEsRaiseOrderStock
       console.error(`${logContext} exit failure:`, { unrecognizedFailure, ddbPutCommand })
       return unrecognizedFailure
     }
-  }
-
-  //
-  //
-  //
-  private isDuplicateEventRaisedError(error: unknown): boolean {
-    const errorCode = DynamoDbUtils.getTransactionCancellationCode(error, 0)
-    return errorCode === DynamoDbUtils.CancellationReasons.ConditionalCheckFailed
   }
 }

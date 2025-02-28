@@ -1,8 +1,7 @@
-import { TransactionCanceledException } from '@aws-sdk/client-dynamodb'
+import { ConditionalCheckFailedException } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
 import { Result } from '../../errors/Result'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
-import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { OrderStockDepletedEvent } from '../model/OrderStockDepletedEvent'
 import { EsRaiseOrderStockDepletedEventClient } from './EsRaiseOrderStockDepletedEventClient'
 
@@ -45,17 +44,13 @@ function buildMockDdbDocClient_send_throws(): DynamoDBDocumentClient {
 }
 
 function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Duplicate(): DynamoDBDocumentClient {
-  const error: Error = new TransactionCanceledException({
-    $metadata: {},
-    message: '',
-    CancellationReasons: [{ Code: DynamoDbUtils.CancellationReasons.ConditionalCheckFailed }, null],
-  })
+  const error = new ConditionalCheckFailedException({ $metadata: {}, message: '' })
   return {
     send: jest.fn().mockRejectedValue(error),
   } as unknown as DynamoDBDocumentClient
 }
 
-describe(`Warehouse Service AllocateOrderStockApi EsRaiseOrderStockDepletedEventClient tests`, () => {
+describe(`Warehouse Service AllocateOrderStockWorker EsRaiseOrderStockDepletedEventClient tests`, () => {
   //
   // Test OrderStockDepletedEvent edge cases
   //

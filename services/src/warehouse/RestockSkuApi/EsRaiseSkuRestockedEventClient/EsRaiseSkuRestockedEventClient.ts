@@ -1,6 +1,6 @@
-import { ConditionalCheckFailedException } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
 import { Failure, Result, Success } from '../../errors/Result'
+import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { SkuRestockedEvent } from '../model/SkuRestockedEvent'
 
 export interface IEsRaiseSkuRestockedEventClient {
@@ -98,7 +98,7 @@ export class EsRaiseSkuRestockedEventClient implements IEsRaiseSkuRestockedEvent
       // When possible multiple transaction errors:
       // Prioritize tagging the "Duplication Errors", because if we get one, this means that the operation
       // has already executed successfully, thus we don't care about other possible transaction errors
-      if (this.isConditionalCheckFailedException(error)) {
+      if (DynamoDbUtils.isConditionalCheckFailedException(error)) {
         const duplicationFailure = Result.makeFailure('DuplicateEventRaisedError', error, false)
         console.error(`${logContext} exit failure:`, { duplicationFailure, ddbPutCommand })
         return duplicationFailure
@@ -108,12 +108,5 @@ export class EsRaiseSkuRestockedEventClient implements IEsRaiseSkuRestockedEvent
       console.error(`${logContext} exit failure:`, { unrecognizedFailure, ddbPutCommand })
       return unrecognizedFailure
     }
-  }
-
-  //
-  //
-  //
-  private isConditionalCheckFailedException(error: unknown): error is ConditionalCheckFailedException {
-    return error instanceof ConditionalCheckFailedException
   }
 }
