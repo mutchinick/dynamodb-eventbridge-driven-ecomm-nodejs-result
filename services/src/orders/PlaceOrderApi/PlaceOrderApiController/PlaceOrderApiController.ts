@@ -1,6 +1,6 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda'
 import { HttpResponse } from '../../../shared/HttpResponse'
-import { OrderError } from '../../errors/OrderError'
+import { Failure, Result, Success } from '../../errors/Result'
 import { IPlaceOrderApiService } from '../PlaceOrderApiService/PlaceOrderApiService'
 import { IncomingPlaceOrderRequest, IncomingPlaceOrderRequestInput } from '../model/IncomingPlaceOrderRequest'
 
@@ -20,38 +20,72 @@ export class PlaceOrderApiController implements IPlaceOrderApiController {
   //
   //
   public async placeOrder(apiEvent: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> {
-    try {
-      console.info('PlaceOrderApiController.placeOrder init:', { apiEvent })
-      const incomingPlaceOrderRequest = this.parseValidateRequest(apiEvent.body)
-      const placeOrderOutput = await this.placeOrderApiService.placeOrder(incomingPlaceOrderRequest)
-      const apiResponse = HttpResponse.Accepted(placeOrderOutput)
-      console.info('PlaceOrderApiController.placeOrder exit:', { apiResponse })
-      return apiResponse
-    } catch (error) {
-      console.error('PlaceOrderApiController.placeOrder error:', { error })
-      if (OrderError.hasName(error, OrderError.InvalidArgumentsError)) {
-        return HttpResponse.BadRequestError()
-      }
+    const logContext = 'PlaceOrderApiController.placeOrder'
+    console.info(`${logContext} init:`, { apiEvent })
 
-      return HttpResponse.InternalServerError()
+    const placeOrderResult = await this.placeOrderSafe(apiEvent)
+    if (Result.isSuccess(placeOrderResult)) {
+      const placeOrderOutput = placeOrderResult.value
+      const apiResponse = HttpResponse.Accepted(placeOrderOutput)
+      console.info(`${logContext} exit success:`, { apiResponse, apiEvent })
+      return apiResponse
     }
+
+    if (Result.isFailureOfKind(placeOrderResult, 'InvalidArgumentsError')) {
+      console.error(`${logContext} failure exit:`, { apiEvent })
+      return HttpResponse.BadRequestError()
+    }
+
+    console.error(`${logContext} failure exit:`, { apiEvent })
+    return HttpResponse.InternalServerError()
   }
 
   //
   //
   //
-  private parseValidateRequest(bodyText: string): IncomingPlaceOrderRequest {
+  private async placeOrderSafe(
+    apiEvent: APIGatewayProxyEventV2,
+  ): Promise<Success<IncomingPlaceOrderRequest> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
+    const logContext = 'PlaceOrderApiController.placeOrderSafe'
+    console.info(`${logContext} init:`, { apiEvent })
+
+    const parseRequestBodyResult = this.parseValidateRequestBody(apiEvent)
+    if (Result.isFailure(parseRequestBodyResult)) {
+      console.error(`${logContext} failure exit:`, { parseRequestResult: parseRequestBodyResult, apiEvent })
+      return parseRequestBodyResult
+    }
+
+    const unverifiedRequest = parseRequestBodyResult.value as IncomingPlaceOrderRequestInput
+    const incomingPlaceOrderRequestResult = IncomingPlaceOrderRequest.validateAndBuild(unverifiedRequest)
+    if (Result.isFailure(incomingPlaceOrderRequestResult)) {
+      console.error(`${logContext} failure exit:`, { incomingPlaceOrderRequestResult, unverifiedRequest })
+      return incomingPlaceOrderRequestResult
+    }
+
+    const incomingPlaceOrderRequest = incomingPlaceOrderRequestResult.value
+    const placeOrderResult = await this.placeOrderApiService.placeOrder(incomingPlaceOrderRequest)
+    Result.isFailure(placeOrderResult)
+      ? console.error(`${logContext} exit failure:`, { placeOrderResult, incomingPlaceOrderRequest })
+      : console.info(`${logContext} exit success:`, { placeOrderResult, incomingPlaceOrderRequest })
+
+    return placeOrderResult
+  }
+
+  //
+  //
+  //
+  private parseValidateRequestBody(
+    apiEvent: APIGatewayProxyEventV2,
+  ): Success<unknown> | Failure<'InvalidArgumentsError'> {
     try {
-      console.info('PlaceOrderApiController.parseValidateRequest init:', { bodyText })
-      const unverifiedRequest = JSON.parse(bodyText) as IncomingPlaceOrderRequestInput
-      const incomingPlaceOrderRequest = IncomingPlaceOrderRequest.validateAndBuild(unverifiedRequest)
-      console.info('PlaceOrderApiController.parseValidateRequest exit:', { incomingPlaceOrderRequest })
-      return incomingPlaceOrderRequest
+      const unverifiedRequest = JSON.parse(apiEvent.body)
+      return Result.makeSuccess<unknown>(unverifiedRequest)
     } catch (error) {
-      console.error('PlaceOrderApiController.parseValidateRequest error:', { error })
-      OrderError.addName(error, OrderError.InvalidArgumentsError)
-      OrderError.addName(error, OrderError.DoNotRetryError)
-      throw error
+      const logContext = 'PlaceOrderApiController.parseValidateRequestBody'
+      console.error(`${logContext} error caught:`, { error })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, apiEvent })
+      return invalidArgsFailure
     }
   }
 }
