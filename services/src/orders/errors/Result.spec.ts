@@ -1,7 +1,7 @@
 import { FailureKind } from './FailureKind'
 import { Failure, Result, Success } from './Result'
 
-describe(`OrdersService Service Result tests`, () => {
+describe(`Orders Service Result tests`, () => {
   describe(`Result.makeSuccess`, () => {
     it(`returns a void Success when called with no arguments`, () => {
       const result = Result.makeSuccess()
