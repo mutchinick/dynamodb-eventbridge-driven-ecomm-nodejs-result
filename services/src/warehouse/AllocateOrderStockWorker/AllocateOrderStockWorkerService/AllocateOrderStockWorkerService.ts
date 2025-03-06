@@ -42,6 +42,8 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
     const logContext = 'AllocateOrderStockWorkerService.allocateOrderStock'
     console.info(`${logContext} init:`, { incomingOrderCreatedEvent })
 
+    // COMBAK: validateIncomingOrderCreatedEvent to validate "just enough" (instanceof, etc)
+
     const allocateOrderResult = await this.allocateOrder(incomingOrderCreatedEvent)
 
     if (

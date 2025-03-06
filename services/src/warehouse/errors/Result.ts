@@ -67,4 +67,16 @@ export class Result {
   ): result is Failure<Kn> {
     return this.isFailure(result) && result.transient === true
   }
+
+  //
+  //
+  //
+  public static getSuccessValueOrThrow<T, K extends FailureKind>(result: Success<T> | Failure<K>): T {
+    if (this.isSuccess(result)) {
+      return result.value
+    }
+
+    const error = new Error('Result could not be asserted to be a Success')
+    throw error
+  }
 }

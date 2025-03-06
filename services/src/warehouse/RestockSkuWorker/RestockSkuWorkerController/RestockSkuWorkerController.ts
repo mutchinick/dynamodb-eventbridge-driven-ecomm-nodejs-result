@@ -52,14 +52,14 @@ export class RestockSkuWorkerController implements IRestockSkuWorkerController {
 
     const parseEventBodyResult = this.parseValidateEventBody(sqsRecord)
     if (Result.isFailure(parseEventBodyResult)) {
-      console.error(`${logContext} failure exit:`, { parseEventResult: parseEventBodyResult, sqsRecord })
+      console.error(`${logContext} failure exit:`, { parseEventBodyResult, sqsRecord })
       return parseEventBodyResult
     }
 
     const eventBridgeEvent = parseEventBodyResult.value as IncomingSkuRestockedEventInput
     const incomingRestockSkuEventResult = IncomingSkuRestockedEvent.validateAndBuild(eventBridgeEvent)
     if (Result.isFailure(incomingRestockSkuEventResult)) {
-      console.error(`${logContext} failure exit:`, { incomingRestockSkuEventResult, unverifiedEvent: eventBridgeEvent })
+      console.error(`${logContext} failure exit:`, { incomingRestockSkuEventResult, eventBridgeEvent })
       return incomingRestockSkuEventResult
     }
 

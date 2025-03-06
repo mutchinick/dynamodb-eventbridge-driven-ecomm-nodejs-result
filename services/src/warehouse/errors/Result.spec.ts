@@ -128,4 +128,18 @@ describe(`Warehouse Service Result tests`, () => {
       expect(Result.isFailureTransient(result)).toBe(false)
     })
   })
+
+  describe(`Result.getSuccessValueOrThrow`, () => {
+    it(`returns the expected value if the Result is a Success`, () => {
+      const value = 'mockValue'
+      const result = Result.makeSuccess(value)
+      const expectedValue = Result.getSuccessValueOrThrow(result)
+      expect(value).toStrictEqual(expectedValue)
+    })
+
+    it(`throws an Error if the Result is not a Success`, () => {
+      const result = Result.makeFailure('UnrecognizedError', 'Mock message', false)
+      expect(() => Result.getSuccessValueOrThrow(result)).toThrow()
+    })
+  })
 })

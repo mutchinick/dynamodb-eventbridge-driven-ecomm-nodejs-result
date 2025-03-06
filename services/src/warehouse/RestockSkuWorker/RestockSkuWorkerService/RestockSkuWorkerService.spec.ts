@@ -1,5 +1,5 @@
 import { FailureKind } from '../../errors/FailureKind'
-import { Result, Success } from '../../errors/Result'
+import { Result } from '../../errors/Result'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
 import { IDbRestockSkuClient } from '../DbRestockSkuClient/DbRestockSkuClient'
 import { IncomingSkuRestockedEvent } from '../model/IncomingSkuRestockedEvent'
@@ -26,7 +26,8 @@ const mockValidRestockSkuCommandInput: RestockSkuCommandInput = {
 }
 
 const expectedRestockSkuCommandResult = RestockSkuCommand.validateAndBuild(mockValidRestockSkuCommandInput)
-const expectedRestockSkuCommand = (expectedRestockSkuCommandResult as Success<RestockSkuCommand>).value
+
+const expectedRestockSkuCommand = Result.getSuccessValueOrThrow(expectedRestockSkuCommandResult)
 
 //
 // Mock Clients

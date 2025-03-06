@@ -1,5 +1,5 @@
 import { FailureKind } from '../../errors/FailureKind'
-import { Result, Success } from '../../errors/Result'
+import { Result } from '../../errors/Result'
 import { IEsRaiseSkuRestockedEventClient } from '../EsRaiseSkuRestockedEventClient/EsRaiseSkuRestockedEventClient'
 import { IncomingRestockSkuRequest } from '../model/IncomingRestockSkuRequest'
 import { SkuRestockedEvent } from '../model/SkuRestockedEvent'
@@ -13,7 +13,7 @@ const mockIncomingRestockSkuRequestResult = IncomingRestockSkuRequest.validateAn
   lotId: 'mockLotId',
 })
 
-const mockIncomingRestockSkuRequest = (mockIncomingRestockSkuRequestResult as Success<IncomingRestockSkuRequest>).value
+const mockIncomingRestockSkuRequest = Result.getSuccessValueOrThrow(mockIncomingRestockSkuRequestResult)
 
 //
 // Mock clients
@@ -78,7 +78,7 @@ describe(`Warehouse Service RestockSkuApi RestockSkuApiService tests`, () => {
     const restockSkuApiService = new RestockSkuApiService(mockDdbRestockSkuEventClient)
     await restockSkuApiService.restockSku(mockIncomingRestockSkuRequest)
     const expectedSkuRestockedEventResult = SkuRestockedEvent.validateAndBuild(mockIncomingRestockSkuRequest)
-    const expectedSkuRestockedEvent = (expectedSkuRestockedEventResult as Success<SkuRestockedEvent>).value
+    const expectedSkuRestockedEvent = Result.getSuccessValueOrThrow(expectedSkuRestockedEventResult)
     expect(mockDdbRestockSkuEventClient.raiseSkuRestockedEvent).toHaveBeenCalledWith(expectedSkuRestockedEvent)
   })
 
