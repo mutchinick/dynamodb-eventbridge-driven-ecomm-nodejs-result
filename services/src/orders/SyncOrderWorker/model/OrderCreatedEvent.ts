@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { OrderError } from '../../errors/OrderError'
+import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
 import { OrderEvent, OrderEventData } from '../../model/OrderEvent'
 import { OrderEventName } from '../../model/OrderEventName'
@@ -28,79 +28,69 @@ export class OrderCreatedEvent implements OrderCreatedEventProps {
   //
   //
   //
-  public static validateAndBuild(orderCreatedEventInput: OrderCreatedEventInput) {
-    try {
-      const { eventName, eventData, createdAt, updatedAt } = this.buildOrderCreatedEventProps(orderCreatedEventInput)
-      return new OrderCreatedEvent(eventName, eventData, createdAt, updatedAt)
-    } catch (error) {
-      console.error('OrderCreatedEvent.validateAndBuild', { error, orderCreatedEventInput })
-      throw error
+  public static validateAndBuild(
+    orderCreatedEventInput: OrderCreatedEventInput,
+  ): Success<OrderCreatedEvent> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'OrderCreatedEvent.validateAndBuild'
+    console.info(`${logContext} init:`, { orderCreatedEventInput })
+
+    const propsResult = this.buildProps(orderCreatedEventInput)
+    if (Result.isFailure(propsResult)) {
+      console.error(`${logContext} exit failure:`, { propsResult, orderCreatedEventInput })
+      return propsResult
     }
+
+    const { eventName, eventData, createdAt, updatedAt } = propsResult.value
+    const orderCreatedEvent = new OrderCreatedEvent(eventName, eventData, createdAt, updatedAt)
+    const orderCreatedEventResult = Result.makeSuccess(orderCreatedEvent)
+    console.info(`${logContext} exit success:`, { orderCreatedEventResult, orderCreatedEventInput })
+    return orderCreatedEventResult
   }
 
   //
   //
   //
-  private static buildOrderCreatedEventProps(orderCreatedEventInput: OrderCreatedEventInput): OrderCreatedEventProps {
-    const { orderData, incomingEventName } = orderCreatedEventInput
-    this.validateOrderData(orderData)
-    this.validateIncomingEventName(incomingEventName)
+  private static buildProps(
+    orderCreatedEventInput: OrderCreatedEventInput,
+  ): Success<OrderCreatedEventProps> | Failure<'InvalidArgumentsError'> {
+    try {
+      this.validateInput(orderCreatedEventInput)
+    } catch (error) {
+      const logContext = 'OrderCreatedEvent.buildProps'
+      console.error(`${logContext} error caught:`, { error })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, orderCreatedEventInput })
+      return invalidArgsFailure
+    }
 
+    const { orderData } = orderCreatedEventInput
+    const { orderId, orderStatus, sku, units, price, userId, createdAt, updatedAt } = orderData
     const date = new Date().toISOString()
-    const orderCreatedEvent: OrderCreatedEventProps = {
+    const orderCreatedEventProps: OrderCreatedEventProps = {
       eventName: OrderEventName.ORDER_CREATED_EVENT,
-      eventData: {
-        orderId: orderData.orderId,
-        orderStatus: orderData.orderStatus,
-        sku: orderData.sku,
-        units: orderData.units,
-        price: orderData.price,
-        userId: orderData.userId,
-        createdAt: orderData.createdAt,
-        updatedAt: orderData.updatedAt,
-      },
+      eventData: { orderId, orderStatus, sku, units, price, userId, createdAt, updatedAt },
       createdAt: date,
       updatedAt: date,
     }
-
-    return orderCreatedEvent
+    return Result.makeSuccess(orderCreatedEventProps)
   }
 
   //
   //
   //
-  private static validateOrderData(orderData: OrderData) {
-    try {
-      return z
-        .object({
-          orderId: ValueValidators.validOrderId(),
-          orderStatus: ValueValidators.validOrderStatus(),
-          sku: ValueValidators.validSku(),
-          units: ValueValidators.validUnits(),
-          price: ValueValidators.validPrice(),
-          userId: ValueValidators.validUserId(),
-          createdAt: ValueValidators.validCreatedAt(),
-          updatedAt: ValueValidators.validUpdatedAt(),
-        })
-        .strict()
-        .parse(orderData) as OrderData
-    } catch (error) {
-      OrderError.addName(error, OrderError.InvalidArgumentsError)
-      OrderError.addName(error, OrderError.DoNotRetryError)
-      throw error
-    }
-  }
-
-  //
-  //
-  //
-  private static validateIncomingEventName(incomingOrderEventName: OrderEventName) {
-    try {
-      ValueValidators.validOrderPlacedEventName().parse(incomingOrderEventName)
-    } catch (error) {
-      OrderError.addName(error, OrderError.InvalidArgumentsError)
-      OrderError.addName(error, OrderError.DoNotRetryError)
-      throw error
-    }
+  private static validateInput(orderCreatedEventInput: OrderCreatedEventInput): void {
+    z.object({
+      incomingEventName: ValueValidators.validOrderPlacedEventName(),
+      orderData: z.object({
+        orderId: ValueValidators.validOrderId(),
+        orderStatus: ValueValidators.validOrderStatus(),
+        sku: ValueValidators.validSku(),
+        units: ValueValidators.validUnits(),
+        price: ValueValidators.validPrice(),
+        userId: ValueValidators.validUserId(),
+        createdAt: ValueValidators.validCreatedAt(),
+        updatedAt: ValueValidators.validUpdatedAt(),
+      }),
+    }).parse(orderCreatedEventInput)
   }
 }

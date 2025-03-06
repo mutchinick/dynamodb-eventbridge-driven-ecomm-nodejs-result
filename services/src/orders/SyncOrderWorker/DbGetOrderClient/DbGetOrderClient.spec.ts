@@ -1,4 +1,5 @@
 import { DynamoDBDocumentClient, GetCommand, GetCommandOutput } from '@aws-sdk/lib-dynamodb'
+import { Result } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
 import { OrderStatus } from '../../model/OrderStatus'
 import { GetOrderCommand } from '../model/GetOrderCommand'
@@ -10,7 +11,7 @@ process.env.EVENT_STORE_TABLE_NAME = mockEventStoreTableName
 
 const mockOrderId = 'mockOrderId'
 
-const mockGetOrderCommand: GetOrderCommand = {
+const mockValidCommand: GetOrderCommand = {
   orderId: mockOrderId,
   options: {},
 }
@@ -23,7 +24,7 @@ const expectedDdbDocClientInput = new GetCommand({
   },
 })
 
-const mockValidOrderData: OrderData = {
+const expectedOrderData: OrderData = {
   orderId: mockOrderId,
   orderStatus: OrderStatus.ORDER_CREATED_STATUS,
   sku: 'mockSku',
@@ -36,7 +37,7 @@ const mockValidOrderData: OrderData = {
 
 function buildMockDdbDocClient_send_resolves_validItem(): DynamoDBDocumentClient {
   const mockGetCommandResult: GetCommandOutput = {
-    Item: mockValidOrderData,
+    Item: expectedOrderData,
     $metadata: {},
   }
   return { send: jest.fn().mockResolvedValue(mockGetCommandResult) } as unknown as DynamoDBDocumentClient
@@ -54,54 +55,117 @@ function buildMockDdbDocClient_send_throws(): DynamoDBDocumentClient {
   return { syncOrder: jest.fn().mockRejectedValue(new Error()) } as unknown as DynamoDBDocumentClient
 }
 
-describe('Orders Service SyncOrderWorker DbGetOrderClient tests', () => {
+describe(`Orders Service SyncOrderWorker DbGetOrderClient tests`, () => {
+  //
+  // Test GetOrderCommand edge cases
+  //
+  it(`returns a Success if the input GetOrderCommand is valid`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_send_resolves_validItem()
+    const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
+    const result = await dbGetOrderClient.getOrder(mockValidCommand)
+    expect(Result.isSuccess(result)).toBe(true)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderCommand is undefined`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_send_resolves_validItem()
+    const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
+    const mockTestCommand = undefined as GetOrderCommand
+    const result = await dbGetOrderClient.getOrder(mockTestCommand)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderCommand is null`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_send_resolves_validItem()
+    const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
+    const mockTestCommand = null as GetOrderCommand
+    const result = await dbGetOrderClient.getOrder(mockTestCommand)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  // it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+  //     GetOrderCommand is empty`, async () => {
+  //   const mockDdbDocClient = buildMockDdbDocClient_send_resolves_validItem()
+  //   const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
+  //   const mockTestCommand = {} as GetOrderCommand
+  //   const result = await dbGetOrderClient.getOrder(mockTestCommand)
+  //   expect(Result.isFailure(result)).toBe(true)
+  //   expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+  //   expect(Result.isFailureTransient(result)).toBe(false)
+  // })
+
+  // it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+  //     GetOrderCommand.orderId is undefined`, async () => {
+  //   const mockDdbDocClient = buildMockDdbDocClient_send_resolves_validItem()
+  //   const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
+  //   const mockTestCommand = { orderId: undefined } as GetOrderCommand
+  //   const result = await dbGetOrderClient.getOrder(mockTestCommand)
+  //   expect(Result.isFailure(result)).toBe(true)
+  //   expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+  //   expect(Result.isFailureTransient(result)).toBe(false)
+  // })
+
+  // it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+  //     GetOrderCommand.orderId is null`, async () => {
+  //   const mockDdbDocClient = buildMockDdbDocClient_send_resolves_validItem()
+  //   const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
+  //   const mockTestCommand = { orderId: null } as GetOrderCommand
+  //   const result = await dbGetOrderClient.getOrder(mockTestCommand)
+  //   expect(Result.isFailure(result)).toBe(true)
+  //   expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+  //   expect(Result.isFailureTransient(result)).toBe(false)
+  // })
+
   //
   // Test internal logic
   //
-  it('calls DynamoDBDocumentClient.send a single time', async () => {
+  it(`calls DynamoDBDocumentClient.send a single time`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_send_resolves_validItem()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
-    await dbGetOrderClient.getOrder(mockGetOrderCommand)
+    await dbGetOrderClient.getOrder(mockValidCommand)
     expect(mockDdbDocClient.send).toHaveBeenCalledTimes(1)
   })
 
-  it('calls DynamoDBDocumentClient.send with the expected input', async () => {
+  it(`calls DynamoDBDocumentClient.send with the expected input`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_send_resolves_validItem()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
-    await dbGetOrderClient.getOrder(mockGetOrderCommand)
+    await dbGetOrderClient.getOrder(mockValidCommand)
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(
       expect.objectContaining({ input: expectedDdbDocClientInput.input }),
     )
   })
 
-  it('throws if DynamoDBDocumentClient.send throws', async () => {
+  it(`returns a transient failure of kind UnrecognizedError if
+      DynamoDBDocumentClient.send throws a generic Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_send_throws()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
-    await expect(dbGetOrderClient.getOrder(mockGetOrderCommand)).rejects.toThrow()
+    const result = await dbGetOrderClient.getOrder(mockValidCommand)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'UnrecognizedError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(true)
   })
 
   //
   // Test expected results
   //
-  it('does not throw if the DynamoDBDocumentClient.send returns a null item', async () => {
+  it(`returns a Success<null> DynamoDBDocumentClient.send returns a null item`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_send_resolves_nullItem()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
-    await expect(dbGetOrderClient.getOrder(mockGetOrderCommand)).resolves.not.toThrow()
+    const result = await dbGetOrderClient.getOrder(mockValidCommand)
+    const expectedResult = Result.makeSuccess(null)
+    expect(result).toStrictEqual(expectedResult)
   })
 
-  it('returns null DynamoDBDocumentClient.send returns a null item', async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_send_resolves_nullItem()
-    const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
-    const expectedOrderData: OrderData = null
-    const orderData = await dbGetOrderClient.getOrder(mockGetOrderCommand)
-    expect(orderData).toBe(expectedOrderData)
-  })
-
-  it('returns the expected OrderData if DynamoDBDocumentClient.send returns a valid item', async () => {
+  it(`returns the expected OrderData if DynamoDBDocumentClient.send returns a valid item`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_send_resolves_validItem()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
-    const expectedOrderData = mockValidOrderData
-    const orderData = await dbGetOrderClient.getOrder(mockGetOrderCommand)
-    expect(orderData).toStrictEqual(expectedOrderData)
+    const result = await dbGetOrderClient.getOrder(mockValidCommand)
+    const expectedResult = Result.makeSuccess(expectedOrderData)
+    expect(result).toStrictEqual(expectedResult)
   })
 })

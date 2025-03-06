@@ -1,6 +1,6 @@
-import { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda'
-import { OrderError } from '../../errors/OrderError'
-import { IncomingOrderEvent } from '../model/IncomingOrderEvent'
+import { SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda'
+import { Failure, Result, Success } from '../../errors/Result'
+import { IncomingOrderEvent, IncomingOrderEventInput } from '../model/IncomingOrderEvent'
 import { ISyncOrderWorkerService } from '../SyncOrderWorkerService/SyncOrderWorkerService'
 
 export interface ISyncOrderWorkerController {
@@ -19,53 +19,65 @@ export class SyncOrderWorkerController implements ISyncOrderWorkerController {
   //
   //
   public async syncOrders(sqsEvent: SQSEvent): Promise<SQSBatchResponse> {
-    console.info('SyncOrderWorkerController.syncOrders init:', { sqsEvent })
-    const batchItemFailures: SQSBatchItemFailure[] = []
+    const logContext = 'SyncOrderWorkerController.syncOrders'
+    console.info(`${logContext} init:`, { sqsEvent })
+
+    const sqsBatchResponse: SQSBatchResponse = { batchItemFailures: [] }
     for (const record of sqsEvent.Records) {
-      try {
-        await this.syncOrder(record)
-      } catch (error) {
-        if (OrderError.doNotRetry(error)) {
-          continue
-        }
-        batchItemFailures.push({ itemIdentifier: record.messageId })
+      // If the failure is transient then we add it to the batch errors to requeue and retry
+      // If the failure is non-transient then we ignore it to remove it from the queue
+      const restockSkuResult = await this.syncSingleOrderSafe(record)
+      if (Result.isFailureTransient(restockSkuResult)) {
+        sqsBatchResponse.batchItemFailures.push({ itemIdentifier: record.messageId })
       }
     }
-    const sqsBatchResponse: SQSBatchResponse = { batchItemFailures }
-    console.info('SyncOrderWorkerController.syncOrders exit:', { sqsBatchResponse })
+
+    console.info(`${logContext} exit success:`, { sqsBatchResponse })
     return sqsBatchResponse
   }
 
   //
   //
   //
-  private async syncOrder(sqsRecord: SQSRecord) {
-    try {
-      console.info('SyncOrderWorkerController.syncOrder init:', { sqsRecord })
-      const incomingOrderEvent = this.parseValidateEvent(sqsRecord.body)
-      await this.syncOrderWorkerService.syncOrder(incomingOrderEvent)
-      console.info('SyncOrderWorkerController.syncOrder exit:', { incomingOrderEvent })
-    } catch (error) {
-      console.error('SyncOrderWorkerController.syncOrder error:', { error })
-      throw error
+  private async syncSingleOrderSafe(sqsRecord: SQSRecord) {
+    const logContext = 'SyncOrderWorkerController.syncSingleOrderSafe'
+    console.info(`${logContext} init:`, { sqsRecord })
+
+    const parseEventBodyResult = this.parseValidateEventBody(sqsRecord)
+    if (Result.isFailure(parseEventBodyResult)) {
+      console.error(`${logContext} failure exit:`, { parseEventBodyResult, sqsRecord })
+      return parseEventBodyResult
     }
+
+    const eventBridgeEvent = parseEventBodyResult.value as IncomingOrderEventInput
+    const incomingRestockSkuEventResult = IncomingOrderEvent.validateAndBuild(eventBridgeEvent)
+    if (Result.isFailure(incomingRestockSkuEventResult)) {
+      console.error(`${logContext} failure exit:`, { incomingRestockSkuEventResult, eventBridgeEvent })
+      return incomingRestockSkuEventResult
+    }
+
+    const incomingRestockSkuEvent = incomingRestockSkuEventResult.value
+    const restockSkuResult = await this.syncOrderWorkerService.syncOrder(incomingRestockSkuEvent)
+    Result.isFailure(restockSkuResult)
+      ? console.error(`${logContext} exit failure:`, { restockSkuResult, incomingRestockSkuEvent })
+      : console.info(`${logContext} exit success:`, { restockSkuResult, incomingRestockSkuEvent })
+
+    return restockSkuResult
   }
 
   //
   //
   //
-  private parseValidateEvent(bodyText: string): IncomingOrderEvent {
+  private parseValidateEventBody(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
     try {
-      console.info('SyncOrderWorkerController.parseValidateEvent init:', { bodyText })
-      const eventBridgeEvent = JSON.parse(bodyText)
-      const incomingOrderEvent = IncomingOrderEvent.validateAndBuild(eventBridgeEvent)
-      console.info('SyncOrderWorkerController.parseValidateEvent exit:', { incomingOrderEvent })
-      return incomingOrderEvent
+      const eventBridgeEvent = JSON.parse(sqsRecord.body)
+      return Result.makeSuccess<unknown>(eventBridgeEvent)
     } catch (error) {
-      console.error('SyncOrderWorkerController.parseValidateEvent error:', { error })
-      OrderError.addName(error, OrderError.InvalidArgumentsError)
-      OrderError.addName(error, OrderError.DoNotRetryError)
-      throw error
+      const logContext = 'SyncOrderWorkerController.parseValidateEventBody'
+      console.error(`${logContext} error caught:`, { error, sqsRecord })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, sqsRecord })
+      return invalidArgsFailure
     }
   }
 }

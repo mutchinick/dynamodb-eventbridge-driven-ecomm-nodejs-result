@@ -1,9 +1,12 @@
 import { DynamoDBDocumentClient, GetCommand, NativeAttributeValue } from '@aws-sdk/lib-dynamodb'
+import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
 import { GetOrderCommand } from '../model/GetOrderCommand'
 
 export interface IDbGetOrderClient {
-  getOrder: (getOrderCommand: GetOrderCommand) => Promise<OrderData>
+  getOrder: (
+    getOrderCommand: GetOrderCommand,
+  ) => Promise<Success<OrderData> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>>
 }
 
 export class DbGetOrderClient implements IDbGetOrderClient {
@@ -15,35 +18,68 @@ export class DbGetOrderClient implements IDbGetOrderClient {
   //
   //
   //
-  public async getOrder(getOrderCommand: GetOrderCommand): Promise<OrderData> {
+  public async getOrder(
+    getOrderCommand: GetOrderCommand,
+  ): Promise<Success<OrderData> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
+    const logContext = 'DbGetOrderClient.getOrder'
+    console.info(`${logContext} init:`, { getOrderCommand })
+
+    const buildCommandResult = this.buildDdbCommand(getOrderCommand)
+    if (Result.isFailure(buildCommandResult)) {
+      console.error(`${logContext} exit failure:`, { buildCommandResult, getOrderCommand })
+      return buildCommandResult
+    }
+
+    const ddbCommand = buildCommandResult.value
+    const sendCommandResult = await this.sendDdbCommand(ddbCommand)
+    Result.isFailure(sendCommandResult)
+      ? console.error(`${logContext} exit failure:`, { sendCommandResult, ddbCommand })
+      : console.info(`${logContext} exit success:`, { sendCommandResult, ddbCommand })
+
+    return sendCommandResult
+  }
+
+  //
+  //
+  //
+  private buildDdbCommand(getOrderCommand: GetOrderCommand): Success<GetCommand> | Failure<'InvalidArgumentsError'> {
     try {
-      console.info('DbGetOrderClient.getOrder init:', { getOrderCommand })
-      const ddbGetCommand = this.buildDdbGetCommand(getOrderCommand.orderId)
-      const result = await this.ddbDocClient.send(ddbGetCommand)
-      if (!result.Item) {
-        console.info('DbGetOrderClient.getOrder exit:', { orderData: result.Item })
-        return null
-      }
-      const orderData = this.buildOrderData(result.Item)
-      console.info('DbGetOrderClient.getOrder exit:', { orderData })
-      return orderData
+      const ddbCommand = new GetCommand({
+        TableName: process.env.EVENT_STORE_TABLE_NAME,
+        Key: {
+          pk: `ORDER_ID#${getOrderCommand.orderId}`,
+          sk: `ORDER_ID#${getOrderCommand.orderId}`,
+        },
+      })
+      return Result.makeSuccess(ddbCommand)
     } catch (error) {
-      console.error('DbGetOrderClient.getOrder error:', { error })
-      throw error
+      const logContext = 'DbGetOrderClient.buildDdbCommand'
+      console.error(`${logContext} error caught:`, { error })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, getOrderCommand })
+      return invalidArgsFailure
     }
   }
 
   //
   //
   //
-  private buildDdbGetCommand(orderId: string): GetCommand {
-    return new GetCommand({
-      TableName: process.env.EVENT_STORE_TABLE_NAME,
-      Key: {
-        pk: `ORDER_ID#${orderId}`,
-        sk: `ORDER_ID#${orderId}`,
-      },
-    })
+  private async sendDdbCommand(ddbCommand: GetCommand) {
+    const logContext = 'DbGetOrderClient.sendDdbCommand'
+    console.info(`${logContext} init:`, { ddbCommand })
+
+    try {
+      const ddbOutput = await this.ddbDocClient.send(ddbCommand)
+      const orderData = ddbOutput.Item ? this.buildOrderData(ddbOutput.Item) : null
+      const orderDataResult = Result.makeSuccess(orderData)
+      console.info(`${logContext} exit success:`, { orderDataResult, ddbCommand })
+      return orderDataResult
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error })
+      const unrecognizedFailure = Result.makeFailure('UnrecognizedError', error, true)
+      console.error(`${logContext} exit failure:`, { unrecognizedFailure, ddbCommand })
+      return unrecognizedFailure
+    }
   }
 
   //

@@ -1,17 +1,29 @@
+import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
 import { OrderEventName } from '../../model/OrderEventName'
 import { IDbCreateOrderClient } from '../DbCreateOrderClient/DbCreateOrderClient'
 import { IDbGetOrderClient } from '../DbGetOrderClient/DbGetOrderClient'
 import { IDbUpdateOrderClient } from '../DbUpdateOrderClient/DbUpdateOrderClient'
 import { IEsRaiseOrderCreatedEventClient } from '../EsRaiseOrderCreatedEventClient/EsRaiseOrderCreatedEventClient'
-import { CreateOrderCommand } from '../model/CreateOrderCommand'
-import { GetOrderCommand } from '../model/GetOrderCommand'
+import { CreateOrderCommand, CreateOrderCommandInput } from '../model/CreateOrderCommand'
+import { GetOrderCommand, GetOrderCommandInput } from '../model/GetOrderCommand'
 import { IncomingOrderEvent } from '../model/IncomingOrderEvent'
-import { OrderCreatedEvent } from '../model/OrderCreatedEvent'
-import { UpdateOrderCommand } from '../model/UpdateOrderCommand'
+import { OrderCreatedEvent, OrderCreatedEventInput } from '../model/OrderCreatedEvent'
+import { UpdateOrderCommand, UpdateOrderCommandInput } from '../model/UpdateOrderCommand'
 
 export interface ISyncOrderWorkerService {
-  syncOrder: (incomingOrderEvent: IncomingOrderEvent) => Promise<void>
+  syncOrder: (
+    incomingOrderEvent: IncomingOrderEvent,
+  ) => Promise<
+    | Success<void>
+    | Failure<'InvalidArgumentsError'>
+    | Failure<'UnrecognizedError'>
+    | Failure<'InvalidOperationError'>
+    | Failure<'DuplicateEventRaisedError'>
+    | Failure<'ForbiddenOrderStatusTransitionError'>
+    | Failure<'NotReadyOrderStatusTransitionError'>
+    | Failure<'RedundantOrderStatusTransitionError'>
+  >
 }
 
 export class SyncOrderWorkerService implements ISyncOrderWorkerService {
@@ -28,55 +40,231 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
   //
   //
   //
-  public async syncOrder(incomingOrderEvent: IncomingOrderEvent): Promise<void> {
-    try {
-      console.info('SyncOrderWorkerService.syncOrder init:', { incomingOrderEvent })
-      const isOrderPlacedEvent = IncomingOrderEvent.isOrderPlacedEvent(incomingOrderEvent)
-      if (isOrderPlacedEvent) {
-        const orderData = await this.createOrder(incomingOrderEvent)
-        await this.raiseOrderCreatedEvent(incomingOrderEvent.eventName, orderData)
-      } else {
-        await this.updateOrder(incomingOrderEvent)
+  public async syncOrder(
+    incomingOrderEvent: IncomingOrderEvent,
+  ): Promise<
+    | Success<void>
+    | Failure<'InvalidArgumentsError'>
+    | Failure<'UnrecognizedError'>
+    | Failure<'DuplicateEventRaisedError'>
+    | Failure<'InvalidOperationError'>
+    | Failure<'ForbiddenOrderStatusTransitionError'>
+    | Failure<'NotReadyOrderStatusTransitionError'>
+    | Failure<'RedundantOrderStatusTransitionError'>
+  > {
+    // Not the smallest, cleanest method. Could be compacted by composing or delegating some of the tasks,
+    // but I wanted to follow the logic step by step for clarity and not hide it or abstract it.
+    // Also, with the current degree of logging (basically everything), the truth is that some of the
+    // methods are just going to be damn ugly (and not just this one).
+
+    const logContext = 'SyncOrderWorkerService.syncOrder'
+    console.info(`${logContext} init:`, { incomingOrderEvent })
+
+    // The input IncomingOrderEvent should already be valid because it can only be built through the same
+    // IncomingOrderEvent class which enforces strict validation. Still we perform just enough validation to
+    // prevent unlikely but still possible "exceptions" for some properties that are accessed directly.
+    const incomingEventValidationResult = this.validateIncomingOrderEvent(incomingOrderEvent)
+    if (Result.isFailure(incomingEventValidationResult)) {
+      console.error(`${logContext} exit failure:`, { incomingEventValidationResult, incomingOrderEvent })
+      return incomingEventValidationResult
+    }
+
+    const getOrderResult = await this.getOrder(incomingOrderEvent)
+    if (Result.isFailure(getOrderResult)) {
+      console.error(`${logContext} exit failure:`, { getOrderResult, incomingOrderEvent })
+      return getOrderResult
+    }
+
+    const existingOrderData = getOrderResult.value
+    const isOrderPlacedEvent = IncomingOrderEvent.isOrderPlacedEvent(incomingOrderEvent)
+
+    // When IT IS an OrderPlacedEvent and the OrderData DOES NOT exist in the database then we need to
+    // create the Order and then raise the event. This is the starting point for the Order.
+    if (isOrderPlacedEvent && !existingOrderData) {
+      const createOrderResult = await this.createOrder(incomingOrderEvent)
+      if (Result.isFailure(createOrderResult)) {
+        console.error(`${logContext} exit failure:`, { createOrderResult, incomingOrderEvent })
+        return createOrderResult
       }
-      console.info('SyncOrderWorkerService.syncOrder exit:')
-    } catch (error) {
-      console.error('SyncOrderWorkerService.syncOrder error:', { error })
-      throw error
+
+      const orderData = createOrderResult.value
+      const incomingEventName = incomingOrderEvent.eventName
+      const raiseEventResult = await this.raiseOrderCreatedEvent(incomingEventName, orderData)
+      Result.isFailure(raiseEventResult)
+        ? console.error(`${logContext} exit failure:`, { raiseEventResult, incomingEventName, orderData })
+        : console.info(`${logContext} exit success:`, { raiseEventResult, incomingEventName, orderData })
+
+      return raiseEventResult
     }
+
+    // When IT IS an OrderPlacedEvent and the OrderData DOES exist in the database, then we only try
+    // to raise the event again because the intuition is that is was tried before but it failed.
+    if (isOrderPlacedEvent && existingOrderData) {
+      const incomingEventName = incomingOrderEvent.eventName
+      const raiseEventResult = await this.raiseOrderCreatedEvent(incomingEventName, existingOrderData)
+      Result.isFailure(raiseEventResult)
+        ? console.error(`${logContext} exit failure:`, { raiseEventResult, incomingEventName, existingOrderData })
+        : console.info(`${logContext} exit success:`, { raiseEventResult, incomingEventName, existingOrderData })
+
+      return raiseEventResult
+    }
+
+    // When IT IS NOT an OrderPlacedEvent and the OrderData DOES exist in the database, then we need to
+    // update the Order to a new state. No event needs to be raised because we are in tracking mode.
+    if (!isOrderPlacedEvent && existingOrderData) {
+      const updateOrderResult = await this.updateOrder(incomingOrderEvent, existingOrderData)
+      if (Result.isFailure(updateOrderResult)) {
+        console.error(`${logContext} exit failure:`, { updateOrderResult, incomingOrderEvent, existingOrderData })
+        return updateOrderResult
+      }
+
+      console.info(`${logContext} exit success:`, { updateOrderResult, incomingOrderEvent, existingOrderData })
+      return Result.makeSuccess() // void the result as we don't use the OrderData in the Controller.
+    }
+
+    // When IT IS NOT an OrderPlacedEvent and the OrderData DOES NOT exist in the database.
+    // This means we reached an invalid operation somehow, so we must return an error.
+    const invalidOpsFailure = Result.makeFailure('InvalidOperationError', 'Order to update does not exists', false)
+    console.error(`${logContext} exit failure:`, { invalidOpsFailure, incomingOrderEvent, existingOrderData })
+    return invalidOpsFailure
   }
 
   //
   //
   //
-  private async createOrder(incomingOrderEvent: IncomingOrderEvent): Promise<OrderData> {
-    const orderId = incomingOrderEvent.eventData.orderId
-    const getOrderCommand = GetOrderCommand.validateAndBuild({ orderId })
-    let orderData = await this.dbGetOrderClient.getOrder(getOrderCommand)
-    if (!orderData) {
-      const createOrderCommand = CreateOrderCommand.validateAndBuild({ incomingOrderEvent })
-      orderData = await this.dbCreateOrderClient.createOrder(createOrderCommand)
+  private validateIncomingOrderEvent(incomingOrderEvent: IncomingOrderEvent) {
+    const logContext = 'SyncOrderWorkerService.validateIncomingOrderEvent'
+    console.info(`${logContext} init:`, { incomingOrderEvent })
+
+    if (
+      incomingOrderEvent instanceof IncomingOrderEvent === false ||
+      incomingOrderEvent == null ||
+      incomingOrderEvent.eventName == null ||
+      incomingOrderEvent.eventData?.orderId == null
+    ) {
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', 'Invalid arguments error', false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingOrderEvent })
+      return invalidArgsFailure
     }
-    return orderData
+
+    return Result.makeSuccess()
   }
 
   //
   //
   //
-  private async updateOrder(incomingOrderEvent: IncomingOrderEvent): Promise<void> {
-    const orderId = incomingOrderEvent.eventData.orderId
-    const getOrderCommand = GetOrderCommand.validateAndBuild({ orderId })
-    const existingOrderData = await this.dbGetOrderClient.getOrder(getOrderCommand)
-    if (existingOrderData) {
-      const updateOrderCommand = UpdateOrderCommand.validateAndBuild({ existingOrderData, incomingOrderEvent })
-      await this.dbUpdateOrderClient.updateOrder(updateOrderCommand)
+  private async getOrder(incomingOrderEvent: IncomingOrderEvent) {
+    const logContext = 'SyncOrderWorkerService.getOrder'
+    console.info(`${logContext} init:`, { incomingOrderEvent })
+
+    const { orderId } = incomingOrderEvent.eventData
+    const getOrderCommandInput: GetOrderCommandInput = { orderId }
+    const getOrderCommandResult = GetOrderCommand.validateAndBuild(getOrderCommandInput)
+    if (Result.isFailure(getOrderCommandResult)) {
+      console.error(`${logContext} exit failure:`, { getOrderCommandResult, getOrderCommandInput })
+      return getOrderCommandResult
     }
+
+    const getOrderCommand = getOrderCommandResult.value
+    const getOrderResult = await this.dbGetOrderClient.getOrder(getOrderCommand)
+    Result.isFailure(getOrderResult)
+      ? console.error(`${logContext} exit failure:`, { getOrderResult, getOrderCommand })
+      : console.info(`${logContext} exit success:`, { getOrderResult, getOrderCommand })
+
+    return getOrderResult
   }
 
   //
   //
   //
-  private async raiseOrderCreatedEvent(incomingEventName: OrderEventName, orderData: OrderData): Promise<void> {
-    const orderCreatedEvent = OrderCreatedEvent.validateAndBuild({ incomingEventName, orderData })
-    await this.esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(orderCreatedEvent)
+  private async createOrder(
+    incomingOrderEvent: IncomingOrderEvent,
+  ): Promise<
+    | Success<OrderData>
+    | Failure<'InvalidArgumentsError'>
+    | Failure<'UnrecognizedError'>
+    | Failure<'InvalidOperationError'>
+  > {
+    const logContext = 'SyncOrderWorkerService.createOrder'
+    console.info(`${logContext} init:`, { incomingOrderEvent })
+
+    const createOrderCommandInput: CreateOrderCommandInput = { incomingOrderEvent }
+    const createOrderCommandResult = CreateOrderCommand.validateAndBuild(createOrderCommandInput)
+    if (Result.isFailure(createOrderCommandResult)) {
+      console.error(`${logContext} exit failure:`, { createOrderCommandResult, createOrderCommandInput })
+      return createOrderCommandResult
+    }
+
+    const createOrderCommand = createOrderCommandResult.value
+    const createOrderResult = await this.dbCreateOrderClient.createOrder(createOrderCommand)
+    Result.isFailure(createOrderResult)
+      ? console.error(`${logContext} exit failure:`, { createOrderResult, createOrderCommand })
+      : console.info(`${logContext} exit success:`, { createOrderResult, createOrderCommand })
+
+    return createOrderResult
+  }
+
+  //
+  //
+  //
+  private async raiseOrderCreatedEvent(
+    incomingEventName: OrderEventName,
+    orderData: OrderData,
+  ): Promise<
+    | Success<void>
+    | Failure<'InvalidArgumentsError'>
+    | Failure<'UnrecognizedError'>
+    | Failure<'DuplicateEventRaisedError'>
+  > {
+    const logContext = 'SyncOrderWorkerService.raiseOrderCreatedEvent'
+    console.info(`${logContext} init:`, { incomingEventName, orderData })
+
+    const orderCreatedEventInput: OrderCreatedEventInput = { incomingEventName, orderData }
+    const orderCreatedEventResult = OrderCreatedEvent.validateAndBuild(orderCreatedEventInput)
+    if (Result.isFailure(orderCreatedEventResult)) {
+      console.error(`${logContext} exit failure:`, { orderCreatedEventResult, orderCreatedEventInput })
+      return orderCreatedEventResult
+    }
+
+    const orderCreatedEvent = orderCreatedEventResult.value
+    const raiseEventResult = await this.esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(orderCreatedEvent)
+    Result.isFailure(raiseEventResult)
+      ? console.error(`${logContext} exit failure:`, { raiseEventResult, orderCreatedEvent })
+      : console.info(`${logContext} exit success:`, { raiseEventResult, orderCreatedEvent })
+
+    return raiseEventResult
+  }
+
+  //
+  //
+  //
+  private async updateOrder(
+    incomingOrderEvent: IncomingOrderEvent,
+    existingOrderData: OrderData,
+  ): Promise<
+    | Success<OrderData>
+    | Failure<'InvalidArgumentsError'>
+    | Failure<'UnrecognizedError'>
+    | Failure<'ForbiddenOrderStatusTransitionError'>
+    | Failure<'NotReadyOrderStatusTransitionError'>
+    | Failure<'RedundantOrderStatusTransitionError'>
+  > {
+    const logContext = 'SyncOrderWorkerService.updateOrder'
+    console.info(`${logContext} init:`, { incomingOrderEvent, existingOrderData })
+
+    const updateOrderCommandInput: UpdateOrderCommandInput = { existingOrderData, incomingOrderEvent }
+    const updateOrderCommandResult = UpdateOrderCommand.validateAndBuild(updateOrderCommandInput)
+    if (Result.isFailure(updateOrderCommandResult)) {
+      console.error(`${logContext} exit failure:`, { updateOrderCommandResult, updateOrderCommandInput })
+      return updateOrderCommandResult
+    }
+
+    const updateOrderCommand = updateOrderCommandResult.value
+    const updateOrderResult = await this.dbUpdateOrderClient.updateOrder(updateOrderCommand)
+    Result.isFailure(updateOrderResult)
+      ? console.error(`${logContext} exit failure:`, { updateOrderResult, updateOrderCommand })
+      : console.info(`${logContext} exit success:`, { updateOrderResult, updateOrderCommand })
+
+    return updateOrderResult
   }
 }

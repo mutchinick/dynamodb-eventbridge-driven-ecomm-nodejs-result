@@ -1,7 +1,6 @@
 import { z } from 'zod'
-import { OrderError } from '../../errors/OrderError'
+import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
-import { OrderEventName } from '../../model/OrderEventName'
 import { OrderStatus } from '../../model/OrderStatus'
 import { ValueValidators } from '../../model/ValueValidators'
 import { IncomingOrderEvent } from './IncomingOrderEvent'
@@ -27,54 +26,67 @@ export class CreateOrderCommand implements CreateOrderCommandProps {
   //
   //
   //
-  public static validateAndBuild(createOrderCommandInput: CreateOrderCommandInput) {
-    try {
-      const { orderData, options } = this.buildCreateOrderCommandProps(createOrderCommandInput)
-      return new CreateOrderCommand(orderData, options)
-    } catch (error) {
-      console.error('CreateOrderCommand.validateAndBuild', { error, createOrderCommandInput })
-      throw error
+  public static validateAndBuild(
+    createOrderCommandInput: CreateOrderCommandInput,
+  ): Success<CreateOrderCommand> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'CreateOrderCommand.validateAndBuild'
+    console.info(`${logContext} init:`, { createOrderCommandInput })
+
+    const propsResult = this.buildProps(createOrderCommandInput)
+    if (Result.isFailure(propsResult)) {
+      console.error(`${logContext} exit failure:`, { propsResult, createOrderCommandInput })
+      return propsResult
     }
+
+    const { orderData, options } = propsResult.value
+    const createOrderCommand = new CreateOrderCommand(orderData, options)
+    const createOrderCommandResult = Result.makeSuccess(createOrderCommand)
+    console.info(`${logContext} exit success:`, { createOrderCommandResult, createOrderCommandInput })
+    return createOrderCommandResult
   }
 
   //
   //
   //
-  private static buildCreateOrderCommandProps(
+  private static buildProps(
     createOrderCommandInput: CreateOrderCommandInput,
-  ): CreateOrderCommandProps {
+  ): Success<CreateOrderCommandProps> | Failure<'InvalidArgumentsError'> {
+    try {
+      this.validateInput(createOrderCommandInput)
+    } catch (error) {
+      const logContext = 'CreateOrderCommand.buildProps'
+      console.error(`${logContext} error caught:`, { error })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, createOrderCommandInput })
+      return invalidArgsFailure
+    }
+
     const { incomingOrderEvent } = createOrderCommandInput
-    this.validateOrderEvent(incomingOrderEvent)
-
-    const incomingEventData = incomingOrderEvent.eventData
-    const incomingEventName = incomingOrderEvent.eventName
-    const { orderId, sku, units, price, userId } = incomingEventData
-    const newOrderStatus = this.getNewOrderStatus(incomingEventName)
-    const currentDate = new Date().toISOString()
-
-    const createOrderCommand: CreateOrderCommandProps = {
+    const { orderId, sku, units, price, userId } = incomingOrderEvent.eventData
+    const date = new Date().toISOString()
+    const createOrderCommandProps: CreateOrderCommandProps = {
       orderData: {
         orderId,
-        orderStatus: newOrderStatus,
+        orderStatus: OrderStatus.ORDER_CREATED_STATUS,
         sku,
         units,
         price,
         userId,
-        createdAt: currentDate,
-        updatedAt: currentDate,
+        createdAt: date,
+        updatedAt: date,
       },
       options: {},
     }
-    return createOrderCommand
+    return Result.makeSuccess(createOrderCommandProps)
   }
 
   //
   //
   //
-  private static validateOrderEvent(incomingOrderEvent: IncomingOrderEvent) {
-    try {
-      z.object({
-        eventName: ValueValidators.validIncomingEventName(),
+  private static validateInput(createOrderCommandInput: CreateOrderCommandInput): void {
+    z.object({
+      incomingOrderEvent: z.object({
+        eventName: ValueValidators.validOrderPlacedEventName(),
         eventData: z.object({
           orderId: ValueValidators.validOrderId(),
           sku: ValueValidators.validSku(),
@@ -84,25 +96,7 @@ export class CreateOrderCommand implements CreateOrderCommandProps {
         }),
         createdAt: ValueValidators.validCreatedAt(),
         updatedAt: ValueValidators.validUpdatedAt(),
-      }).parse(incomingOrderEvent)
-    } catch (error) {
-      OrderError.addName(error, OrderError.InvalidArgumentsError)
-      OrderError.addName(error, OrderError.DoNotRetryError)
-      throw error
-    }
-  }
-
-  //
-  //
-  //
-  private static getNewOrderStatus(incomingEventName: OrderEventName) {
-    if (incomingEventName === OrderEventName.ORDER_PLACED_EVENT) {
-      return OrderStatus.ORDER_CREATED_STATUS
-    }
-
-    const error = new Error('InvalidOrderStatusTransitionError_Forbidden')
-    OrderError.addName(error, OrderError.InvalidOrderStatusTransitionError_Forbidden)
-    OrderError.addName(error, OrderError.DoNotRetryError)
-    throw error
+      }),
+    }).parse(createOrderCommandInput)
   }
 }

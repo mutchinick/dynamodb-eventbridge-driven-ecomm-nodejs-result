@@ -1,4 +1,5 @@
-import { OrderError } from '../../errors/OrderError'
+import { z } from 'zod'
+import { Result, Success, Failure } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
 import { ValueValidators } from '../../model/ValueValidators'
 
@@ -21,40 +22,52 @@ export class GetOrderCommand implements GetOrderCommandProps {
   //
   //
   //
-  public static validateAndBuild(getOrderCommandInput: GetOrderCommandInput) {
-    try {
-      const { orderId, options } = this.buildGetOrderCommandProps(getOrderCommandInput)
-      return new GetOrderCommand(orderId, options)
-    } catch (error) {
-      console.error('GetOrderCommand.validateAndBuild', { error, getOrderCommandInput })
-      throw error
+  public static validateAndBuild(
+    getOrderCommandInput: GetOrderCommandInput,
+  ): Success<GetOrderCommand> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'GetOrderCommand.validateAndBuild'
+    console.info(`${logContext} init:`, { getOrderCommandInput })
+
+    const propsResult = this.buildProps(getOrderCommandInput)
+    if (Result.isFailure(propsResult)) {
+      console.error(`${logContext} exit failure:`, { propsResult, getOrderCommandInput })
+      return propsResult
     }
+
+    const { orderId, options } = propsResult.value
+    const getOrderCommand = new GetOrderCommand(orderId, options)
+    const getOrderCommandResult = Result.makeSuccess(getOrderCommand)
+    console.info(`${logContext} exit success:`, { getOrderCommandResult, getOrderCommandInput })
+    return getOrderCommandResult
   }
 
   //
   //
   //
-  private static buildGetOrderCommandProps(getOrderCommandInput: GetOrderCommandInput): GetOrderCommandProps {
+  private static buildProps(
+    getOrderCommandInput: GetOrderCommandInput,
+  ): Success<GetOrderCommandProps> | Failure<'InvalidArgumentsError'> {
+    try {
+      this.validateInput(getOrderCommandInput)
+    } catch (error) {
+      const logContext = 'GetOrderCommand.buildProps'
+      console.error(`${logContext} error caught:`, { error })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, getOrderCommandInput })
+      return invalidArgsFailure
+    }
+
     const { orderId } = getOrderCommandInput
-    this.validateOrderId(orderId)
-
-    const getOrderCommand: GetOrderCommandProps = {
-      orderId,
-      options: {},
-    }
-    return getOrderCommand
+    const getOrderCommandProps: GetOrderCommandProps = { orderId, options: {} }
+    return Result.makeSuccess(getOrderCommandProps)
   }
 
   //
   //
   //
-  private static validateOrderId(orderId: string) {
-    try {
-      ValueValidators.validOrderId().parse(orderId)
-    } catch (error) {
-      OrderError.addName(error, OrderError.InvalidArgumentsError)
-      OrderError.addName(error, OrderError.DoNotRetryError)
-      throw error
-    }
+  private static validateInput(getOrderCommandInput: GetOrderCommandInput): void {
+    z.object({
+      orderId: ValueValidators.validOrderId(),
+    }).parse(getOrderCommandInput)
   }
 }
