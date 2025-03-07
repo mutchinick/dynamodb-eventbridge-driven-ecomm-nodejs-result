@@ -1,5 +1,5 @@
 {
-  "name": "edaof",
+  "name": "dynamodb-eventbridge-driven-ecomm-nodejs-result-services",
   "version": "1.0.0",
   "description": "",
   "scripts": {

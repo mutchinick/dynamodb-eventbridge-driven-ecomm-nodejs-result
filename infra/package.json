@@ -1,8 +1,8 @@
 {
-  "name": "edaof-infra",
+  "name": "dynamodb-eventbridge-driven-ecomm-nodejs-result-infra",
   "version": "0.1.0",
   "config": {
-    "prefix": "edaof"
+    "prefix": "ddbEbEcommNjsRes"
   },
   "bin": {
     "main": "bin/main.ts"
