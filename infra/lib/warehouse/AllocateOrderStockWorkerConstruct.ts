@@ -15,7 +15,13 @@ export interface IAllocateOrderStockWorkerConstructProps {
   eventBus: EventBus
 }
 
+//
+//
+//
 export class AllocateOrderStockWorkerConstruct extends Construct {
+  //
+  //
+  //
   constructor(scope: Construct, id: string, props: IAllocateOrderStockWorkerConstructProps) {
     super(scope, id)
     const dlq = this.createAllocateOrderStockWorkerDlq(scope, id)
@@ -24,6 +30,9 @@ export class AllocateOrderStockWorkerConstruct extends Construct {
     this.createAllocateOrderStockWorkerRoutingRule(scope, id, props.dynamoDbTable, props.eventBus, queue)
   }
 
+  //
+  //
+  //
   private createAllocateOrderStockWorkerDlq(scope: Construct, id: string) {
     const dlqName = `${id}-Dlq`
     const dlq = new Queue(scope, dlqName, {
@@ -33,6 +42,9 @@ export class AllocateOrderStockWorkerConstruct extends Construct {
     return dlq
   }
 
+  //
+  //
+  //
   private createAllocateOrderStockWorkerQueue(scope: Construct, id: string, dlq: Queue) {
     const queueName = `${id}-Queue`
     const { maxReceiveCount, receiveMessageWaitTime, visibilityTimeout } = settings.SQS
@@ -48,8 +60,11 @@ export class AllocateOrderStockWorkerConstruct extends Construct {
     return queue
   }
 
+  //
+  //
+  //
   private createAllocateOrderStockWorkerFunction(scope: Construct, id: string, dynamoDbTable: Table, queue: Queue) {
-    const lambdaFuncName = `${id}-LambdaFunc`
+    const lambdaFuncName = `${id}-Lambda`
     const lambdaFunc = new NodejsFunction(scope, lambdaFuncName, {
       functionName: lambdaFuncName,
       runtime: Runtime.NODEJS_20_X,
@@ -79,6 +94,9 @@ export class AllocateOrderStockWorkerConstruct extends Construct {
     return lambdaFunc
   }
 
+  //
+  //
+  //
   private createAllocateOrderStockWorkerRoutingRule(
     scope: Construct,
     id: string,
@@ -90,7 +108,7 @@ export class AllocateOrderStockWorkerConstruct extends Construct {
     const routingRule = new Rule(scope, ruleName, {
       eventBus,
       eventPattern: {
-        source: ['edaof-event-store.dynamodb.stream'],
+        source: ['event-store.dynamodb.stream'],
         detailType: ['DynamoDBStreamRecord'],
         detail: {
           eventSourceARN: [dynamoDbTable.tableStreamArn],

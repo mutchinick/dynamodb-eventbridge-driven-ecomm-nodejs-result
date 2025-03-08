@@ -15,7 +15,13 @@ export interface ISyncOrderWorkerConstructProps {
   eventBus: EventBus
 }
 
+//
+//
+//
 export class SyncOrderWorkerConstruct extends Construct {
+  //
+  //
+  //
   constructor(scope: Construct, id: string, props: ISyncOrderWorkerConstructProps) {
     super(scope, id)
     const dlq = this.createSyncOrderWorkerDlq(scope, id)
@@ -24,6 +30,9 @@ export class SyncOrderWorkerConstruct extends Construct {
     this.createSyncOrderWorkerRoutingRule(scope, id, props.dynamoDbTable, props.eventBus, queue)
   }
 
+  //
+  //
+  //
   private createSyncOrderWorkerDlq(scope: Construct, id: string) {
     const dlqName = `${id}-Dlq`
     const dlq = new Queue(scope, dlqName, {
@@ -33,6 +42,9 @@ export class SyncOrderWorkerConstruct extends Construct {
     return dlq
   }
 
+  //
+  //
+  //
   private createSyncOrderWorkerQueue(scope: Construct, id: string, dlq: Queue) {
     const queueName = `${id}-Queue`
     const { maxReceiveCount, receiveMessageWaitTime, visibilityTimeout } = settings.SQS
@@ -48,8 +60,11 @@ export class SyncOrderWorkerConstruct extends Construct {
     return queue
   }
 
+  //
+  //
+  //
   private createSyncOrderWorkerFunction(scope: Construct, id: string, dynamoDbTable: Table, queue: Queue) {
-    const lambdaFuncName = `${id}-LambdaFunc`
+    const lambdaFuncName = `${id}-Lambda`
     const lambdaFunc = new NodejsFunction(scope, lambdaFuncName, {
       functionName: lambdaFuncName,
       runtime: Runtime.NODEJS_20_X,
@@ -79,6 +94,9 @@ export class SyncOrderWorkerConstruct extends Construct {
     return lambdaFunc
   }
 
+  //
+  //
+  //
   private createSyncOrderWorkerRoutingRule(
     scope: Construct,
     id: string,
@@ -90,7 +108,7 @@ export class SyncOrderWorkerConstruct extends Construct {
     const routingRule = new Rule(scope, ruleName, {
       eventBus,
       eventPattern: {
-        source: ['edaof-event-store.dynamodb.stream'],
+        source: ['event-store.dynamodb.stream'],
         detailType: ['DynamoDBStreamRecord'],
         detail: {
           eventSourceARN: [dynamoDbTable.tableStreamArn],

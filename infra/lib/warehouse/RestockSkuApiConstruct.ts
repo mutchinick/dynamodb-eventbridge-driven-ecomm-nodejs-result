@@ -11,6 +11,9 @@ export interface IRestockSkuApiConstructProps {
   dynamoDbTable: Table
 }
 
+//
+//
+//
 export class RestockSkuApiConstruct extends Construct {
   //
   //
@@ -50,7 +53,7 @@ export class RestockSkuApiConstruct extends Construct {
   //
   //
   private createRestockSkuApiFunction(scope: Construct, id: string, dynamoDbTable: Table) {
-    const lambdaFuncName = `${id}-LambdaFunc`
+    const lambdaFuncName = `${id}-Lambda`
     const lambdaFunc = new NodejsFunction(scope, lambdaFuncName, {
       functionName: lambdaFuncName,
       runtime: Runtime.NODEJS_20_X,

@@ -8,14 +8,23 @@ export interface IEventBusConstructProps {
   dynamoDbTable: Table
 }
 
+//
+//
+//
 export class EventBusConstruct extends Construct {
   public eventBus: EventBus
 
+  //
+  //
+  //
   constructor(scope: Construct, id: string, props: IEventBusConstructProps) {
     super(scope, id)
     this.eventBus = this.createEventBusEventBus(scope, id, props.dynamoDbTable)
   }
 
+  //
+  //
+  //
   private createEventBusEventBus(scope: Construct, id: string, dynamoDbTable: Table) {
     const eventBusName = `${id}-Bus`
     const eventBus = new EventBus(scope, eventBusName, {
@@ -43,7 +52,7 @@ export class EventBusConstruct extends Construct {
       targetParameters: {
         eventBridgeEventBusParameters: {
           detailType: 'DynamoDBStreamRecord',
-          source: 'edaof-event-store.dynamodb.stream',
+          source: 'event-store.dynamodb.stream',
         },
       },
     })

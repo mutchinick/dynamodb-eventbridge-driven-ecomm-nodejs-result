@@ -34,7 +34,7 @@ if (!stage) {
 
 // Pass or omit the profile (useful for pipelines)
 const cdkOmitProfile = Boolean(process.env.CDK_OMIT_PROFILE)
-const profileParams = cdkOmitProfile ? '' : `--profile edaof-${stage}`
+const profileParams = cdkOmitProfile ? '' : `--profile ${prefix}-${stage}`
 
 // Require or omit the approval
 const cdkOmitApproval = Boolean(process.env.CDK_OMIT_APPROVAL)
