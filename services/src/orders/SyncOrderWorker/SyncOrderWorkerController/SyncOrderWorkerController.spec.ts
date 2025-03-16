@@ -128,18 +128,36 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
   //
   // Test SQSEvent edge cases
   //
-  it(`throws if the input SQSEvent is undefined`, async () => {
+  it(`does not throw if the input SQSEvent is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
-    const mockApiEvent = undefined as unknown as SQSEvent
-    await expect(syncOrderWorkerController.syncOrders(mockApiEvent)).rejects.toThrow()
+    const mockSqsEvent = undefined as never
+    await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`throws if the input SQSEvent records are missing`, async () => {
+  it(`returns no SQSBatchItemFailures if the input SQSEvent is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
-    const mockApiEvent = {} as unknown as SQSEvent
-    await expect(syncOrderWorkerController.syncOrders(mockApiEvent)).rejects.toThrow()
+    const mockSqsEvent = undefined as never
+    const result = await syncOrderWorkerController.syncOrders(mockSqsEvent)
+    const expected: SQSBatchResponse = { batchItemFailures: [] }
+    expect(result).toStrictEqual(expected)
+  })
+
+  it(`does not throw if the input SQSEvent records are missing`, async () => {
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
+    const mockSqsEvent = {} as never
+    await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
+  })
+
+  it(`returns no SQSBatchItemFailures if the input SQSEvent records are missing`, async () => {
+    const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
+    const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
+    const mockSqsEvent = {} as never
+    const result = await syncOrderWorkerController.syncOrders(mockSqsEvent)
+    const expected: SQSBatchResponse = { batchItemFailures: [] }
+    expect(result).toStrictEqual(expected)
   })
 
   it(`does not throw if the input SQSEvent records are empty`, async () => {
@@ -149,7 +167,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input SQSEvent records are empty`, async () => {
+  it(`returns no SQSBatchItemFailures if the input SQSEvent records are empty`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockSqsEvent = buildMockSqsEvent([])
@@ -169,7 +187,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input SQSRecord.body is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if the input SQSRecord.body is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockSqsRecord = {} as unknown as SQSRecord
@@ -187,7 +205,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input SQSRecord.body is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input SQSRecord.body is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockSqsRecord = { body: undefined } as unknown as SQSRecord
@@ -206,7 +224,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input SQSRecord.body is not a valid JSON`, async () => {
+  it(`returns no SQSBatchItemFailures if the input SQSRecord.body is not a valid JSON`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockSqsRecord = {} as unknown as SQSRecord
@@ -229,7 +247,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input EventBridgeEvent is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input EventBridgeEvent is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockEventBridgeEvent = undefined as unknown as EventBridgeEvent<string, MockEventDetail>
@@ -249,7 +267,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input EventBridgeEvent is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input EventBridgeEvent is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockEventBridgeEvent = undefined as unknown as EventBridgeEvent<string, MockEventDetail>
@@ -269,7 +287,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input EventBridgeEvent is invalid`, async () => {
+  it(`returns no SQSBatchItemFailures if the input EventBridgeEvent is invalid`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockEventBridgeEvent = 'mockInvalidValue' as unknown as EventBridgeEvent<string, MockEventDetail>
@@ -295,7 +313,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input EventBridgeEvent.detail is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if the input EventBridgeEvent.detail is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -321,7 +339,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input EventBridgeEvent.detail is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input EventBridgeEvent.detail is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -347,7 +365,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input EventBridgeEvent.detail is invalid`, async () => {
+  it(`returns no SQSBatchItemFailures if the input EventBridgeEvent.detail is invalid`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -376,7 +394,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input EventBridgeEvent.detail.dynamodb is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if the input EventBridgeEvent.detail.dynamodb is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -402,7 +420,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input EventBridgeEvent.detail.dynamodb is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input EventBridgeEvent.detail.dynamodb is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -428,7 +446,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input EventBridgeEvent.detail.dynamodb is invalid`, async () => {
+  it(`returns no SQSBatchItemFailures if the input EventBridgeEvent.detail.dynamodb is invalid`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -457,7 +475,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input EventBridgeEvent.detail.dynamodb.newImage is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if the input EventBridgeEvent.detail.dynamodb.newImage is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -483,7 +501,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input EventBridgeEvent.detail.dynamodb.newImage is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input EventBridgeEvent.detail.dynamodb.newImage is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -509,7 +527,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the input EventBridgeEvent.detail.dynamodb.newImage is invalid`, async () => {
+  it(`returns no SQSBatchItemFailures if the input EventBridgeEvent.detail.dynamodb.newImage is invalid`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -539,7 +557,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it(`returns no failures if an input IncomingOrderEvent is invalid`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent is invalid`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -567,7 +585,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventName is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventName is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -593,7 +611,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventName is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventName is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -619,7 +637,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventName is null`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventName is null`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -648,7 +666,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -674,7 +692,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -700,7 +718,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData is null`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData is null`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -729,7 +747,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.orderId is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.orderId is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -755,7 +773,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.orderId is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.orderId is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -781,7 +799,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.orderId is null`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.orderId is null`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -810,7 +828,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.orderStatus is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.orderStatus is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -836,7 +854,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.orderStatus is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.orderStatus is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -862,7 +880,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.orderStatus is null`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.orderStatus is null`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -891,7 +909,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.sku is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.sku is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -917,7 +935,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.sku is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.sku is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -943,7 +961,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.sku is null`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.sku is null`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -972,7 +990,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.units is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.units is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -998,7 +1016,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.units is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.units is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1024,7 +1042,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.units is null`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.units is null`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1053,7 +1071,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.price is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.price is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1079,7 +1097,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.price is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.price is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1105,7 +1123,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.price is null`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.price is null`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1134,7 +1152,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.userId is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.userId is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1160,7 +1178,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.userId is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.userId is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1186,7 +1204,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.userId is null`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.userId is null`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1215,7 +1233,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.createdAt is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.createdAt is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1241,7 +1259,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.createdAt is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.createdAt is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1267,7 +1285,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.createdAt is null`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.createdAt is null`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1296,7 +1314,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.updatedAt is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.updatedAt is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1322,7 +1340,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.updatedAt is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.updatedAt is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1348,7 +1366,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.eventData.updatedAt is null`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.eventData.updatedAt is null`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1377,7 +1395,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.createdAt is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.createdAt is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1403,7 +1421,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.createdAt is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.createdAt is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1429,7 +1447,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.createdAt is null`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.createdAt is null`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1458,7 +1476,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.updatedAt is missing`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.updatedAt is missing`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1484,7 +1502,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.updatedAt is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.updatedAt is undefined`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1510,7 +1528,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`returns no failures if an input IncomingOrderEvent.updatedAt is null`, async () => {
+  it(`returns no SQSBatchItemFailures if an input IncomingOrderEvent.updatedAt is null`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockId = 'AA'
@@ -1567,7 +1585,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     await expect(syncOrderWorkerController.syncOrders(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`return no failures if the SyncOrderWorkerService does not throw`, async () => {
+  it(`returns no SQSBatchItemFailures if the SyncOrderWorkerService does not throw`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_succeeds()
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA', 'BB', 'CC']
@@ -1577,7 +1595,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it(`return no failures if the SyncOrderWorkerService returns a non-transient Failure (test 1)`, async () => {
+  it(`returns no SQSBatchItemFailures if the SyncOrderWorkerService returns a non-transient Failure (test 1)`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_failsOnData(false)
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA-FAILURE', 'BB-FAILURE', 'CC']
@@ -1587,7 +1605,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it(`return no failures if the SyncOrderWorkerService returns a non-transient Failure (test 2)`, async () => {
+  it(`returns no SQSBatchItemFailures if the SyncOrderWorkerService returns a non-transient Failure (test 2)`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_failsOnData(false)
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA', 'BB-FAILURE', 'CC', 'DD', 'EE-FAILURE']
@@ -1597,7 +1615,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it(`return no failures if the SyncOrderWorkerService returns a non-transient Failure (test 3)`, async () => {
+  it(`returns no SQSBatchItemFailures if the SyncOrderWorkerService returns a non-transient Failure (test 3)`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_failsOnData(false)
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA', 'BB-FAILURE', 'CC-FAILURE', 'DD-FAILURE', 'EE-FAILURE']
@@ -1607,7 +1625,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it(`returns expected failures if the SyncOrderWorkerService returns a transient Failure (test 1)`, async () => {
+  it(`returns expected SQSBatchItemFailures if the SyncOrderWorkerService returns a transient Failure (test 1)`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_failsOnData(true)
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA-FAILURE', 'BB-FAILURE', 'CC']
@@ -1622,7 +1640,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it(`returns expected failures if the SyncOrderWorkerService returns a transient Failure (test 2)`, async () => {
+  it(`returns expected SQSBatchItemFailures if the SyncOrderWorkerService returns a transient Failure (test 2)`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_failsOnData(true)
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA', 'BB-FAILURE', 'CC', 'DD', 'EE-FAILURE']
@@ -1637,7 +1655,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it(`returns expected failures if the SyncOrderWorkerService returns a transient Failure (test 3)`, async () => {
+  it(`returns expected SQSBatchItemFailures if the SyncOrderWorkerService returns a transient Failure (test 3)`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_failsOnData(true)
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA', 'BB-FAILURE', 'CC-FAILURE', 'DD-FAILURE', 'EE-FAILURE']
@@ -1654,7 +1672,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerController tests`, () =>
     expect(result).toStrictEqual(expected)
   })
 
-  it(`returns all failures if the SyncOrderWorkerService throws all and only transient Failure`, async () => {
+  it(`returns all SQSBatchItemFailures if the SyncOrderWorkerService throws all and only transient Failure`, async () => {
     const mockSyncOrderWorkerService = buildMockSyncOrderWorkerService_syncOrder_failsOnData(true)
     const syncOrderWorkerController = new SyncOrderWorkerController(mockSyncOrderWorkerService)
     const mockIds = ['AA-FAILURE', 'BB-FAILURE', 'CC-FAILURE']
