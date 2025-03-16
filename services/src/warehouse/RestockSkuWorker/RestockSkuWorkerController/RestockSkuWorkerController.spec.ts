@@ -136,18 +136,36 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuWorkerController tests`, 
   //
   // Test SQSEvent edge cases
   //
-  it(`throws if the input SQSEvent is undefined`, async () => {
+  it(`does not throw if the input SQSEvent is undefined`, async () => {
     const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
-    const mockApiEvent = undefined as unknown as SQSEvent
-    await expect(restockSkuWorkerController.restockSkus(mockApiEvent)).rejects.toThrow()
+    const mockSqsEvent = undefined as never
+    await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`throws if the input SQSEvent records are missing`, async () => {
+  it(`returns no SQSBatchItemFailures if the input SQSEvent is undefined`, async () => {
     const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
-    const mockApiEvent = {} as unknown as SQSEvent
-    await expect(restockSkuWorkerController.restockSkus(mockApiEvent)).rejects.toThrow()
+    const mockSqsEvent = undefined as never
+    const result = await restockSkuWorkerController.restockSkus(mockSqsEvent)
+    const expected: SQSBatchResponse = { batchItemFailures: [] }
+    expect(result).toStrictEqual(expected)
+  })
+
+  it(`does not throw if the input SQSEvent records are missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
+    const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
+    const mockSqsEvent = {} as never
+    await expect(restockSkuWorkerController.restockSkus(mockSqsEvent)).resolves.not.toThrow()
+  })
+
+  it(`returns no SQSBatchItemFailures if the input SQSEvent records are missing`, async () => {
+    const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_succeeds()
+    const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
+    const mockSqsEvent = {} as never
+    const result = await restockSkuWorkerController.restockSkus(mockSqsEvent)
+    const expected: SQSBatchResponse = { batchItemFailures: [] }
+    expect(result).toStrictEqual(expected)
   })
 
   it(`does not throw if the input SQSEvent records are empty`, async () => {
@@ -1210,7 +1228,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuWorkerController tests`, 
     expect(result).toStrictEqual(expected)
   })
 
-  it(`returns expected failures if the RestockSkuWorkerService returns a transient Failure (test 1)`, async () => {
+  it(`returns expected SQSBatchItemFailures if the RestockSkuWorkerService returns a transient Failure (test 1)`, async () => {
     const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_failsOnData(true)
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockIds = ['AA-FAILURE', 'BB-FAILURE', 'CC']
@@ -1225,7 +1243,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuWorkerController tests`, 
     expect(result).toStrictEqual(expected)
   })
 
-  it(`returns expected failures if the RestockSkuWorkerService returns a transient Failure (test 2)`, async () => {
+  it(`returns expected SQSBatchItemFailures if the RestockSkuWorkerService returns a transient Failure (test 2)`, async () => {
     const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_failsOnData(true)
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockIds = ['AA', 'BB-FAILURE', 'CC', 'DD', 'EE-FAILURE']
@@ -1240,7 +1258,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuWorkerController tests`, 
     expect(result).toStrictEqual(expected)
   })
 
-  it(`returns expected failures if the RestockSkuWorkerService returns a transient Failure (test 3)`, async () => {
+  it(`returns expected SQSBatchItemFailures if the RestockSkuWorkerService returns a transient Failure (test 3)`, async () => {
     const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_failsOnData(true)
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockIds = ['AA', 'BB-FAILURE', 'CC-FAILURE', 'DD-FAILURE', 'EE-FAILURE']
@@ -1257,7 +1275,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuWorkerController tests`, 
     expect(result).toStrictEqual(expected)
   })
 
-  it(`returns all failures if the RestockSkuWorkerService throws all and only transient Failure`, async () => {
+  it(`returns all SQSBatchItemFailures if the RestockSkuWorkerService throws all and only transient Failure`, async () => {
     const mockRestockSkuWorkerService = buildMockRestockSkuWorkerService_restockSku_failsOnData(true)
     const restockSkuWorkerController = new RestockSkuWorkerController(mockRestockSkuWorkerService)
     const mockIds = ['AA-FAILURE', 'BB-FAILURE', 'CC-FAILURE']
