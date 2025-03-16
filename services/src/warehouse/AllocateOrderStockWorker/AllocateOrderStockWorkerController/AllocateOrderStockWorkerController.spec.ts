@@ -135,22 +135,53 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerCon
   //
   // Test SQSEvent edge cases
   //
-  it(`throws if the input SQSEvent is undefined`, async () => {
+  it(`does not throw if the input SQSEvent is undefined`, async () => {
     const mockAllocateOrderStockWorkerService = buildMockAllocateOrderStockWorkerService_allocateOrderStock_succeeds()
     const allocateOrderStockWorkerController = new AllocateOrderStockWorkerController(
       mockAllocateOrderStockWorkerService,
     )
-    const mockApiEvent = undefined as unknown as SQSEvent
-    await expect(allocateOrderStockWorkerController.allocateOrdersStock(mockApiEvent)).rejects.toThrow()
+    const mockSqsEvent = undefined as never
+    await expect(allocateOrderStockWorkerController.allocateOrdersStock(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`throws if the input SQSEvent records are missing`, async () => {
+  it(`returns no SQSBatchItemFailures if the input SQSEvent is undefined`, async () => {
     const mockAllocateOrderStockWorkerService = buildMockAllocateOrderStockWorkerService_allocateOrderStock_succeeds()
     const allocateOrderStockWorkerController = new AllocateOrderStockWorkerController(
       mockAllocateOrderStockWorkerService,
     )
-    const mockApiEvent = {} as unknown as SQSEvent
-    await expect(allocateOrderStockWorkerController.allocateOrdersStock(mockApiEvent)).rejects.toThrow()
+    const mockSqsEvent = undefined as never
+    const result = await allocateOrderStockWorkerController.allocateOrdersStock(mockSqsEvent)
+    const expected: SQSBatchResponse = { batchItemFailures: [] }
+    expect(result).toStrictEqual(expected)
+  })
+
+  it(`does not throw if the input SQSEvent records are missing`, async () => {
+    const mockAllocateOrderStockWorkerService = buildMockAllocateOrderStockWorkerService_allocateOrderStock_succeeds()
+    const allocateOrderStockWorkerController = new AllocateOrderStockWorkerController(
+      mockAllocateOrderStockWorkerService,
+    )
+    const mockSqsEvent = {} as never
+    await expect(allocateOrderStockWorkerController.allocateOrdersStock(mockSqsEvent)).resolves.not.toThrow()
+  })
+
+  it(`returns no SQSBatchItemFailures if the input SQSEvent records are missing`, async () => {
+    const mockAllocateOrderStockWorkerService = buildMockAllocateOrderStockWorkerService_allocateOrderStock_succeeds()
+    const allocateOrderStockWorkerController = new AllocateOrderStockWorkerController(
+      mockAllocateOrderStockWorkerService,
+    )
+    const mockSqsEvent = {} as never
+    const result = await allocateOrderStockWorkerController.allocateOrdersStock(mockSqsEvent)
+    const expected: SQSBatchResponse = { batchItemFailures: [] }
+    expect(result).toStrictEqual(expected)
+  })
+
+  it(`does not throw if the input SQSEvent records are empty`, async () => {
+    const mockAllocateOrderStockWorkerService = buildMockAllocateOrderStockWorkerService_allocateOrderStock_succeeds()
+    const allocateOrderStockWorkerController = new AllocateOrderStockWorkerController(
+      mockAllocateOrderStockWorkerService,
+    )
+    const mockSqsEvent = buildMockSqsEvent([])
+    await expect(allocateOrderStockWorkerController.allocateOrdersStock(mockSqsEvent)).resolves.not.toThrow()
   })
 
   it(`returns no SQSBatchItemFailures if the input SQSEvent records are empty`, async () => {
@@ -164,9 +195,6 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerCon
     expect(result).toStrictEqual(expected)
   })
 
-  //
-  // Test SQSRecord edge cases
-  //
   it(`does not throw if the input SQSRecord.body is missing`, async () => {
     const mockAllocateOrderStockWorkerService = buildMockAllocateOrderStockWorkerService_allocateOrderStock_succeeds()
     const allocateOrderStockWorkerController = new AllocateOrderStockWorkerController(

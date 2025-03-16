@@ -23,6 +23,14 @@ export class AllocateOrderStockWorkerController implements IAllocateOrderStockWo
     console.info(`${logContext} init:`, { sqsEvent })
 
     const sqsBatchResponse: SQSBatchResponse = { batchItemFailures: [] }
+
+    if (!sqsEvent || !sqsEvent.Records) {
+      const error = new Error(`Expected SQSEvent but got ${sqsEvent}`)
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, sqsEvent })
+      return sqsBatchResponse
+    }
+
     for (const record of sqsEvent.Records) {
       // If the failure is transient then we add it to the batch errors to requeue and retry
       // If the failure is non-transient then we ignore it to remove it from the queue
