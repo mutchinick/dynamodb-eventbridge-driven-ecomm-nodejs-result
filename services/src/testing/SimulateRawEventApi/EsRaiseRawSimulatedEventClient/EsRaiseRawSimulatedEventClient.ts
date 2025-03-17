@@ -1,9 +1,17 @@
+import { ConditionalCheckFailedException } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
-import { TestingError } from '../../errors/TestingError'
+import { Failure, Result, Success } from '../../errors/Result'
 import { RawSimulatedEvent } from '../model/RawSimulatedEvent'
 
 export interface IEsRaiseRawSimulatedEventClient {
-  raiseRawSimulatedEvent: (rawSimulatedEvent: RawSimulatedEvent) => Promise<void>
+  raiseRawSimulatedEvent: (
+    rawSimulatedEvent: RawSimulatedEvent,
+  ) => Promise<
+    | Success<void>
+    | Failure<'InvalidArgumentsError'>
+    | Failure<'DuplicateEventRaisedError'>
+    | Failure<'UnrecognizedError'>
+  >
 }
 
 export class EsRaiseRawSimulatedEventClient implements IEsRaiseRawSimulatedEventClient {
@@ -15,30 +23,94 @@ export class EsRaiseRawSimulatedEventClient implements IEsRaiseRawSimulatedEvent
   //
   //
   //
-  public async raiseRawSimulatedEvent(rawSimulatedEvent: RawSimulatedEvent): Promise<void> {
+  public async raiseRawSimulatedEvent(
+    rawSimulatedEvent: RawSimulatedEvent,
+  ): Promise<
+    | Success<void>
+    | Failure<'InvalidArgumentsError'>
+    | Failure<'DuplicateEventRaisedError'>
+    | Failure<'UnrecognizedError'>
+  > {
+    const logContext = 'EsRaiseRawSimulatedEventClient.raiseRawSimulatedEvent'
+    console.info(`${logContext} init:`, { rawSimulatedEvent })
+
+    const ddbCommandResult = this.buildDdbCommand(rawSimulatedEvent)
+    if (Result.isFailure(ddbCommandResult)) {
+      console.error(`${logContext} exit error:`, { ddbCommandResult, rawSimulatedEvent })
+      return ddbCommandResult
+    }
+
+    const ddbCommand = ddbCommandResult.value
+    const sendDdbCommandResult = await this.sendDdbCommand(ddbCommand)
+    Result.isFailure(sendDdbCommandResult)
+      ? console.error(`${logContext} exit error:`, { sendDdbCommandResult, ddbCommand, rawSimulatedEvent })
+      : console.info(`${logContext} exit success:`, { sendDdbCommandResult, ddbCommand, rawSimulatedEvent })
+
+    return sendDdbCommandResult
+  }
+
+  //
+  //
+  //
+  private async sendDdbCommand(
+    ddbCommand: PutCommand,
+  ): Promise<Success<void> | Failure<'DuplicateEventRaisedError'> | Failure<'UnrecognizedError'>> {
+    const logContext = 'EsRaiseRawSimulatedEventClient.sendDdbCommand'
+    console.info(`${logContext} init:`, { ddbCommand })
+
     try {
-      console.info('EsRaiseRawSimulatedEventClient.raiseRawSimulatedEvent init:', { rawSimulatedEvent })
-      const ddbPutCommand = this.buildDdbPutCommand(rawSimulatedEvent)
-      await this.ddbDocClient.send(ddbPutCommand)
-      console.info('EsRaiseRawSimulatedEventClient.raiseRawSimulatedEvent exit:')
+      await this.ddbDocClient.send(ddbCommand)
+      const sendDdbCommandResult = Result.makeSuccess()
+      console.info(`${logContext} exit success:`, { sendDdbCommandResult, ddbCommand })
+      return sendDdbCommandResult
     } catch (error) {
-      console.error('EsRaiseRawSimulatedEventClient.raiseRawSimulatedEvent error:', { error })
-      if (TestingError.hasName(error, TestingError.ConditionalCheckFailedException)) {
-        TestingError.addName(error, TestingError.InvalidEventRaiseOperationError_Redundant)
-        TestingError.addName(error, TestingError.DoNotRetryError)
+      console.error(`${logContext} error caught:`, { error })
+
+      // If the error is a ConditionalCheckFailedException, then we already performed this operation
+      // successfully so we return a non-transient DuplicateEventRaisedError. No sense in retrying.
+      if (error instanceof ConditionalCheckFailedException) {
+        const duplicationFailure = Result.makeFailure('DuplicateEventRaisedError', error, false)
+        console.error(`${logContext} exit error:`, { duplicationFailure, ddbCommand })
+        return duplicationFailure
       }
-      throw error
+
+      // If the error is not recognizable, we return a transient UnrecognizedError, because most likely
+      // there was a failure with the request and we want to retry.
+      const unrecognizedFailure = Result.makeFailure('UnrecognizedError', error, true)
+      console.error(`${logContext} exit error:`, { unrecognizedFailure, ddbCommand })
+      return unrecognizedFailure
     }
   }
 
   //
   //
   //
-  private buildDdbPutCommand(rawSimulatedEvent: RawSimulatedEvent): PutCommand {
-    return new PutCommand({
-      TableName: process.env.EVENT_STORE_TABLE_NAME,
-      Item: { ...rawSimulatedEvent },
-      ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
-    })
+  private buildDdbCommand(
+    rawSimulatedEvent: RawSimulatedEvent,
+  ): Success<PutCommand> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'EsRaiseRawSimulatedEventClient.buildDdbCommand'
+
+    try {
+      const { pk, sk, eventName, eventData, createdAt, updatedAt, _tn } = rawSimulatedEvent
+      const ddbCommand = new PutCommand({
+        TableName: process.env.EVENT_STORE_TABLE_NAME,
+        Item: {
+          pk,
+          sk,
+          eventName,
+          eventData,
+          createdAt,
+          updatedAt,
+          _tn,
+        },
+        ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
+      })
+      return Result.makeSuccess(ddbCommand)
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit error:`, { invalidArgsFailure, rawSimulatedEvent })
+      return invalidArgsFailure
+    }
   }
 }

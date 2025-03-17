@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Failure, Result, Success } from '../../errors/Result'
 import { EventProps } from './EventProps'
 
 export type IncomingSimulateRawEventRequestInput = EventProps
@@ -21,26 +22,67 @@ export class IncomingSimulateRawEventRequest implements IncomingSimulateRawEvent
   //
   //
   //
-  public static validateAndBuild(input: IncomingSimulateRawEventRequestInput) {
-    try {
-      const { pk, sk, eventName, eventData, createdAt, updatedAt } = this.validateAndBuildProps(input)
-      return new IncomingSimulateRawEventRequest(pk, sk, eventName, eventData, createdAt, updatedAt)
-    } catch (error) {
-      console.error('IncomingSimulateRawEventRequest.validateAndBuild', {
-        error,
-        incomingSimulateRawEventRequestInput: input,
-      })
-      throw error
+  public static validateAndBuild(
+    incomingSimulateRawEventRequestInput: IncomingSimulateRawEventRequestInput,
+  ): Success<IncomingSimulateRawEventRequest> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'IncomingSimulateRawEventRequest.validateAndBuild'
+    console.info(`${logContext} init:`, { incomingSimulateRawEventRequestInput })
+
+    const propsResult = this.buildProps(incomingSimulateRawEventRequestInput)
+    if (Result.isFailure(propsResult)) {
+      console.error(`${logContext} exit failure:`, { propsResult, incomingSimulateRawEventRequestInput })
+      return propsResult
     }
+
+    const { pk, sk, eventName, eventData, createdAt, updatedAt } = propsResult.value
+    const incomingSimulateRawEventRequest = new IncomingSimulateRawEventRequest(
+      pk,
+      sk,
+      eventName,
+      eventData,
+      createdAt,
+      updatedAt,
+    )
+    const incomingSimulateRawEventRequestResult = Result.makeSuccess(incomingSimulateRawEventRequest)
+    console.info(`${logContext} exit success:`, {
+      incomingSimulateRawEventRequestResult,
+      incomingSimulateRawEventRequestInput,
+    })
+    return incomingSimulateRawEventRequestResult
   }
 
   //
   //
   //
-  private static validateAndBuildProps(
-    input: IncomingSimulateRawEventRequestInput,
-  ): IncomingSimulateRawEventRequestProps {
-    z.object({
+  private static buildProps(
+    incomingSimulateRawEventRequestInput: IncomingSimulateRawEventRequestInput,
+  ): Success<EventProps> | Failure<'InvalidArgumentsError'> {
+    const inputValidationResult = this.validateInput(incomingSimulateRawEventRequestInput)
+    if (Result.isFailure(inputValidationResult)) {
+      return inputValidationResult
+    }
+
+    const { pk, sk, eventName, eventData, createdAt, updatedAt } = incomingSimulateRawEventRequestInput
+    const incomingSimulateRawEventRequestProps: IncomingSimulateRawEventRequestProps = {
+      pk,
+      sk,
+      eventName,
+      eventData,
+      createdAt,
+      updatedAt,
+    }
+    return Result.makeSuccess(incomingSimulateRawEventRequestProps)
+  }
+
+  //
+  //
+  //
+  private static validateInput(
+    incomingSimulateRawEventRequestInput: EventProps,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'IncomingSimulateRawEventRequest.validateInput'
+
+    const schema = z.object({
       pk: z.string().trim().min(1),
       sk: z.string().trim().min(1),
       eventName: z.string().trim().min(1),
@@ -48,9 +90,15 @@ export class IncomingSimulateRawEventRequest implements IncomingSimulateRawEvent
       createdAt: z.string().optional(),
       updatedAt: z.string().optional(),
     })
-      .strict()
-      .parse(input)
 
-    return input
+    try {
+      schema.strict().parse(incomingSimulateRawEventRequestInput)
+      return Result.makeSuccess()
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingSimulateRawEventRequestInput })
+      return invalidArgsFailure
+    }
   }
 }

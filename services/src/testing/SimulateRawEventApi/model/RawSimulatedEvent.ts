@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Failure, Result, Success } from '../../errors/Result'
 import { EventProps } from './EventProps'
 
 export type RawSimulatedEventInput = EventProps
@@ -22,34 +23,37 @@ export class RawSimulatedEvent implements RawSimulatedEventProps {
   //
   //
   //
-  public static validateAndBuild(input: RawSimulatedEventInput) {
-    try {
-      const { pk, sk, eventName, eventData, createdAt, updatedAt, _tn } = this.validateAndBuildProps(input)
-      return new RawSimulatedEvent(pk, sk, eventName, eventData, createdAt, updatedAt, _tn)
-    } catch (error) {
-      console.error('RawSimulatedEvent.validateAndBuild', { error, input })
-      throw error
+  public static validateAndBuild(rawSimulatedEventInput: RawSimulatedEventInput) {
+    const logContext = 'RawSimulatedEvent.validateAndBuild'
+    console.info(`${logContext} init:`, { rawSimulatedEventInput })
+
+    const propsResult = this.buildProps(rawSimulatedEventInput)
+    if (Result.isFailure(propsResult)) {
+      console.error(`${logContext} exit failure:`, { propsResult, rawSimulatedEventInput })
+      return propsResult
     }
+
+    const { pk, sk, eventName, eventData, createdAt, updatedAt, _tn } = propsResult.value
+    const rawSimulatedEvent = new RawSimulatedEvent(pk, sk, eventName, eventData, createdAt, updatedAt, _tn)
+    const rawSimulatedEventResult = Result.makeSuccess(rawSimulatedEvent)
+    console.info(`${logContext} exit success:`, { rawSimulatedEventResult, rawSimulatedEventInput })
+    return rawSimulatedEventResult
   }
 
   //
   //
   //
-  private static validateAndBuildProps(input: RawSimulatedEventInput): RawSimulatedEventProps {
-    z.object({
-      pk: z.string().trim().min(1),
-      sk: z.string().trim().min(1),
-      eventName: z.string().trim().min(1),
-      eventData: z.any().optional(),
-      createdAt: z.string().optional(),
-      updatedAt: z.string().optional(),
-    })
-      .strict()
-      .parse(input)
+  private static buildProps(
+    rawSimulatedEventInput: RawSimulatedEventInput,
+  ): Success<RawSimulatedEventProps> | Failure<'InvalidArgumentsError'> {
+    const inputValidationResult = this.validateInput(rawSimulatedEventInput)
+    if (Result.isFailure(inputValidationResult)) {
+      return inputValidationResult
+    }
 
     const date = new Date().toISOString()
-    const { pk, sk, eventName, eventData, createdAt, updatedAt } = input
-    return {
+    const { pk, sk, eventName, eventData, createdAt, updatedAt } = rawSimulatedEventInput
+    const rawSimulatedEventProps: RawSimulatedEventProps = {
       pk,
       sk,
       eventName,
@@ -57,6 +61,35 @@ export class RawSimulatedEvent implements RawSimulatedEventProps {
       createdAt: createdAt?.trim() || date,
       updatedAt: updatedAt?.trim() || date,
       _tn: '#EVENT',
+    }
+    return Result.makeSuccess(rawSimulatedEventProps)
+  }
+
+  //
+  //
+  //
+  private static validateInput(
+    rawSimulatedEventInput: RawSimulatedEventInput,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'RawSimulatedEvent.validateInput'
+
+    const schema = z.object({
+      pk: z.string().trim().min(1),
+      sk: z.string().trim().min(1),
+      eventName: z.string().trim().min(1),
+      eventData: z.any().optional(),
+      createdAt: z.string().optional(),
+      updatedAt: z.string().optional(),
+    })
+
+    try {
+      schema.strict().parse(rawSimulatedEventInput)
+      return Result.makeSuccess()
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, rawSimulatedEventInput })
+      return invalidArgsFailure
     }
   }
 }
