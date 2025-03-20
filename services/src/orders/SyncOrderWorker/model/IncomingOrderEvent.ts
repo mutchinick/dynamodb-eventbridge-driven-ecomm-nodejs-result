@@ -22,6 +22,9 @@ export type IncomingOrderEventInput = EventBridgeEvent<string, EventDetail>
 
 type IncomingOrderEventProps = OrderEvent<OrderEventName, OrderEventData>
 
+//
+//
+//
 export class IncomingOrderEvent implements IncomingOrderEventProps {
   //
   //
@@ -68,41 +71,44 @@ export class IncomingOrderEvent implements IncomingOrderEventProps {
   private static buildProps(
     incomingOrderEventInput: IncomingOrderEventInput,
   ): Success<IncomingOrderEventProps> | Failure<'InvalidArgumentsError'> {
-    try {
-      const validInput = this.parseValidateInput(incomingOrderEventInput)
-      return Result.makeSuccess(validInput)
-    } catch (error) {
-      const logContext = 'IncomingOrderEvent.buildProps'
-      console.error(`${logContext} error caught:`, { error })
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
-      console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingOrderEventInput })
-      return invalidArgsFailure
-    }
+    return this.parseValidateInput(incomingOrderEventInput)
   }
 
   //
   //
   //
-  private static parseValidateInput(incomingOrderEventInput: IncomingOrderEventInput): IncomingOrderEventProps {
-    const eventDetail = incomingOrderEventInput.detail
-    const unverifiedIncomingOrderEvent = unmarshall(eventDetail.dynamodb.NewImage) as IncomingOrderEventProps
-    const incomingOrderEvent = z
-      .object({
-        eventName: ValueValidators.validIncomingEventName(),
-        eventData: z.object({
-          orderId: ValueValidators.validOrderId(),
-          orderStatus: ValueValidators.validOrderStatus().optional(),
-          sku: ValueValidators.validSku().optional(),
-          units: ValueValidators.validUnits().optional(),
-          price: ValueValidators.validPrice().optional(),
-          userId: ValueValidators.validUserId().optional(),
-          createdAt: ValueValidators.validCreatedAt().optional(),
-          updatedAt: ValueValidators.validUpdatedAt().optional(),
-        }),
-        createdAt: ValueValidators.validCreatedAt(),
-        updatedAt: ValueValidators.validUpdatedAt(),
-      })
-      .parse(unverifiedIncomingOrderEvent) as IncomingOrderEventProps
-    return incomingOrderEvent
+  private static parseValidateInput(
+    incomingOrderEventInput: IncomingOrderEventInput,
+  ): Success<IncomingOrderEventProps> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'IncomingOrderEvent.parseValidateInput'
+
+    // COMBAK: Maybe some schemas can be converted to shared models at some point
+    const schema = z.object({
+      eventName: ValueValidators.validIncomingEventName(),
+      eventData: z.object({
+        orderId: ValueValidators.validOrderId(),
+        orderStatus: ValueValidators.validOrderStatus().optional(),
+        sku: ValueValidators.validSku().optional(),
+        units: ValueValidators.validUnits().optional(),
+        price: ValueValidators.validPrice().optional(),
+        userId: ValueValidators.validUserId().optional(),
+        createdAt: ValueValidators.validCreatedAt().optional(),
+        updatedAt: ValueValidators.validUpdatedAt().optional(),
+      }),
+      createdAt: ValueValidators.validCreatedAt(),
+      updatedAt: ValueValidators.validUpdatedAt(),
+    })
+
+    try {
+      const eventDetail = incomingOrderEventInput.detail
+      const unverifiedEvent = unmarshall(eventDetail.dynamodb.NewImage)
+      const incomingOrderEventProps = schema.parse(unverifiedEvent) as IncomingOrderEventProps
+      return Result.makeSuccess(incomingOrderEventProps)
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error, incomingOrderEventInput })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingOrderEventInput })
+      return invalidArgsFailure
+    }
   }
 }

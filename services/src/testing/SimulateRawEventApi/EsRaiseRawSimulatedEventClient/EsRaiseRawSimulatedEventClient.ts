@@ -34,6 +34,12 @@ export class EsRaiseRawSimulatedEventClient implements IEsRaiseRawSimulatedEvent
     const logContext = 'EsRaiseRawSimulatedEventClient.raiseRawSimulatedEvent'
     console.info(`${logContext} init:`, { rawSimulatedEvent })
 
+    const inputValidationResult = this.validateInput(rawSimulatedEvent)
+    if (Result.isFailure(inputValidationResult)) {
+      console.error(`${logContext} exit failure:`, { inputValidationResult, rawSimulatedEvent })
+      return inputValidationResult
+    }
+
     const ddbCommandResult = this.buildDdbCommand(rawSimulatedEvent)
     if (Result.isFailure(ddbCommandResult)) {
       console.error(`${logContext} exit error:`, { ddbCommandResult, rawSimulatedEvent })
@@ -52,6 +58,22 @@ export class EsRaiseRawSimulatedEventClient implements IEsRaiseRawSimulatedEvent
   //
   //
   //
+  private validateInput(rawSimulatedEvent: RawSimulatedEvent): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'EsRaiseRawSimulatedEventClient.validateInput'
+
+    if (rawSimulatedEvent instanceof RawSimulatedEvent === false) {
+      const errorMessage = `Expected RawSimulatedEvent but got ${rawSimulatedEvent}`
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', errorMessage, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, rawSimulatedEvent })
+      return invalidArgsFailure
+    }
+
+    return Result.makeSuccess()
+  }
+
+  //
+  //
+  //
   private async sendDdbCommand(
     ddbCommand: PutCommand,
   ): Promise<Success<void> | Failure<'DuplicateEventRaisedError'> | Failure<'UnrecognizedError'>> {
@@ -64,7 +86,7 @@ export class EsRaiseRawSimulatedEventClient implements IEsRaiseRawSimulatedEvent
       console.info(`${logContext} exit success:`, { sendDdbCommandResult, ddbCommand })
       return sendDdbCommandResult
     } catch (error) {
-      console.error(`${logContext} error caught:`, { error })
+      console.error(`${logContext} error caught:`, { error, ddbCommand })
 
       // If the error is a ConditionalCheckFailedException, then we already performed this operation
       // successfully so we return a non-transient DuplicateEventRaisedError. No sense in retrying.
@@ -107,7 +129,7 @@ export class EsRaiseRawSimulatedEventClient implements IEsRaiseRawSimulatedEvent
       })
       return Result.makeSuccess(ddbCommand)
     } catch (error) {
-      console.error(`${logContext} error caught:`, { error })
+      console.error(`${logContext} error caught:`, { error, rawSimulatedEvent })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} exit error:`, { invalidArgsFailure, rawSimulatedEvent })
       return invalidArgsFailure

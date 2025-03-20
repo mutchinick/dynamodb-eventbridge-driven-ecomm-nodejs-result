@@ -6,7 +6,7 @@ jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
 const mockDate = new Date().toISOString()
 
-function buildMockValidOrderStockAllocatedEventInput(): OrderStockAllocatedEventInput {
+function buildMockOrderStockAllocatedEventInput(): OrderStockAllocatedEventInput {
   const mockValidInput: OrderStockAllocatedEventInput = {
     orderId: 'mockOrderId',
     sku: 'mockSku',
@@ -20,7 +20,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
   // Test OrderStockAllocatedEventData edge cases
   //
   it(`returns a Success if the input OrderStockAllocatedEventInput is valid`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isSuccess(result)).toBe(true)
   })
@@ -48,7 +48,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
   //
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.orderId is missing`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     delete mockOrderStockAllocatedEventInput.orderId
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -58,7 +58,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.orderId is undefined`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.orderId = undefined
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -68,7 +68,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.orderId is null`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.orderId = null
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -78,7 +78,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.orderId is empty`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.orderId = ''
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -88,7 +88,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.orderId is blank`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.orderId = '      '
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -98,7 +98,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.orderId length < 4`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.orderId = '123'
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -111,7 +111,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
   //
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.sku is missing`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     delete mockOrderStockAllocatedEventInput.sku
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -121,7 +121,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.sku is undefined`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.sku = undefined
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -131,7 +131,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.sku is null`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.sku = null
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -141,7 +141,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.sku is empty`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.sku = ''
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -151,7 +151,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.sku is blank`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.sku = '      '
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -161,7 +161,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.sku length < 4`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.sku = '123'
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -174,7 +174,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
   //
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.units is missing`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     delete mockOrderStockAllocatedEventInput.units
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -184,7 +184,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.units is undefined`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.units = undefined
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -194,7 +194,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.units is null`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.units = null
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -204,7 +204,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.units < 0`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.units = -1
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -214,7 +214,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.units == 0`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.units = 0
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -224,7 +224,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.units is not an integer`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.units = 2.34
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -234,7 +234,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
 
   it(`returns non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockAllocatedEventInput.units is not a number`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
     mockOrderStockAllocatedEventInput.units = '1' as unknown as number
     const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -246,8 +246,8 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
   // Test expected results
   //
   it(`returns the expected Success<OrderStockAllocatedEvent> with the expected data`, () => {
-    const mockOrderStockAllocatedEventInput = buildMockValidOrderStockAllocatedEventInput()
-    const orderStockAllocatedEvent = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
+    const mockOrderStockAllocatedEventInput = buildMockOrderStockAllocatedEventInput()
+    const result = OrderStockAllocatedEvent.validateAndBuild(mockOrderStockAllocatedEventInput)
     const expectedEvent: OrderStockAllocatedEvent = {
       eventName: WarehouseEventName.ORDER_STOCK_ALLOCATED_EVENT,
       eventData: {
@@ -259,6 +259,7 @@ describe(`Warehouse Service AllocateOrderStockApi OrderStockAllocatedEvent tests
       updatedAt: mockDate,
     }
     const expectedResult = Result.makeSuccess(expectedEvent)
-    expect(orderStockAllocatedEvent).toMatchObject(expectedResult)
+    expect(Result.isSuccess(result)).toBe(true)
+    expect(result).toMatchObject(expectedResult)
   })
 })

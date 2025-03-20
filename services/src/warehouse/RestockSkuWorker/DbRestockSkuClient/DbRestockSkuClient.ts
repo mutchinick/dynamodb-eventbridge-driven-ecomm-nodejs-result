@@ -34,14 +34,20 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
     const logContext = 'DbRestockSkuClient.restockSku'
     console.info(`${logContext} init:`, { restockSkuCommand })
 
+    const inputValidationResult = this.validateInput(restockSkuCommand)
+    if (Result.isFailure(inputValidationResult)) {
+      console.error(`${logContext} exit failure:`, { inputValidationResult, restockSkuCommand })
+      return inputValidationResult
+    }
+
     const buildCommandResult = this.buildDdbUpdateCommand(restockSkuCommand)
     if (Result.isFailure(buildCommandResult)) {
       console.error(`${logContext} exit failure:`, { buildCommandResult, restockSkuCommand })
       return buildCommandResult
     }
 
-    const ddbUpdateCommand = buildCommandResult.value
-    const sendCommandResult = await this.sendDdbUpdateCommand(ddbUpdateCommand)
+    const ddbCommand = buildCommandResult.value
+    const sendCommandResult = await this.sendDdbUpdateCommand(ddbCommand)
     Result.isFailure(sendCommandResult)
       ? console.error(`${logContext} exit failure:`, { sendCommandResult, restockSkuCommand })
       : console.info(`${logContext} exit success:`, { sendCommandResult, restockSkuCommand })
@@ -52,15 +58,33 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
   //
   //
   //
+  private validateInput(restockSkuCommand: RestockSkuCommand): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'DbRestockSkuClient.validateInput'
+
+    if (restockSkuCommand instanceof RestockSkuCommand === false) {
+      const errorMessage = `Expected RestockSkuCommand but got ${restockSkuCommand}`
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', errorMessage, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, restockSkuCommand })
+      return invalidArgsFailure
+    }
+
+    return Result.makeSuccess()
+  }
+
+  //
+  //
+  //
   private buildDdbUpdateCommand(
     restockSkuCommand: RestockSkuCommand,
   ): Success<TransactWriteCommand> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'DbRestockSkuClient.buildDdbUpdateCommand'
+
     // Perhaps we can prevent all errors by validating the arguments, but TransactWriteCommand
     // is an external dependency and we don't know what happens internally, so we try-catch
     try {
       const tableName = process.env.WAREHOUSE_TABLE_NAME
       const { sku, units, lotId, createdAt, updatedAt } = restockSkuCommand.restockSkuData
-      const ddbUpdateCommand = new TransactWriteCommand({
+      const ddbCommand = new TransactWriteCommand({
         TransactItems: [
           {
             Put: {
@@ -111,10 +135,9 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
           },
         ],
       })
-      return Result.makeSuccess(ddbUpdateCommand)
+      return Result.makeSuccess(ddbCommand)
     } catch (error) {
-      const logContext = 'DbRestockSkuClient.buildDdbUpdateCommand'
-      console.error(`${logContext} error caught:`, { error })
+      console.error(`${logContext} error caught:`, { error, restockSkuCommand })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, restockSkuCommand })
       return invalidArgsFailure
@@ -125,30 +148,30 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
   //
   //
   private async sendDdbUpdateCommand(
-    ddbUpdateCommand: TransactWriteCommand,
+    ddbCommand: TransactWriteCommand,
   ): Promise<Success<void> | Failure<'DuplicateRestockOperationError'> | Failure<'UnrecognizedError'>> {
     const logContext = 'DbRestockSkuClient.sendDdbUpdateCommand'
-    console.info(`${logContext} init:`, { ddbUpdateCommand })
+    console.info(`${logContext} init:`, { ddbCommand })
 
     try {
-      await this.ddbDocClient.send(ddbUpdateCommand)
+      await this.ddbDocClient.send(ddbCommand)
       const sendCommandResult = Result.makeSuccess()
       console.info(`${logContext} exit success:`, { sendCommandResult })
       return sendCommandResult
     } catch (error) {
-      console.error(`${logContext} error caught:`, { error })
+      console.error(`${logContext} error caught:`, { error, ddbCommand })
 
       // When possible multiple transaction errors:
       // Prioritize tagging the "Duplication Errors", because if we get one, this means that the operation
       // has already executed successfully, thus we don't care about other possible transaction errors
       if (this.isDuplicateRestockOperationError(error)) {
         const duplicationFailure = Result.makeFailure('DuplicateRestockOperationError', error, false)
-        console.error(`${logContext} exit failure:`, { duplicationFailure, ddbUpdateCommand })
+        console.error(`${logContext} exit failure:`, { duplicationFailure, ddbCommand })
         return duplicationFailure
       }
 
       const unrecognizedFailure = Result.makeFailure('UnrecognizedError', error, true)
-      console.error(`${logContext} exit failure:`, { unrecognizedFailure, ddbUpdateCommand })
+      console.error(`${logContext} exit failure:`, { unrecognizedFailure, ddbCommand })
       return unrecognizedFailure
     }
   }

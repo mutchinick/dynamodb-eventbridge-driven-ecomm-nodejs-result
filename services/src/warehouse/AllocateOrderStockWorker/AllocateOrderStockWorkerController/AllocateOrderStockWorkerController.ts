@@ -86,12 +86,13 @@ export class AllocateOrderStockWorkerController implements IAllocateOrderStockWo
   //
   //
   private parseEventBrideEvent(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'AllocateOrderStockWorkerController.parseEventBrideEvent'
+
     try {
       const eventBridgeEvent = JSON.parse(sqsRecord.body)
       return Result.makeSuccess<unknown>(eventBridgeEvent)
     } catch (error) {
-      const logContext = 'AllocateOrderStockWorkerController.parseEventBrideEvent'
-      console.error(`${logContext} error caught:`, { error })
+      console.error(`${logContext} error caught:`, { error, sqsRecord })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, sqsRecord })
       return invalidArgsFailure

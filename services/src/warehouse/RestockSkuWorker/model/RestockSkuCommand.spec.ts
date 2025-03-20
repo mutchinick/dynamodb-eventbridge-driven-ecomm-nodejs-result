@@ -15,7 +15,7 @@ type Mutable_RestockSkuCommandInput = {
   incomingSkuRestockedEvent: Mutable_IncomingSkuRestockedEvent
 }
 
-function buildMockValidIncomingSkuRestockedEvent(): Mutable_IncomingSkuRestockedEvent {
+function buildMockIncomingSkuRestockedEvent(): Mutable_IncomingSkuRestockedEvent {
   const mockValidWarehouseEvent: Mutable_IncomingSkuRestockedEvent = {
     eventName: WarehouseEventName.SKU_RESTOCKED_EVENT,
     eventData: {
@@ -29,9 +29,9 @@ function buildMockValidIncomingSkuRestockedEvent(): Mutable_IncomingSkuRestocked
   return mockValidWarehouseEvent
 }
 
-function buildMockValidRestockSkuCommandInput(): Mutable_RestockSkuCommandInput {
+function buildMockRestockSkuCommandInput(): Mutable_RestockSkuCommandInput {
   const mockValidInput: Mutable_RestockSkuCommandInput = {
-    incomingSkuRestockedEvent: buildMockValidIncomingSkuRestockedEvent(),
+    incomingSkuRestockedEvent: buildMockIncomingSkuRestockedEvent(),
   }
   return mockValidInput
 }
@@ -40,14 +40,14 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
   //
   // Test RestockSkuCommandInput edge cases
   //
-  it(`returns a Success if the input RestockSkuCommandInput.is valid`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+  it(`returns a Success if the input RestockSkuCommandInput is valid`, () => {
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isSuccess(result)).toBe(true)
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError
-      if the input RestockSkuCommandInput.is undefined`, () => {
+      if the input RestockSkuCommandInput is undefined`, () => {
     const mockRestockSkuCommandInput: RestockSkuCommandInput = undefined
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -56,7 +56,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError 
-      if the input RestockSkuCommandInput.is null`, () => {
+      if the input RestockSkuCommandInput is null`, () => {
     const mockRestockSkuCommandInput: RestockSkuCommandInput = null
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -69,7 +69,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
   //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventName is missing`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     delete mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventName
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -79,7 +79,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventName is undefined`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventName = undefined
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -89,7 +89,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventName is null`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventName = null
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -99,7 +99,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventName is empty`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventName = '' as never
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -109,7 +109,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventName is blank`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventName = '      ' as never
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -119,7 +119,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventName is not an SKU_RESTOCKED_EVENT`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventName = 'mockWarehouseEventName' as never
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -132,7 +132,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
   //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.sku is missing`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     delete mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.sku
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -142,7 +142,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.sku is undefined`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.sku = undefined
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -152,7 +152,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.sku is null`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.sku = null
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -162,7 +162,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.sku is empty`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.sku = ''
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -172,7 +172,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.sku is blank`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.sku = '      '
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -182,7 +182,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.sku length < 4`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.sku = '123'
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -195,7 +195,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
   //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units is missing`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     delete mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -205,7 +205,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units is undefined`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units = undefined
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -215,7 +215,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units is null`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units = null
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -225,7 +225,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units < 0`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units = -1
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -235,7 +235,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units == 0`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units = 0
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -245,7 +245,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units is not an integer`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units = 3.45
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -255,7 +255,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units is not a number`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units = '1' as unknown as number
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -268,7 +268,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
   //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.lotId is missing`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     delete mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.lotId
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -278,7 +278,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.lotId is undefined`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.lotId = undefined
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -288,7 +288,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.lotId is null`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.lotId = null
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -298,7 +298,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.lotId is empty`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.lotId = ''
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -308,7 +308,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.lotId is blank`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.lotId = '      '
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -318,7 +318,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.eventData.lotId length < 4`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.lotId = '123'
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -331,7 +331,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
   //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.createdAt is missing`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     delete mockRestockSkuCommandInput.incomingSkuRestockedEvent.createdAt
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -341,7 +341,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.createdAt is undefined`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.createdAt = undefined
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -351,7 +351,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.createdAt is null`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.createdAt = null
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -361,7 +361,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.createdAt is empty`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.createdAt = ''
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -371,7 +371,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError of kind 'InvalidArgumentsError' if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.createdAt is blank`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.createdAt = '      '
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -381,7 +381,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.createdAt length < 4`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.createdAt = '123'
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -394,7 +394,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
   //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.updatedAt is missing`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     delete mockRestockSkuCommandInput.incomingSkuRestockedEvent.updatedAt
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -404,7 +404,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.updatedAt is undefined`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.updatedAt = undefined
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -414,7 +414,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.updatedAt is null`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.updatedAt = null
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -424,7 +424,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.updatedAt is empty`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.updatedAt = ''
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -434,7 +434,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.updatedAt is blank`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.updatedAt = '      '
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -444,7 +444,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommandInput.incomingSkuRestockedEvent.updatedAt length < 4`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     mockRestockSkuCommandInput.incomingSkuRestockedEvent.updatedAt = '123'
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -456,8 +456,8 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
   // Test expected results
   //
   it(`returns the expected Success<RestockSkuCommand> with the expected data`, () => {
-    const mockRestockSkuCommandInput = buildMockValidRestockSkuCommandInput()
-    const restockSkuCommand = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
+    const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
+    const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     const expectedCommand: RestockSkuCommand = {
       restockSkuData: {
         sku: mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.sku,
@@ -469,6 +469,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
       options: {},
     }
     const expectedResult = Result.makeSuccess(expectedCommand)
-    expect(restockSkuCommand).toMatchObject(expectedResult)
+    expect(Result.isSuccess(result)).toBe(true)
+    expect(result).toMatchObject(expectedResult)
   })
 })

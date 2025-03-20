@@ -53,14 +53,9 @@ export class OrderStockDepletedEvent implements OrderStockDepletedEventProps {
   private static buildProps(
     orderStockDepletedEventInput: OrderStockDepletedEventInput,
   ): Success<OrderStockDepletedEventProps> | Failure<'InvalidArgumentsError'> {
-    try {
-      this.validateInput(orderStockDepletedEventInput)
-    } catch (error) {
-      const logContext = 'OrderStockDepletedEvent.buildProps'
-      console.error(`${logContext} error caught:`, { error })
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
-      console.error(`${logContext} exit failure:`, { invalidArgsFailure, orderStockDepletedEventInput })
-      return invalidArgsFailure
+    const inputValidationResult = this.validateInput(orderStockDepletedEventInput)
+    if (Result.isFailure(inputValidationResult)) {
+      return inputValidationResult
     }
 
     const { orderId, sku, units } = orderStockDepletedEventInput
@@ -78,11 +73,26 @@ export class OrderStockDepletedEvent implements OrderStockDepletedEventProps {
   //
   //
   //
-  private static validateInput(orderStockDepletedEventInput: OrderStockDepletedEventData): void {
-    z.object({
+  private static validateInput(
+    orderStockDepletedEventInput: OrderStockDepletedEventData,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'OrderStockDepletedEvent.validateInput'
+
+    // COMBAK: Maybe some schemas can be converted to shared models at some point
+    const schema = z.object({
       orderId: ValueValidators.validOrderId(),
       sku: ValueValidators.validSku(),
       units: ValueValidators.validUnits(),
-    }).parse(orderStockDepletedEventInput)
+    })
+
+    try {
+      schema.parse(orderStockDepletedEventInput)
+      return Result.makeSuccess()
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error, orderStockDepletedEventInput })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, orderStockDepletedEventInput })
+      return invalidArgsFailure
+    }
   }
 }

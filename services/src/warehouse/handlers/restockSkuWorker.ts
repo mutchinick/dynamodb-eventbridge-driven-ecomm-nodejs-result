@@ -8,8 +8,8 @@ import { RestockSkuWorkerService } from '../RestockSkuWorker/RestockSkuWorkerSer
 function createHandler(): (sqsEvent: SQSEvent) => Promise<SQSBatchResponse> {
   const ddbClient = new DynamoDBClient({})
   const ddbDocClient = DynamoDBDocumentClient.from(ddbClient)
-  const restockSkuClient = new DbRestockSkuClient(ddbDocClient)
-  const restockSkuWorkerService = new RestockSkuWorkerService(restockSkuClient)
+  const dbRestockSkuClient = new DbRestockSkuClient(ddbDocClient)
+  const restockSkuWorkerService = new RestockSkuWorkerService(dbRestockSkuClient)
   const restockSkuWorkerController = new RestockSkuWorkerController(restockSkuWorkerService)
   return restockSkuWorkerController.restockSkus
 }

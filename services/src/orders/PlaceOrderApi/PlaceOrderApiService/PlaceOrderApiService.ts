@@ -26,10 +26,10 @@ export class PlaceOrderApiService implements IPlaceOrderApiService {
     const logContext = 'PlaceOrderApiService.placeOrder'
     console.info(`${logContext} init:`, { incomingPlaceOrderRequest })
 
-    const incomingRequestValidationResult = this.validateIncomingPlaceOrderRequest(incomingPlaceOrderRequest)
-    if (Result.isFailure(incomingRequestValidationResult)) {
-      console.error(`${logContext} exit failure:`, { incomingRequestValidationResult, incomingPlaceOrderRequest })
-      return incomingRequestValidationResult
+    const inputValidationResult = this.validateInput(incomingPlaceOrderRequest)
+    if (Result.isFailure(inputValidationResult)) {
+      console.error(`${logContext} exit failure:`, { inputValidationResult, incomingPlaceOrderRequest })
+      return inputValidationResult
     }
 
     const raiseEventResult = await this.raiseOrderPlacedEvent(incomingPlaceOrderRequest)
@@ -47,12 +47,13 @@ export class PlaceOrderApiService implements IPlaceOrderApiService {
   //
   //
   //
-  private validateIncomingPlaceOrderRequest(incomingPlaceOrderRequest: IncomingPlaceOrderRequest) {
-    const logContext = 'PlaceOrderApiService.validateIncomingPlaceOrderRequest'
+  private validateInput(incomingPlaceOrderRequest: IncomingPlaceOrderRequest) {
+    const logContext = 'PlaceOrderApiService.validateInput'
     console.info(`${logContext} init:`, { incomingPlaceOrderRequest })
 
     if (incomingPlaceOrderRequest instanceof IncomingPlaceOrderRequest === false) {
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', 'Invalid arguments error', false)
+      const errorMessage = `Expected IncomingPlaceOrderRequest but got ${incomingPlaceOrderRequest}`
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', errorMessage, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingPlaceOrderRequest })
       return invalidArgsFailure
     }

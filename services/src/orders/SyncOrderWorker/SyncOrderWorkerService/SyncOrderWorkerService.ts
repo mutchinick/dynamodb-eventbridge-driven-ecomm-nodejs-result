@@ -17,12 +17,12 @@ export interface ISyncOrderWorkerService {
   ) => Promise<
     | Success<void>
     | Failure<'InvalidArgumentsError'>
-    | Failure<'UnrecognizedError'>
     | Failure<'InvalidOperationError'>
     | Failure<'DuplicateEventRaisedError'>
     | Failure<'ForbiddenOrderStatusTransitionError'>
     | Failure<'NotReadyOrderStatusTransitionError'>
     | Failure<'RedundantOrderStatusTransitionError'>
+    | Failure<'UnrecognizedError'>
   >
 }
 
@@ -45,28 +45,29 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
   ): Promise<
     | Success<void>
     | Failure<'InvalidArgumentsError'>
-    | Failure<'UnrecognizedError'>
-    | Failure<'DuplicateEventRaisedError'>
     | Failure<'InvalidOperationError'>
+    | Failure<'DuplicateEventRaisedError'>
     | Failure<'ForbiddenOrderStatusTransitionError'>
     | Failure<'NotReadyOrderStatusTransitionError'>
     | Failure<'RedundantOrderStatusTransitionError'>
+    | Failure<'UnrecognizedError'>
   > {
+    const logContext = 'SyncOrderWorkerService.syncOrder'
+    console.info(`${logContext} init:`, { incomingOrderEvent })
+
     // Not the smallest, cleanest method. Could be compacted by composing or delegating some of the tasks,
     // but I wanted to follow the logic step by step for clarity and not hide it or abstract it.
     // Also, with the current degree of logging (basically everything), the truth is that some of the
     // methods are just going to be damn ugly (and not just this one).
 
-    const logContext = 'SyncOrderWorkerService.syncOrder'
-    console.info(`${logContext} init:`, { incomingOrderEvent })
-
     // The input IncomingOrderEvent should already be valid because it can only be built through the same
     // IncomingOrderEvent class which enforces strict validation. Still we perform just enough validation to
     // prevent unlikely but still possible "exceptions" for some properties that are accessed directly.
-    const incomingEventValidationResult = this.validateIncomingOrderEvent(incomingOrderEvent)
-    if (Result.isFailure(incomingEventValidationResult)) {
-      console.error(`${logContext} exit failure:`, { incomingEventValidationResult, incomingOrderEvent })
-      return incomingEventValidationResult
+
+    const inputValidationResult = this.validateInput(incomingOrderEvent)
+    if (Result.isFailure(inputValidationResult)) {
+      console.error(`${logContext} exit failure:`, { inputValidationResult, incomingOrderEvent })
+      return inputValidationResult
     }
 
     const getOrderResult = await this.getOrder(incomingOrderEvent)
@@ -132,9 +133,8 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
   //
   //
   //
-  private validateIncomingOrderEvent(incomingOrderEvent: IncomingOrderEvent) {
-    const logContext = 'SyncOrderWorkerService.validateIncomingOrderEvent'
-    console.info(`${logContext} init:`, { incomingOrderEvent })
+  private validateInput(incomingOrderEvent: IncomingOrderEvent) {
+    const logContext = 'SyncOrderWorkerService.validateInput'
 
     if (
       incomingOrderEvent instanceof IncomingOrderEvent === false ||
@@ -142,7 +142,8 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
       incomingOrderEvent.eventName == null ||
       incomingOrderEvent.eventData?.orderId == null
     ) {
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', 'Invalid arguments error', false)
+      const errorMessage = `Expected IncomingOrderEvent but got ${incomingOrderEvent}`
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', errorMessage, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingOrderEvent })
       return invalidArgsFailure
     }
@@ -182,8 +183,8 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
   ): Promise<
     | Success<OrderData>
     | Failure<'InvalidArgumentsError'>
-    | Failure<'UnrecognizedError'>
     | Failure<'InvalidOperationError'>
+    | Failure<'UnrecognizedError'>
   > {
     const logContext = 'SyncOrderWorkerService.createOrder'
     console.info(`${logContext} init:`, { incomingOrderEvent })
@@ -213,8 +214,8 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
   ): Promise<
     | Success<void>
     | Failure<'InvalidArgumentsError'>
-    | Failure<'UnrecognizedError'>
     | Failure<'DuplicateEventRaisedError'>
+    | Failure<'UnrecognizedError'>
   > {
     const logContext = 'SyncOrderWorkerService.raiseOrderCreatedEvent'
     console.info(`${logContext} init:`, { incomingEventName, orderData })
@@ -244,10 +245,11 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
   ): Promise<
     | Success<OrderData>
     | Failure<'InvalidArgumentsError'>
-    | Failure<'UnrecognizedError'>
+    | Failure<'InvalidOperationError'>
     | Failure<'ForbiddenOrderStatusTransitionError'>
     | Failure<'NotReadyOrderStatusTransitionError'>
     | Failure<'RedundantOrderStatusTransitionError'>
+    | Failure<'UnrecognizedError'>
   > {
     const logContext = 'SyncOrderWorkerService.updateOrder'
     console.info(`${logContext} init:`, { incomingOrderEvent, existingOrderData })

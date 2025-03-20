@@ -1,8 +1,8 @@
+import { ConditionalCheckFailedException } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, NativeAttributeValue, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { unmarshall } from '@aws-sdk/util-dynamodb'
 import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
-import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { UpdateOrderCommand } from '../model/UpdateOrderCommand'
 
 export interface IDbUpdateOrderClient {
@@ -26,6 +26,12 @@ export class DbUpdateOrderClient implements IDbUpdateOrderClient {
     const logContext = 'DbUpdateOrderClient.updateOrder'
     console.info(`${logContext} init:`, { updateOrderCommand })
 
+    const inputValidationResult = this.validateInput(updateOrderCommand)
+    if (Result.isFailure(inputValidationResult)) {
+      console.error(`${logContext} exit failure:`, { inputValidationResult, updateOrderCommand })
+      return inputValidationResult
+    }
+
     const buildCommandResult = this.buildDdbCommand(updateOrderCommand)
     if (Result.isFailure(buildCommandResult)) {
       console.error(`${logContext} exit failure:`, { buildCommandResult, updateOrderCommand })
@@ -44,7 +50,25 @@ export class DbUpdateOrderClient implements IDbUpdateOrderClient {
   //
   //
   //
+  private validateInput(updateOrderCommand: UpdateOrderCommand): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'DbUpdateOrderClient.validateInput'
+
+    if (updateOrderCommand instanceof UpdateOrderCommand === false) {
+      const errorMessage = `Expected UpdateOrderCommand but got ${updateOrderCommand}`
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', errorMessage, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, updateOrderCommand })
+      return invalidArgsFailure
+    }
+
+    return Result.makeSuccess()
+  }
+
+  //
+  //
+  //
   private buildDdbCommand(updateOrderCommand: UpdateOrderCommand) {
+    const logContext = 'DbUpdateOrderClient.buildDdbCommand'
+
     try {
       const ddbCommand = new UpdateCommand({
         TableName: process.env.ORDER_TABLE_NAME,
@@ -67,8 +91,7 @@ export class DbUpdateOrderClient implements IDbUpdateOrderClient {
       })
       return Result.makeSuccess(ddbCommand)
     } catch (error) {
-      const logContext = 'DbUpdateOrderClient.buildDdbCommand'
-      console.error(`${logContext} error caught:`, { error })
+      console.error(`${logContext} error caught:`, { error, updateOrderCommand })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, updateOrderCommand })
       return invalidArgsFailure
@@ -89,19 +112,19 @@ export class DbUpdateOrderClient implements IDbUpdateOrderClient {
       console.info(`${logContext} exit success:`, { orderDataResult, ddbCommand })
       return orderDataResult
     } catch (error) {
-      console.error(`${logContext} error caught:`, { error })
+      console.error(`${logContext} error caught:`, { error, ddbCommand })
 
-      if (DynamoDbUtils.isConditionalCheckFailedException(error)) {
-        // FIXME: Can this unmarshall throw?
+      if (error instanceof ConditionalCheckFailedException) {
+        // COMBAK: Can this unmarshall throw?
         const attributes = unmarshall(error.Item)
         const orderData = this.buildOrderData(attributes)
         const orderDataResult = Result.makeSuccess(orderData)
-        console.info(`${logContext} exit success:`, { orderDataResult, ddbCommand, error })
+        console.info(`${logContext} exit success: from-error:`, { orderDataResult, ddbCommand, error })
         return orderDataResult
       }
 
       const unrecognizedFailure = Result.makeFailure('UnrecognizedError', error, true)
-      console.error(`${logContext} exit failure:`, { error })
+      console.error(`${logContext} exit failure:`, { unrecognizedFailure, ddbCommand })
       return unrecognizedFailure
     }
   }

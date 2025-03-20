@@ -42,7 +42,11 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
     const logContext = 'AllocateOrderStockWorkerService.allocateOrderStock'
     console.info(`${logContext} init:`, { incomingOrderCreatedEvent })
 
-    // COMBAK: validateIncomingOrderCreatedEvent to validate "just enough" (instanceof, etc)
+    const inputValidationResult = this.validateInput(incomingOrderCreatedEvent)
+    if (Result.isFailure(inputValidationResult)) {
+      console.error(`${logContext} exit failure:`, { inputValidationResult, incomingOrderCreatedEvent })
+      return inputValidationResult
+    }
 
     const allocateOrderResult = await this.allocateOrder(incomingOrderCreatedEvent)
 
@@ -67,6 +71,25 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
 
     console.error(`${logContext} exit failure:`, { allocateOrderResult, incomingOrderCreatedEvent })
     return allocateOrderResult
+  }
+
+  //
+  //
+  //
+  private validateInput(
+    incomingOrderCreatedEvent: IncomingOrderCreatedEvent,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'AllocateOrderStockWorkerService.validateInput'
+    console.info(`${logContext} init:`, { incomingOrderCreatedEvent })
+
+    if (incomingOrderCreatedEvent instanceof IncomingOrderCreatedEvent === false) {
+      const errorMessage = `Expected IncomingOrderCreatedEvent but got ${incomingOrderCreatedEvent}`
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', errorMessage, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingOrderCreatedEvent })
+      return invalidArgsFailure
+    }
+
+    return Result.makeSuccess()
   }
 
   //

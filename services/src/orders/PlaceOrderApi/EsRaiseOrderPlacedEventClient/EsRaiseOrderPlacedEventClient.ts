@@ -1,6 +1,6 @@
+import { ConditionalCheckFailedException } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
 import { Failure, Result, Success } from '../../errors/Result'
-import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { OrderPlacedEvent } from '../model/OrderPlacedEvent'
 
 export interface IEsRaiseOrderPlacedEventClient {
@@ -34,6 +34,12 @@ export class EsRaiseOrderPlacedEventClient implements IEsRaiseOrderPlacedEventCl
     const logContext = 'EsRaiseOrderPlacedEventClient.raiseOrderPlacedEvent'
     console.info(`${logContext} init:`, { orderPlacedEvent })
 
+    const inputValidationResult = this.validateInput(orderPlacedEvent)
+    if (Result.isFailure(inputValidationResult)) {
+      console.error(`${logContext} exit failure:`, { inputValidationResult, orderPlacedEvent })
+      return inputValidationResult
+    }
+
     const buildCommandResult = this.buildDdbCommand(orderPlacedEvent)
     if (Result.isFailure(buildCommandResult)) {
       console.error(`${logContext} exit failure:`, { buildCommandResult, orderPlacedEvent })
@@ -52,8 +58,26 @@ export class EsRaiseOrderPlacedEventClient implements IEsRaiseOrderPlacedEventCl
   //
   //
   //
+  private validateInput(orderPlacedEvent: OrderPlacedEvent): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'EsRaiseOrderPlacedEventClient.validateInput'
+
+    if (orderPlacedEvent instanceof OrderPlacedEvent === false) {
+      const errorMessage = `Expected OrderPlacedEvent but got ${orderPlacedEvent}`
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', errorMessage, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, orderPlacedEvent })
+      return invalidArgsFailure
+    }
+
+    return Result.makeSuccess()
+  }
+
+  //
+  //
+  //
   private buildDdbCommand(orderPlacedEvent: OrderPlacedEvent): Success<PutCommand> | Failure<'InvalidArgumentsError'> {
-    // Perhaps we can prevent all errors by validating the arguments, but TransactWriteCommand
+    const logContext = 'EsRaiseOrderPlacedEventClient.buildDdbCommand'
+
+    // Perhaps we can prevent all errors by validating the arguments, but PutCommand
     // is an external dependency and we don't know what happens internally, so we try-catch
     try {
       const ddbCommand = new PutCommand({
@@ -68,8 +92,7 @@ export class EsRaiseOrderPlacedEventClient implements IEsRaiseOrderPlacedEventCl
       })
       return Result.makeSuccess(ddbCommand)
     } catch (error) {
-      const logContext = 'EsRaiseOrderPlacedEventClient.buildDdbCommand'
-      console.error(`${logContext} error caught:`, { error })
+      console.error(`${logContext} error caught:`, { error, orderPlacedEvent })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} failure exit:`, { invalidArgsFailure, orderPlacedEvent })
       return invalidArgsFailure
@@ -91,12 +114,12 @@ export class EsRaiseOrderPlacedEventClient implements IEsRaiseOrderPlacedEventCl
       console.info(`${logContext} exit success:`, { sendCommandResult, ddbCommand })
       return sendCommandResult
     } catch (error) {
-      console.error(`${logContext} error caught:`, { error })
+      console.error(`${logContext} error caught:`, { error, ddbCommand })
 
       // When possible multiple transaction errors:
       // Prioritize tagging the "Duplication Errors", because if we get one, this means that the operation
       // has already executed successfully, thus we don't care about other possible transaction errors
-      if (DynamoDbUtils.isConditionalCheckFailedException(error)) {
+      if (error instanceof ConditionalCheckFailedException) {
         const duplicationFailure = Result.makeFailure('DuplicateEventRaisedError', error, false)
         console.error(`${logContext} exit failure:`, { duplicationFailure, ddbCommand })
         return duplicationFailure

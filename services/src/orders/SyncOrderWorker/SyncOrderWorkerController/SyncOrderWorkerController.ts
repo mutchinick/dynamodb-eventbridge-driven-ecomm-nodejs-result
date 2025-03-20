@@ -77,11 +77,12 @@ export class SyncOrderWorkerController implements ISyncOrderWorkerController {
   //
   //
   private parseValidateEventBody(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'SyncOrderWorkerController.parseValidateEventBody'
+
     try {
       const eventBridgeEvent = JSON.parse(sqsRecord.body)
       return Result.makeSuccess<unknown>(eventBridgeEvent)
     } catch (error) {
-      const logContext = 'SyncOrderWorkerController.parseValidateEventBody'
       console.error(`${logContext} error caught:`, { error, sqsRecord })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, sqsRecord })

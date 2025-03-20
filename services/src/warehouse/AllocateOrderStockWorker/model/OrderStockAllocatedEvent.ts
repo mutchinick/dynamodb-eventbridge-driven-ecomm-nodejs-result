@@ -53,14 +53,9 @@ export class OrderStockAllocatedEvent implements OrderStockAllocatedEventProps {
   private static buildProps(
     orderStockAllocatedEventInput: OrderStockAllocatedEventInput,
   ): Success<OrderStockAllocatedEventProps> | Failure<'InvalidArgumentsError'> {
-    try {
-      this.validateInput(orderStockAllocatedEventInput)
-    } catch (error) {
-      const logContext = 'OrderStockAllocatedEvent.buildProps'
-      console.error(`${logContext} error caught:`, { error })
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
-      console.error(`${logContext} exit failure:`, { invalidArgsFailure, orderStockAllocatedEventInput })
-      return invalidArgsFailure
+    const inputValidationResult = this.validateInput(orderStockAllocatedEventInput)
+    if (Result.isFailure(inputValidationResult)) {
+      return inputValidationResult
     }
 
     const { orderId, sku, units } = orderStockAllocatedEventInput
@@ -78,11 +73,26 @@ export class OrderStockAllocatedEvent implements OrderStockAllocatedEventProps {
   //
   //
   //
-  private static validateInput(orderStockAllocatedEventInput: OrderStockAllocatedEventData): void {
-    z.object({
+  private static validateInput(
+    orderStockAllocatedEventInput: OrderStockAllocatedEventData,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'OrderStockAllocatedEvent.validateInput'
+
+    // COMBAK: Maybe some schemas can be converted to shared models at some point
+    const schema = z.object({
       orderId: ValueValidators.validOrderId(),
       sku: ValueValidators.validSku(),
       units: ValueValidators.validUnits(),
-    }).parse(orderStockAllocatedEventInput)
+    })
+
+    try {
+      schema.parse(orderStockAllocatedEventInput)
+      return Result.makeSuccess()
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error, orderStockAllocatedEventInput })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, orderStockAllocatedEventInput })
+      return invalidArgsFailure
+    }
   }
 }

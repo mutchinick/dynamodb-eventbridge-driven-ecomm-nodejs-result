@@ -8,8 +8,8 @@ import { RestockSkuApiService } from '../RestockSkuApi/RestockSkuApiService/Rest
 function createHandler(): (apiEvent: APIGatewayProxyEventV2) => Promise<APIGatewayProxyStructuredResultV2> {
   const ddbClient = new DynamoDBClient({})
   const ddbDocClient = DynamoDBDocumentClient.from(ddbClient)
-  const restockSkuClient = new EsRaiseSkuRestockedEventClient(ddbDocClient)
-  const restockSkuApiService = new RestockSkuApiService(restockSkuClient)
+  const esRaiseSkuRestockedEventClient = new EsRaiseSkuRestockedEventClient(ddbDocClient)
+  const restockSkuApiService = new RestockSkuApiService(esRaiseSkuRestockedEventClient)
   const restockSkuApiController = new RestockSkuApiController(restockSkuApiService)
   return restockSkuApiController.restockSku
 }

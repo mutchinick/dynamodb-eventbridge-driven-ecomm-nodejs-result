@@ -24,6 +24,12 @@ export class DbGetOrderClient implements IDbGetOrderClient {
     const logContext = 'DbGetOrderClient.getOrder'
     console.info(`${logContext} init:`, { getOrderCommand })
 
+    const inputValidationResult = this.validateInput(getOrderCommand)
+    if (Result.isFailure(inputValidationResult)) {
+      console.error(`${logContext} exit failure:`, { inputValidationResult, getOrderCommand })
+      return inputValidationResult
+    }
+
     const buildCommandResult = this.buildDdbCommand(getOrderCommand)
     if (Result.isFailure(buildCommandResult)) {
       console.error(`${logContext} exit failure:`, { buildCommandResult, getOrderCommand })
@@ -42,19 +48,36 @@ export class DbGetOrderClient implements IDbGetOrderClient {
   //
   //
   //
+  private validateInput(getOrderCommand: GetOrderCommand): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'DbGetOrderClient.validateInput'
+
+    if (getOrderCommand instanceof GetOrderCommand === false) {
+      const errorMessage = `Expected GetOrderCommand but got ${getOrderCommand}`
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', errorMessage, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, getOrderCommand })
+      return invalidArgsFailure
+    }
+
+    return Result.makeSuccess()
+  }
+
+  //
+  //
+  //
   private buildDdbCommand(getOrderCommand: GetOrderCommand): Success<GetCommand> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'DbGetOrderClient.buildDdbCommand'
+
     try {
       const ddbCommand = new GetCommand({
         TableName: process.env.EVENT_STORE_TABLE_NAME,
         Key: {
-          pk: `ORDER_ID#${getOrderCommand.orderId}`,
-          sk: `ORDER_ID#${getOrderCommand.orderId}`,
+          pk: `ORDER_ID#${getOrderCommand.orderData.orderId}`,
+          sk: `ORDER_ID#${getOrderCommand.orderData.orderId}`,
         },
       })
       return Result.makeSuccess(ddbCommand)
     } catch (error) {
-      const logContext = 'DbGetOrderClient.buildDdbCommand'
-      console.error(`${logContext} error caught:`, { error })
+      console.error(`${logContext} error caught:`, { error, getOrderCommand })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, getOrderCommand })
       return invalidArgsFailure
@@ -75,7 +98,7 @@ export class DbGetOrderClient implements IDbGetOrderClient {
       console.info(`${logContext} exit success:`, { orderDataResult, ddbCommand })
       return orderDataResult
     } catch (error) {
-      console.error(`${logContext} error caught:`, { error })
+      console.error(`${logContext} error caught:`, { error, ddbCommand })
       const unrecognizedFailure = Result.makeFailure('UnrecognizedError', error, true)
       console.error(`${logContext} exit failure:`, { unrecognizedFailure, ddbCommand })
       return unrecognizedFailure

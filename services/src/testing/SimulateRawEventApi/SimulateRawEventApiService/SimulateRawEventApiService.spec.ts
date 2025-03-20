@@ -1,3 +1,4 @@
+import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { FailureKind } from '../../errors/FailureKind'
 import { Result } from '../../errors/Result'
 import { IEsRaiseRawSimulatedEventClient } from '../EsRaiseRawSimulatedEventClient/EsRaiseRawSimulatedEventClient'
@@ -9,22 +10,25 @@ jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
 const mockDate = new Date().toISOString()
 
-const mockIncomingSimulateRawEventRequestResult = IncomingSimulateRawEventRequest.validateAndBuild({
-  pk: 'mockPk',
-  sk: 'mockSk',
-  eventName: 'mockEventName',
-  eventData: {
-    orderId: 'mockOrderId',
-    sku: 'mockSku',
-    units: 2,
-    price: 3.98,
-    userId: 'mockUserId',
-  },
-  createdAt: mockDate,
-  updatedAt: mockDate,
-})
+function buildMockIncomingSimulateRawEventRequest(): TypeUtilsMutable<IncomingSimulateRawEventRequest> {
+  const mockClass = IncomingSimulateRawEventRequest.validateAndBuild({
+    pk: 'mockPk',
+    sk: 'mockSk',
+    eventName: 'mockEventName',
+    eventData: {
+      orderId: 'mockOrderId',
+      sku: 'mockSku',
+      units: 2,
+      price: 3.98,
+      userId: 'mockUserId',
+    },
+    createdAt: mockDate,
+    updatedAt: mockDate,
+  })
+  return Result.getSuccessValueOrThrow(mockClass)
+}
 
-const mockIncomingSimulateRawEventRequest = Result.getSuccessValueOrThrow(mockIncomingSimulateRawEventRequestResult)
+const mockIncomingSimulateRawEventRequest = buildMockIncomingSimulateRawEventRequest()
 
 //
 // Mock clients
@@ -75,6 +79,15 @@ describe(`Testing Service SimulateRawEventApi SimulateRawEventApiService tests`,
   //
   // Test internal logic
   //
+  it(`returns an Failure if RawSimulatedEvent.validateAndBuild returns a Failure`, async () => {
+    const mockEsRaiseRawSimulatedEventClient = buildMockEsRaiseRawSimulatedEventClient_succeeds()
+    const simulateRawEventApiService = new SimulateRawEventApiService(mockEsRaiseRawSimulatedEventClient)
+    const mockFailure = Result.makeFailure('InvalidArgumentsError', '', false)
+    jest.spyOn(RawSimulatedEvent, 'validateAndBuild').mockReturnValueOnce(mockFailure)
+    const result = await simulateRawEventApiService.simulateRawEvent(mockIncomingSimulateRawEventRequest)
+    expect(Result.isFailure(result)).toBe(true)
+  })
+
   it(`calls EsRaiseRawSimulatedEventClient.simulateRawEvent a single time`, async () => {
     const mockEsRaiseRawSimulatedEventClient = buildMockEsRaiseRawSimulatedEventClient_succeeds()
     const simulateRawEventApiService = new SimulateRawEventApiService(mockEsRaiseRawSimulatedEventClient)
@@ -103,9 +116,9 @@ describe(`Testing Service SimulateRawEventApi SimulateRawEventApiService tests`,
     )
     const simulateRawEventApiService = new SimulateRawEventApiService(mockEsRaiseRawSimulatedEventClient)
     const result = await simulateRawEventApiService.simulateRawEvent(mockIncomingSimulateRawEventRequest)
-    const expectedFailure = Result.makeFailure(mockFailureKind, mockError, mockTransient)
+    const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
     expect(Result.isFailure(result)).toBe(true)
-    expect(result).toStrictEqual(expectedFailure)
+    expect(result).toStrictEqual(expectedResult)
   })
 
   //

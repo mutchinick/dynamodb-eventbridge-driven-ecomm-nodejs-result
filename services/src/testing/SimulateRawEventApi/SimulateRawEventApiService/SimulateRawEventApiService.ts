@@ -30,12 +30,10 @@ export class SimulateRawEventApiService implements ISimulateRawEventApiService {
     const logContext = 'SimulateRawEventApiService.simulateRawEvent'
     console.info(`${logContext} init:`, { incomingSimulateRawEventRequest })
 
-    const incomingRequestValidationResult = this.validateIncomingSimulateRawEventRequest(
-      incomingSimulateRawEventRequest,
-    )
-    if (Result.isFailure(incomingRequestValidationResult)) {
-      console.error(`${logContext} exit failure:`, { incomingRequestValidationResult, incomingSimulateRawEventRequest })
-      return incomingRequestValidationResult
+    const inputValidationResult = this.validateInput(incomingSimulateRawEventRequest)
+    if (Result.isFailure(inputValidationResult)) {
+      console.error(`${logContext} exit failure:`, { inputValidationResult, incomingSimulateRawEventRequest })
+      return inputValidationResult
     }
 
     const raiseEventResult = await this.raiseRawSimulatedEvent(incomingSimulateRawEventRequest)
@@ -53,12 +51,13 @@ export class SimulateRawEventApiService implements ISimulateRawEventApiService {
   //
   //
   //
-  private validateIncomingSimulateRawEventRequest(incomingSimulateRawEventRequest: IncomingSimulateRawEventRequest) {
-    const logContext = 'SimulateRawEventApiService.validateIncomingSimulateRawEventRequest'
+  private validateInput(incomingSimulateRawEventRequest: IncomingSimulateRawEventRequest) {
+    const logContext = 'SimulateRawEventApiService.validateInput'
     console.info(`${logContext} init:`, { incomingSimulateRawEventRequest })
 
     if (incomingSimulateRawEventRequest instanceof IncomingSimulateRawEventRequest === false) {
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', 'Invalid arguments error', false)
+      const errorMessage = `Expected IncomingSimulateRawEventRequest but got ${incomingSimulateRawEventRequest}`
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', errorMessage, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingSimulateRawEventRequest })
       return invalidArgsFailure
     }

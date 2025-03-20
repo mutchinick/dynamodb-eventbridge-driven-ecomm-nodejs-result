@@ -1,6 +1,8 @@
 import { TransactionCanceledException } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, TransactWriteCommand } from '@aws-sdk/lib-dynamodb'
+import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
+import { WarehouseEventName } from '../../model/WarehouseEventName'
 import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { RestockSkuCommand } from '../model/RestockSkuCommand'
 import { DbRestockSkuClient } from './DbRestockSkuClient'
@@ -13,15 +15,23 @@ jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
 const mockDate = new Date().toISOString()
 
-const mockRestockSkuCommand: RestockSkuCommand = {
-  restockSkuData: {
-    sku: 'mockSku',
-    units: 3,
-    lotId: 'mockLotId',
-    createdAt: mockDate,
-    updatedAt: mockDate,
-  },
+function buildMockRestockSkuCommand(): TypeUtilsMutable<RestockSkuCommand> {
+  const mockClass = RestockSkuCommand.validateAndBuild({
+    incomingSkuRestockedEvent: {
+      eventName: WarehouseEventName.SKU_RESTOCKED_EVENT,
+      eventData: {
+        sku: 'mockSku',
+        units: 3,
+        lotId: 'mockLotId',
+      },
+      createdAt: mockDate,
+      updatedAt: mockDate,
+    },
+  })
+  return Result.getSuccessValueOrThrow(mockClass)
 }
+
+const mockRestockSkuCommand = buildMockRestockSkuCommand()
 
 const expectedTransactWriteCommand = new TransactWriteCommand({
   TransactItems: [
@@ -75,15 +85,18 @@ const expectedTransactWriteCommand = new TransactWriteCommand({
   ],
 })
 
-function buildMockDdbDocClient_send_resolves(): DynamoDBDocumentClient {
+//
+// Mock clients
+//
+function buildMockDdbDocClient_resolves(): DynamoDBDocumentClient {
   return { send: jest.fn() } as unknown as DynamoDBDocumentClient
 }
 
-function buildMockDdbDocClient_send_throws(): DynamoDBDocumentClient {
+function buildMockDdbDocClient_throws(): DynamoDBDocumentClient {
   return { send: jest.fn().mockRejectedValue(new Error()) } as unknown as DynamoDBDocumentClient
 }
 
-function buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Duplicate(): DynamoDBDocumentClient {
+function buildMockDdbDocClient_throws_ConditionalCheckFailedException_Duplicate(): DynamoDBDocumentClient {
   const error: Error = new TransactionCanceledException({
     $metadata: {},
     message: '',
@@ -99,7 +112,7 @@ describe(`Warehouse Service RestockSkuWorker DbRestockSkuClient tests`, () => {
   // Test RestockSkuCommand edge cases
   //
   it(`returns a Success if the input RestockSkuCommand is valid`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_send_resolves()
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
     const result = await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
     expect(Result.isSuccess(result)).toBe(true)
@@ -107,7 +120,7 @@ describe(`Warehouse Service RestockSkuWorker DbRestockSkuClient tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommand is undefined`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_send_throws()
+    const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
     const mockRestockSkuCommand = undefined as RestockSkuCommand
     const result = await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
@@ -118,7 +131,7 @@ describe(`Warehouse Service RestockSkuWorker DbRestockSkuClient tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommand is null`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_send_throws()
+    const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
     const mockRestockSkuCommand = null as RestockSkuCommand
     const result = await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
@@ -128,21 +141,11 @@ describe(`Warehouse Service RestockSkuWorker DbRestockSkuClient tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      RestockSkuCommand is empty`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_send_throws()
-    const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
-    const mockRestockSkuCommand = {} as RestockSkuCommand
-    const result = await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommand.restockSkuData is undefined`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_send_throws()
+    const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
-    const mockRestockSkuCommand = { restockSkuData: undefined } as RestockSkuCommand
+    const mockRestockSkuCommand = buildMockRestockSkuCommand()
+    mockRestockSkuCommand.restockSkuData = undefined
     const result = await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -151,9 +154,10 @@ describe(`Warehouse Service RestockSkuWorker DbRestockSkuClient tests`, () => {
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       RestockSkuCommand.restockSkuData is null`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_send_throws()
+    const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
-    const mockRestockSkuCommand = { restockSkuData: null } as RestockSkuCommand
+    const mockRestockSkuCommand = buildMockRestockSkuCommand()
+    mockRestockSkuCommand.restockSkuData = null
     const result = await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -164,14 +168,14 @@ describe(`Warehouse Service RestockSkuWorker DbRestockSkuClient tests`, () => {
   // Test internal logic
   //
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_send_resolves()
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
     await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
     expect(mockDdbDocClient.send).toHaveBeenCalledTimes(1)
   })
 
   it(`calls DynamoDBDocumentClient.send with the expected input`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_send_resolves()
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
     await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(
@@ -181,7 +185,7 @@ describe(`Warehouse Service RestockSkuWorker DbRestockSkuClient tests`, () => {
 
   it(`returns a transient Failure of kind UnrecognizedError
       if DynamoDBDocumentClient.send throws a generic Error`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_send_throws()
+    const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
     const result = await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
     expect(Result.isFailure(result)).toBe(true)
@@ -195,7 +199,7 @@ describe(`Warehouse Service RestockSkuWorker DbRestockSkuClient tests`, () => {
   it(`returns a non-transient Failure of kind DuplicateRestockOperationError
       if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException error 
       when restocking the sku`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_send_throws_ConditionalCheckFailedException_Duplicate()
+    const mockDdbDocClient = buildMockDdbDocClient_throws_ConditionalCheckFailedException_Duplicate()
     const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
     const result = await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
     expect(Result.isFailure(result)).toBe(true)
@@ -206,11 +210,12 @@ describe(`Warehouse Service RestockSkuWorker DbRestockSkuClient tests`, () => {
   //
   // Test expected results
   //
-  it(`returns the  expected Success<void>`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_send_resolves()
+  it(`returns the  expected Success<void> with the expected data`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
     const result = await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
     const expectedResult = Result.makeSuccess()
+    expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)
   })
 })

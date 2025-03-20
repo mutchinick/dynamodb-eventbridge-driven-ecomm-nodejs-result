@@ -7,6 +7,9 @@ export type IncomingRestockSkuRequestInput = Pick<RestockSkuData, 'sku' | 'units
 
 type IncomingRestockSkuRequestProps = Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>
 
+//
+//
+//
 export class IncomingRestockSkuRequest implements IncomingRestockSkuRequestProps {
   //
   //
@@ -45,14 +48,9 @@ export class IncomingRestockSkuRequest implements IncomingRestockSkuRequestProps
   private static buildProps(
     incomingRestockSkuRequestInput: IncomingRestockSkuRequestInput,
   ): Success<IncomingRestockSkuRequestProps> | Failure<'InvalidArgumentsError'> {
-    try {
-      this.validateInput(incomingRestockSkuRequestInput)
-    } catch (error) {
-      const logContext = 'IncomingRestockSkuRequest.buildProps'
-      console.error(`${logContext} error caught:`, { error })
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
-      console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingRestockSkuRequestInput })
-      return invalidArgsFailure
+    const inputValidationResult = this.validateInput(incomingRestockSkuRequestInput)
+    if (Result.isFailure(inputValidationResult)) {
+      return inputValidationResult
     }
 
     const { sku, units, lotId } = incomingRestockSkuRequestInput
@@ -63,11 +61,26 @@ export class IncomingRestockSkuRequest implements IncomingRestockSkuRequestProps
   //
   //
   //
-  private static validateInput(incomingRestockSkuRequestInput: IncomingRestockSkuRequestInput): void {
-    z.object({
+  private static validateInput(
+    incomingRestockSkuRequestInput: IncomingRestockSkuRequestInput,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'IncomingRestockSkuRequest.validateInput'
+
+    // COMBAK: Maybe some schemas can be converted to shared models at some point
+    const schema = z.object({
       sku: ValueValidators.validSku(),
       units: ValueValidators.validUnits(),
       lotId: ValueValidators.validLotId(),
-    }).parse(incomingRestockSkuRequestInput)
+    })
+
+    try {
+      schema.parse(incomingRestockSkuRequestInput)
+      return Result.makeSuccess()
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error, incomingRestockSkuRequestInput })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingRestockSkuRequestInput })
+      return invalidArgsFailure
+    }
   }
 }

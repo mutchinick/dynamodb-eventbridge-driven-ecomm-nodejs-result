@@ -10,11 +10,11 @@ import { EsRaiseOrderStockDepletedEventClient } from '../AllocateOrderStockWorke
 function createHandler(): (sqsEvent: SQSEvent) => Promise<SQSBatchResponse> {
   const ddbClient = new DynamoDBClient({})
   const ddbDocClient = DynamoDBDocumentClient.from(ddbClient)
-  const allocateOrderStockClient = new DbAllocateOrderStockClient(ddbDocClient)
+  const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(ddbDocClient)
   const esRaiseOrderStockAllocatedEventClient = new EsRaiseOrderStockAllocatedEventClient(ddbDocClient)
   const esRaiseOrderStockDepletedEventClient = new EsRaiseOrderStockDepletedEventClient(ddbDocClient)
   const allocateOrderStockWorkerService = new AllocateOrderStockWorkerService(
-    allocateOrderStockClient,
+    dbAllocateOrderStockClient,
     esRaiseOrderStockAllocatedEventClient,
     esRaiseOrderStockDepletedEventClient,
   )

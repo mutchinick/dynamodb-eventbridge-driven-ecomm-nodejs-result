@@ -34,6 +34,12 @@ export class RestockSkuWorkerService implements IRestockSkuWorkerService {
     const logContext = 'RestockSkuWorkerService.restockSku'
     console.info(`${logContext} init:`, { incomingSkuRestockedEvent })
 
+    const inputValidationResult = this.validateInput(incomingSkuRestockedEvent)
+    if (Result.isFailure(inputValidationResult)) {
+      console.error(`${logContext} exit failure:`, { inputValidationResult, incomingSkuRestockedEvent })
+      return inputValidationResult
+    }
+
     const restockSkuCommandResult = RestockSkuCommand.validateAndBuild({ incomingSkuRestockedEvent })
     if (Result.isFailure(restockSkuCommandResult)) {
       console.error(`${logContext} exit failure:`, { restockSkuCommandResult, incomingSkuRestockedEvent })
@@ -47,5 +53,24 @@ export class RestockSkuWorkerService implements IRestockSkuWorkerService {
       : console.info(`${logContext} exit success:`, { restockSkuResult, restockSkuCommand })
 
     return restockSkuResult
+  }
+
+  //
+  //
+  //
+  private validateInput(
+    incomingSkuRestockedEvent: IncomingSkuRestockedEvent,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'IncomingSkuRestockedEvent.validateInput'
+    console.info(`${logContext} init:`, { incomingSkuRestockedEvent })
+
+    if (incomingSkuRestockedEvent instanceof IncomingSkuRestockedEvent === false) {
+      const errorMessage = `Expected IncomingSkuRestockedEvent but got ${incomingSkuRestockedEvent}`
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', errorMessage, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingSkuRestockedEvent })
+      return invalidArgsFailure
+    }
+
+    return Result.makeSuccess()
   }
 }

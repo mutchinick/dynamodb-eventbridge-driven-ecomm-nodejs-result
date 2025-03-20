@@ -69,7 +69,7 @@ export class RestockSkuWorkerConstruct extends Construct {
       functionName: lambdaFuncName,
       runtime: Runtime.NODEJS_20_X,
       handler: 'handler',
-      entry: join(__dirname, './restockSkuWorkerHandler.ts'),
+      entry: join(__dirname, './restockSkuWorkerEntry.ts'),
       environment: {
         EVENT_STORE_TABLE_NAME: dynamoDbTable.tableName,
         WAREHOUSE_TABLE_NAME: dynamoDbTable.tableName,

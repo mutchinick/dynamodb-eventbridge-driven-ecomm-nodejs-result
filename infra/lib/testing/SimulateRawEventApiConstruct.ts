@@ -58,7 +58,7 @@ export class SimulateRawEventApiConstruct extends Construct {
       functionName: lambdaFuncName,
       runtime: Runtime.NODEJS_20_X,
       handler: 'handler',
-      entry: join(__dirname, './simulateRawEventApiHandler.ts'),
+      entry: join(__dirname, './simulateRawEventApiEntry.ts'),
       environment: {
         EVENT_STORE_TABLE_NAME: dynamoDbTable.tableName,
       },

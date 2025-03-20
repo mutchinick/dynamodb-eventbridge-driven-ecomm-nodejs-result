@@ -14,6 +14,9 @@ type CreateOrderCommandProps = {
   readonly options?: Record<string, unknown>
 }
 
+//
+//
+//
 export class CreateOrderCommand implements CreateOrderCommandProps {
   //
   //
@@ -51,14 +54,9 @@ export class CreateOrderCommand implements CreateOrderCommandProps {
   private static buildProps(
     createOrderCommandInput: CreateOrderCommandInput,
   ): Success<CreateOrderCommandProps> | Failure<'InvalidArgumentsError'> {
-    try {
-      this.validateInput(createOrderCommandInput)
-    } catch (error) {
-      const logContext = 'CreateOrderCommand.buildProps'
-      console.error(`${logContext} error caught:`, { error })
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
-      console.error(`${logContext} exit failure:`, { invalidArgsFailure, createOrderCommandInput })
-      return invalidArgsFailure
+    const inputValidationResult = this.validateInput(createOrderCommandInput)
+    if (Result.isFailure(inputValidationResult)) {
+      return inputValidationResult
     }
 
     const { incomingOrderEvent } = createOrderCommandInput
@@ -83,8 +81,13 @@ export class CreateOrderCommand implements CreateOrderCommandProps {
   //
   //
   //
-  private static validateInput(createOrderCommandInput: CreateOrderCommandInput): void {
-    z.object({
+  private static validateInput(
+    createOrderCommandInput: CreateOrderCommandInput,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'CreateOrderCommand.validateInput'
+
+    // COMBAK: Maybe some schemas can be converted to shared models at some point
+    const schema = z.object({
       incomingOrderEvent: z.object({
         eventName: ValueValidators.validOrderPlacedEventName(),
         eventData: z.object({
@@ -97,6 +100,16 @@ export class CreateOrderCommand implements CreateOrderCommandProps {
         createdAt: ValueValidators.validCreatedAt(),
         updatedAt: ValueValidators.validUpdatedAt(),
       }),
-    }).parse(createOrderCommandInput)
+    })
+
+    try {
+      schema.parse(createOrderCommandInput)
+      return Result.makeSuccess()
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error, createOrderCommandInput })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, createOrderCommandInput })
+      return invalidArgsFailure
+    }
   }
 }

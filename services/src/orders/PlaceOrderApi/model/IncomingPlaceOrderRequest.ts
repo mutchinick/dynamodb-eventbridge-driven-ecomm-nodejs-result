@@ -47,32 +47,47 @@ export class IncomingPlaceOrderRequest implements IncomingPlaceOrderRequestProps
   private static buildProps(
     incomingPlaceOrderRequestInput: IncomingPlaceOrderRequestInput,
   ): Success<IncomingPlaceOrderRequestProps> | Failure<'InvalidArgumentsError'> {
-    try {
-      const validInput = this.parseValidateInput(incomingPlaceOrderRequestInput)
-      return Result.makeSuccess(validInput)
-    } catch (error) {
-      const logContext = 'IncomingPlaceOrderRequest.buildProps'
-      console.error(`${logContext} error caught:`, { error })
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
-      console.error(`${logContext} failure exit:`, { invalidArgsFailure, incomingPlaceOrderRequestInput })
-      return invalidArgsFailure
+    const inputValidationResult = this.validateInput(incomingPlaceOrderRequestInput)
+    if (Result.isFailure(inputValidationResult)) {
+      return inputValidationResult
     }
+
+    const { orderId, sku, units, price, userId } = incomingPlaceOrderRequestInput
+    const incomingPlaceOrderRequestProps: IncomingPlaceOrderRequestProps = {
+      orderId,
+      sku,
+      units,
+      price,
+      userId,
+    }
+    return Result.makeSuccess(incomingPlaceOrderRequestProps)
   }
 
   //
   //
   //
-  private static parseValidateInput(
+  private static validateInput(
     incomingPlaceOrderRequestInput: IncomingPlaceOrderRequestInput,
-  ): IncomingPlaceOrderRequestProps {
-    return z
-      .object({
-        orderId: ValueValidators.validOrderId(),
-        sku: ValueValidators.validSku(),
-        units: ValueValidators.validUnits(),
-        price: ValueValidators.validPrice(),
-        userId: ValueValidators.validUserId(),
-      })
-      .parse(incomingPlaceOrderRequestInput) as IncomingPlaceOrderRequestProps
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'IncomingPlaceOrderRequest.validateInput'
+
+    // COMBAK: Maybe some schemas can be converted to shared models at some point
+    const schema = z.object({
+      orderId: ValueValidators.validOrderId(),
+      sku: ValueValidators.validSku(),
+      units: ValueValidators.validUnits(),
+      price: ValueValidators.validPrice(),
+      userId: ValueValidators.validUserId(),
+    })
+
+    try {
+      schema.parse(incomingPlaceOrderRequestInput)
+      return Result.makeSuccess()
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error, incomingPlaceOrderRequestInput })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} failure exit:`, { invalidArgsFailure, incomingPlaceOrderRequestInput })
+      return invalidArgsFailure
+    }
   }
 }

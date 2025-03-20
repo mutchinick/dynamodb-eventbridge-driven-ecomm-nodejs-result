@@ -1,5 +1,6 @@
 import { ConditionalCheckFailedException } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
+import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
 import { RawSimulatedEvent } from '../model/RawSimulatedEvent'
 import { EsRaiseRawSimulatedEventClient } from './EsRaiseRawSimulatedEventClient'
@@ -12,15 +13,19 @@ const mockEventStoreTableName = 'mockEventStoreTableName'
 
 process.env.EVENT_STORE_TABLE_NAME = mockEventStoreTableName
 
-const mockValidEvent: RawSimulatedEvent = {
-  pk: 'mockPk',
-  sk: 'mockSk',
-  eventName: 'mockEventName',
-  eventData: {},
-  createdAt: mockDate,
-  updatedAt: mockDate,
-  _tn: '#EVENT',
+function buildMockRawSimulatedEvent(): TypeUtilsMutable<RawSimulatedEvent> {
+  const mockClass = RawSimulatedEvent.validateAndBuild({
+    pk: 'mockPk',
+    sk: 'mockSk',
+    eventName: 'mockEventName',
+    eventData: {},
+    createdAt: mockDate,
+    updatedAt: mockDate,
+  })
+  return Result.getSuccessValueOrThrow(mockClass)
 }
+
+const mockValidEvent = buildMockRawSimulatedEvent()
 
 const expectedDdbDocClientInput = new PutCommand({
   TableName: mockEventStoreTableName,
@@ -113,11 +118,12 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
   //
   // Test expected result
   //
-  it(`returns a Success<void> if all components succeed`, async () => {
+  it(`returns the expected Success<void> with the expected data`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_succeeds()
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
     const result = await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockValidEvent)
+    const expectedResult = Result.makeSuccess()
     expect(Result.isSuccess(result)).toBe(true)
-    expect(Result.isSuccess(result) && result.value).toBe(undefined)
+    expect(result).toStrictEqual(expectedResult)
   })
 })

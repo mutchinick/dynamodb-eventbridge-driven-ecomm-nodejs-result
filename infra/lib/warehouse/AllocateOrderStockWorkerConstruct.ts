@@ -69,7 +69,7 @@ export class AllocateOrderStockWorkerConstruct extends Construct {
       functionName: lambdaFuncName,
       runtime: Runtime.NODEJS_20_X,
       handler: 'handler',
-      entry: join(__dirname, './allocateOrderStockWorkerHandler.ts'),
+      entry: join(__dirname, './allocateOrderStockWorkerEntry.ts'),
       environment: {
         EVENT_STORE_TABLE_NAME: dynamoDbTable.tableName,
         WAREHOUSE_TABLE_NAME: dynamoDbTable.tableName,

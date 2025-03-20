@@ -53,14 +53,9 @@ export class OrderCreatedEvent implements OrderCreatedEventProps {
   private static buildProps(
     orderCreatedEventInput: OrderCreatedEventInput,
   ): Success<OrderCreatedEventProps> | Failure<'InvalidArgumentsError'> {
-    try {
-      this.validateInput(orderCreatedEventInput)
-    } catch (error) {
-      const logContext = 'OrderCreatedEvent.buildProps'
-      console.error(`${logContext} error caught:`, { error })
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
-      console.error(`${logContext} exit failure:`, { invalidArgsFailure, orderCreatedEventInput })
-      return invalidArgsFailure
+    const inputValidationResult = this.validateInput(orderCreatedEventInput)
+    if (Result.isFailure(inputValidationResult)) {
+      return inputValidationResult
     }
 
     const { orderData } = orderCreatedEventInput
@@ -78,8 +73,13 @@ export class OrderCreatedEvent implements OrderCreatedEventProps {
   //
   //
   //
-  private static validateInput(orderCreatedEventInput: OrderCreatedEventInput): void {
-    z.object({
+  private static validateInput(
+    orderCreatedEventInput: OrderCreatedEventInput,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'OrderCreatedEvent.validateInput'
+
+    // COMBAK: Maybe some schemas can be converted to shared models at some point
+    const schema = z.object({
       incomingEventName: ValueValidators.validOrderPlacedEventName(),
       orderData: z.object({
         orderId: ValueValidators.validOrderId(),
@@ -91,6 +91,16 @@ export class OrderCreatedEvent implements OrderCreatedEventProps {
         createdAt: ValueValidators.validCreatedAt(),
         updatedAt: ValueValidators.validUpdatedAt(),
       }),
-    }).parse(orderCreatedEventInput)
+    })
+
+    try {
+      schema.parse(orderCreatedEventInput)
+      return Result.makeSuccess()
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error, orderCreatedEventInput })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, orderCreatedEventInput })
+      return invalidArgsFailure
+    }
   }
 }

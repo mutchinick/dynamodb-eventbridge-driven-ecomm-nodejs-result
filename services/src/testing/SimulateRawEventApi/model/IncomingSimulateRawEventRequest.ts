@@ -82,6 +82,7 @@ export class IncomingSimulateRawEventRequest implements IncomingSimulateRawEvent
   ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'IncomingSimulateRawEventRequest.validateInput'
 
+    // COMBAK: Maybe some schemas can be converted to shared models at some point
     const schema = z.object({
       pk: z.string().trim().min(1),
       sk: z.string().trim().min(1),
@@ -95,7 +96,7 @@ export class IncomingSimulateRawEventRequest implements IncomingSimulateRawEvent
       schema.strict().parse(incomingSimulateRawEventRequestInput)
       return Result.makeSuccess()
     } catch (error) {
-      console.error(`${logContext} error caught:`, { error })
+      console.error(`${logContext} error caught:`, { error, incomingSimulateRawEventRequestInput })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingSimulateRawEventRequestInput })
       return invalidArgsFailure

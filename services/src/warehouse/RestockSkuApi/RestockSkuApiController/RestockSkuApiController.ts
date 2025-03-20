@@ -77,11 +77,12 @@ export class RestockSkuApiController implements IRestockSkuApiController {
   private parseValidateRequestBody(
     apiEvent: APIGatewayProxyEventV2,
   ): Success<unknown> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'RestockSkuApiController.parseValidateRequestBody'
+
     try {
       const unverifiedRequest = JSON.parse(apiEvent.body)
       return Result.makeSuccess<unknown>(unverifiedRequest)
     } catch (error) {
-      const logContext = 'RestockSkuApiController.parseValidateRequestBody'
       console.error(`${logContext} error caught:`, { error, apiEvent })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, apiEvent })

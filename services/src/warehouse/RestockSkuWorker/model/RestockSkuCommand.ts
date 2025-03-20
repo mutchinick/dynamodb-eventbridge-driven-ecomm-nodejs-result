@@ -52,14 +52,9 @@ export class RestockSkuCommand implements RestockSkuCommandProps {
   private static buildProps(
     restockSkuCommandInput: RestockSkuCommandInput,
   ): Success<RestockSkuCommandProps> | Failure<'InvalidArgumentsError'> {
-    try {
-      this.validateInput(restockSkuCommandInput)
-    } catch (error) {
-      const logContext = 'RestockSkuCommand.buildProps'
-      console.error(`${logContext} error caught:`, { error })
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
-      console.error(`${logContext} exit failure:`, { invalidArgsFailure, restockSkuCommandInput })
-      return invalidArgsFailure
+    const inputValidationResult = this.validateInput(restockSkuCommandInput)
+    if (Result.isFailure(inputValidationResult)) {
+      return inputValidationResult
     }
 
     const { incomingSkuRestockedEvent } = restockSkuCommandInput
@@ -75,8 +70,13 @@ export class RestockSkuCommand implements RestockSkuCommandProps {
   //
   //
   //
-  private static validateInput(restockSkuCommandInput: RestockSkuCommandInput): void {
-    z.object({
+  private static validateInput(
+    restockSkuCommandInput: RestockSkuCommandInput,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'RestockSkuCommand.validateInput'
+
+    // COMBAK: Maybe some schemas can be converted to shared models at some point
+    const schema = z.object({
       incomingSkuRestockedEvent: z.object({
         eventName: ValueValidators.validSkuRestockedEventName(),
         eventData: z.object({
@@ -87,6 +87,16 @@ export class RestockSkuCommand implements RestockSkuCommandProps {
         createdAt: ValueValidators.validCreatedAt(),
         updatedAt: ValueValidators.validUpdatedAt(),
       }),
-    }).parse(restockSkuCommandInput)
+    })
+
+    try {
+      schema.parse(restockSkuCommandInput)
+      return Result.makeSuccess()
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error, restockSkuCommandInput })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, restockSkuCommandInput })
+      return invalidArgsFailure
+    }
   }
 }

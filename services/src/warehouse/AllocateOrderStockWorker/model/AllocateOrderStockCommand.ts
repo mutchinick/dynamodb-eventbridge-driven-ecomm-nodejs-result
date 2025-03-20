@@ -52,16 +52,10 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
   private static buildProps(
     allocateOrderStockCommandInput: AllocateOrderStockCommandInput,
   ): Success<AllocateOrderStockCommandProps> | Failure<'InvalidArgumentsError'> {
-    try {
-      this.validateInput(allocateOrderStockCommandInput)
-    } catch (error) {
-      const logContext = 'AllocateOrderStockCommand.buildProps'
-      console.error(`${logContext} error caught:`, { error })
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
-      console.error(`${logContext} exit failure:`, { invalidArgsFailure, allocateOrderStockCommandInput })
-      return invalidArgsFailure
+    const inputValidationResult = this.validateInput(allocateOrderStockCommandInput)
+    if (Result.isFailure(inputValidationResult)) {
+      return inputValidationResult
     }
-
     const { incomingOrderCreatedEvent } = allocateOrderStockCommandInput
     const { sku, orderId, units } = incomingOrderCreatedEvent.eventData
     const date = new Date().toISOString()
@@ -81,8 +75,13 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
   //
   //
   //
-  private static validateInput(allocateOrderStockCommandInput: AllocateOrderStockCommandInput): void {
-    z.object({
+  private static validateInput(
+    allocateOrderStockCommandInput: AllocateOrderStockCommandInput,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'AllocateOrderStockCommand.validateInput'
+
+    // COMBAK: Maybe some schemas can be converted to shared models at some point
+    const schema = z.object({
       incomingOrderCreatedEvent: z.object({
         eventName: ValueValidators.validOrderCreatedEventName(),
         eventData: z.object({
@@ -93,6 +92,16 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
         createdAt: ValueValidators.validCreatedAt(),
         updatedAt: ValueValidators.validUpdatedAt(),
       }),
-    }).parse(allocateOrderStockCommandInput)
+    })
+
+    try {
+      schema.parse(allocateOrderStockCommandInput)
+      return Result.makeSuccess()
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error, allocateOrderStockCommandInput })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, allocateOrderStockCommandInput })
+      return invalidArgsFailure
+    }
   }
 }

@@ -58,7 +58,7 @@ export class PlaceOrderApiConstruct extends Construct {
       functionName: lambdaFuncName,
       runtime: Runtime.NODEJS_20_X,
       handler: 'handler',
-      entry: join(__dirname, './placeOrderApiHandler.ts'),
+      entry: join(__dirname, './placeOrderApiEntry.ts'),
       environment: {
         EVENT_STORE_TABLE_NAME: dynamoDbTable.tableName,
       },

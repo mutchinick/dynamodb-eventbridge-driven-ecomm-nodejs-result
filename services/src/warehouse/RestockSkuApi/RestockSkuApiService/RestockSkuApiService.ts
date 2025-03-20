@@ -27,6 +27,12 @@ export class RestockSkuApiService implements IRestockSkuApiService {
     const logContext = 'RestockSkuApiService.restockSku'
     console.info(`${logContext} init:`, { incomingRestockSkuRequest })
 
+    const inputValidationResult = this.validateInput(incomingRestockSkuRequest)
+    if (Result.isFailure(inputValidationResult)) {
+      console.error(`${logContext} exit failure:`, { inputValidationResult, incomingRestockSkuRequest })
+      return inputValidationResult
+    }
+
     const raiseEventResult = await this.raiseSkuRestockedEvent(incomingRestockSkuRequest)
     if (Result.isSuccess(raiseEventResult) || Result.isFailureOfKind(raiseEventResult, 'DuplicateEventRaisedError')) {
       const serviceOutput: RestockSkuServiceOutput = { ...incomingRestockSkuRequest }
@@ -37,6 +43,25 @@ export class RestockSkuApiService implements IRestockSkuApiService {
 
     console.error(`${logContext} exit failure:`, { raiseEventResult, incomingRestockSkuRequest })
     return raiseEventResult
+  }
+
+  //
+  //
+  //
+  private validateInput(
+    incomingRestockSkuRequest: IncomingRestockSkuRequest,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'IncomingRestockSkuRequest.validateInput'
+    console.info(`${logContext} init:`, { incomingRestockSkuRequest })
+
+    if (incomingRestockSkuRequest instanceof IncomingRestockSkuRequest === false) {
+      const errorMessage = `Expected IncomingRestockSkuRequest but got ${incomingRestockSkuRequest}`
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', errorMessage, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, incomingRestockSkuRequest })
+      return invalidArgsFailure
+    }
+
+    return Result.makeSuccess()
   }
 
   //

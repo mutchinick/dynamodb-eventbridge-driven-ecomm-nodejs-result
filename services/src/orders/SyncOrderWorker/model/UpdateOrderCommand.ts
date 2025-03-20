@@ -36,6 +36,7 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
   ): TypeUtilsWrapper<
     | Success<UpdateOrderCommand>
     | Failure<'InvalidArgumentsError'>
+    | Failure<'InvalidOperationError'>
     | Failure<'ForbiddenOrderStatusTransitionError'>
     | Failure<'NotReadyOrderStatusTransitionError'>
     | Failure<'RedundantOrderStatusTransitionError'>
@@ -67,16 +68,11 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
     | Failure<'ForbiddenOrderStatusTransitionError'>
     | Failure<'NotReadyOrderStatusTransitionError'>
     | Failure<'RedundantOrderStatusTransitionError'>
+    | Failure<'InvalidOperationError'>
   > {
-    const logContext = 'UpdateOrderCommand.buildProps'
-
-    try {
-      this.validateInput(updateOrderCommandInput)
-    } catch (error) {
-      console.error(`${logContext} error caught:`, { error })
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
-      console.error(`${logContext} exit failure:`, { invalidArgsFailure })
-      return invalidArgsFailure
+    const inputValidationResult = this.validateInput(updateOrderCommandInput)
+    if (Result.isFailure(inputValidationResult)) {
+      return inputValidationResult
     }
 
     const { existingOrderData, incomingOrderEvent } = updateOrderCommandInput
@@ -85,7 +81,6 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
 
     const orderStatusResult = this.computeNewOrderStatus({ existingOrderStatus, incomingEventName })
     if (Result.isFailure(orderStatusResult)) {
-      console.error(`${logContext} exit failure:`, { orderStatusResult, updateOrderCommandInput })
       return orderStatusResult
     }
 
@@ -103,16 +98,11 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
   //
   //
   //
-  private static validateInput(updateOrderCommandInput: UpdateOrderCommandInput): void {
-    this.validateExistingOrderData(updateOrderCommandInput.existingOrderData)
-    this.validateIncomingOrderEvent(updateOrderCommandInput.incomingOrderEvent)
-  }
+  private static validateInput(updateOrderCommandInput: UpdateOrderCommandInput) {
+    const logContext = 'UpdateOrderCommand.validateInput'
 
-  //
-  //
-  //
-  private static validateExistingOrderData(existingOrderData: OrderData): void {
-    z.object({
+    // COMBAK: Maybe some schemas can be converted to shared models at some point.
+    const existingOrderDataSchema = z.object({
       orderId: ValueValidators.validOrderId(),
       orderStatus: ValueValidators.validOrderStatus(),
       sku: ValueValidators.validSku(),
@@ -121,14 +111,10 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
       userId: ValueValidators.validUserId(),
       createdAt: ValueValidators.validCreatedAt(),
       updatedAt: ValueValidators.validUpdatedAt(),
-    }).parse(existingOrderData)
-  }
+    })
 
-  //
-  //
-  //
-  private static validateIncomingOrderEvent(incomingOrderEvent: IncomingOrderEvent): void {
-    z.object({
+    // COMBAK: Maybe some schemas can be converted to shared models at some point.
+    const incomingOrderEventSchema = z.object({
       eventName: ValueValidators.validIncomingEventName(),
       eventData: z.object({
         orderId: ValueValidators.validOrderId(),
@@ -142,7 +128,23 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
       }),
       createdAt: ValueValidators.validCreatedAt(),
       updatedAt: ValueValidators.validUpdatedAt(),
-    }).parse(incomingOrderEvent)
+    })
+
+    // COMBAK: Maybe some schemas can be converted to shared models at some point
+    const schema = z.object({
+      existingOrderData: existingOrderDataSchema,
+      incomingOrderEvent: incomingOrderEventSchema,
+    })
+
+    try {
+      schema.parse(updateOrderCommandInput)
+      return Result.makeSuccess()
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error, updateOrderCommandInput })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, updateOrderCommandInput })
+      return invalidArgsFailure
+    }
   }
 
   //
@@ -159,7 +161,10 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
     | Failure<'ForbiddenOrderStatusTransitionError'>
     | Failure<'NotReadyOrderStatusTransitionError'>
     | Failure<'RedundantOrderStatusTransitionError'>
+    | Failure<'InvalidOperationError'>
   > {
+    const logContext = 'UpdateOrderCommand.computeNewOrderStatus'
+
     //
     const forbiddenFailure = Result.makeFailure(
       'ForbiddenOrderStatusTransitionError',
@@ -322,10 +327,16 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
       },
     }
 
-    const eventNameToOrderStatusMap = orderStatusTransitionRules[existingOrderStatus] ?? null
-    const newOrderStatusResult = eventNameToOrderStatusMap?.[incomingEventName] ?? forbiddenFailure
+    const eventNameToOrderStatusMap = orderStatusTransitionRules[existingOrderStatus]
+    const newOrderStatusResult = eventNameToOrderStatusMap?.[incomingEventName]
 
-    const logContext = 'UpdateOrderCommand.computeNewOrderStatus'
+    if (!newOrderStatusResult) {
+      const error = new Error(`Expected valid event but received "${incomingEventName}"`)
+      const invalidOpsFailure = Result.makeFailure('InvalidOperationError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidOpsFailure, existingOrderStatus, incomingEventName })
+      return invalidOpsFailure
+    }
+
     Result.isFailure(newOrderStatusResult)
       ? console.error(`${logContext} exit failure:`, { newOrderStatusResult, existingOrderStatus, incomingEventName })
       : console.info(`${logContext} exit success:`, { newOrderStatusResult, existingOrderStatus, incomingEventName })

@@ -28,9 +28,9 @@ export class Result {
     if (err instanceof Error) {
       error = err
     } else if (typeof err === 'string') {
-      error = new Error(err)
+      error = new Error(`[${failureKind}]: ${err}`)
     } else {
-      error = new Error('Unrecognized Error')
+      error = new Error('[UnrecognizedError]: Unrecognized error')
     }
     return { failureKind, transient, error }
   }

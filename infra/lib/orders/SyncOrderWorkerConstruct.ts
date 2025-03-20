@@ -69,7 +69,7 @@ export class SyncOrderWorkerConstruct extends Construct {
       functionName: lambdaFuncName,
       runtime: Runtime.NODEJS_20_X,
       handler: 'handler',
-      entry: join(__dirname, './syncOrderWorkerHandler.ts'),
+      entry: join(__dirname, './syncOrderWorkerEntry.ts'),
       environment: {
         EVENT_STORE_TABLE_NAME: dynamoDbTable.tableName,
         ORDER_TABLE_NAME: dynamoDbTable.tableName,

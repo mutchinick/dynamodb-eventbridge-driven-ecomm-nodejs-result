@@ -50,14 +50,9 @@ export class SkuRestockedEvent implements SkuRestockedEventProps {
   private static buildProps(
     skuRestockedEventInput: SkuRestockedEventInput,
   ): Success<SkuRestockedEventProps> | Failure<'InvalidArgumentsError'> {
-    try {
-      this.validateInput(skuRestockedEventInput)
-    } catch (error) {
-      const logContext = 'SkuRestockedEvent.buildProps'
-      console.error(`${logContext} error caught:`, { error })
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
-      console.error(`${logContext} exit failure:`, { invalidArgsFailure, skuRestockedEventInput })
-      return invalidArgsFailure
+    const inputValidationResult = this.validateInput(skuRestockedEventInput)
+    if (Result.isFailure(inputValidationResult)) {
+      return inputValidationResult
     }
 
     const { sku, units, lotId } = skuRestockedEventInput
@@ -75,11 +70,26 @@ export class SkuRestockedEvent implements SkuRestockedEventProps {
   //
   //
   //
-  private static validateInput(skuRestockedEventInput: SkuRestockedEventData): void {
-    z.object({
+  private static validateInput(
+    skuRestockedEventInput: SkuRestockedEventData,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'SkuRestockedEvent.validateInput'
+
+    // COMBAK: Maybe some schemas can be converted to shared models at some point
+    const schema = z.object({
       sku: ValueValidators.validSku(),
       units: ValueValidators.validUnits(),
       lotId: ValueValidators.validLotId(),
-    }).parse(skuRestockedEventInput)
+    })
+
+    try {
+      schema.parse(skuRestockedEventInput)
+      return Result.makeSuccess()
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error, skuRestockedEventInput })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit failure:`, { invalidArgsFailure, skuRestockedEventInput })
+      return invalidArgsFailure
+    }
   }
 }

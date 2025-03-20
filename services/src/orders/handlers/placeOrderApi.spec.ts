@@ -1,7 +1,7 @@
-import { handler } from './api'
+import { handler } from './placeOrderApi'
 
 // COMBAK: Can mock clients to assert the Controller is built as expected
-describe('Orders Service API handler tests', () => {
+describe('Orders Service handlers placeOrderApi tests', () => {
   it('exports the handler function', () => {
     expect(typeof handler === 'function')
   })

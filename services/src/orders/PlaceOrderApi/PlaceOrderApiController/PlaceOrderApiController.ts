@@ -77,12 +77,13 @@ export class PlaceOrderApiController implements IPlaceOrderApiController {
   private parseValidateRequestBody(
     apiEvent: APIGatewayProxyEventV2,
   ): Success<unknown> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'PlaceOrderApiController.parseValidateRequestBody'
+
     try {
       const unverifiedRequest = JSON.parse(apiEvent.body)
       return Result.makeSuccess<unknown>(unverifiedRequest)
     } catch (error) {
-      const logContext = 'PlaceOrderApiController.parseValidateRequestBody'
-      console.error(`${logContext} error caught:`, { error })
+      console.error(`${logContext} error caught:`, { error, apiEvent })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} exit failure:`, { invalidArgsFailure, apiEvent })
       return invalidArgsFailure

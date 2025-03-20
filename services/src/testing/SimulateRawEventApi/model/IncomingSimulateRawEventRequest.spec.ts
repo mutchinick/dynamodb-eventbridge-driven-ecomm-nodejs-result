@@ -4,7 +4,7 @@ import {
   IncomingSimulateRawEventRequestInput,
 } from './IncomingSimulateRawEventRequest'
 
-function buildMockValidIncomingSimulateRawEventRequestInput(): IncomingSimulateRawEventRequestInput {
+function buildMockIncomingSimulateRawEventRequestInput(): IncomingSimulateRawEventRequestInput {
   const mockValidRequestInput: IncomingSimulateRawEventRequestInput = {
     pk: 'mockPk',
     sk: 'mockSk',
@@ -21,7 +21,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
   // Test IncomingSimulateRawEventRequestInput edge cases
   //
   it(`returns a Success if the input IncomingSimulateRawEventRequestInput is valid`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isSuccess(result)).toBe(true)
   })
@@ -58,7 +58,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
   //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.pk is missing`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     delete mockIncomingSimulateRawEventRequestInput.pk
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -68,7 +68,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.pk is undefined`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.pk = undefined as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -78,7 +78,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.pk is null`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.pk = null as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -88,7 +88,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.pk is empty`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.pk = '' as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -98,7 +98,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.pk is blank`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.pk = '      ' as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -108,7 +108,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.pk is not a string`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.pk = 123456 as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -121,7 +121,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
   //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.sk is missing`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     delete mockIncomingSimulateRawEventRequestInput.sk
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -131,7 +131,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.sk is undefined`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.sk = undefined as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -141,7 +141,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.sk is null`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.sk = null as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -151,7 +151,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.sk is empty`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.sk = '' as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -161,7 +161,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.sk is blank`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.sk = '      ' as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -171,7 +171,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.sk is not a string`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.sk = 123456 as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -184,7 +184,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
   //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.eventName is missing`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     delete mockIncomingSimulateRawEventRequestInput.eventName
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -194,7 +194,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.eventName is undefined`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.eventName = undefined as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -204,7 +204,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.eventName is null`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.eventName = null as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -214,7 +214,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.eventName is empty`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.eventName = '' as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -224,7 +224,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.eventName is blank`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.eventName = '      ' as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -234,7 +234,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.eventName is not a string`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.eventName = 123456 as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -247,7 +247,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
   //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.createdAt is null`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.createdAt = null as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -257,7 +257,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.createdAt not a string`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.createdAt = 123456 as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -270,7 +270,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
   //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.updatedAt is null`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.updatedAt = null as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -280,7 +280,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingSimulateRawEventRequestInput.updatedAt not a string`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     mockIncomingSimulateRawEventRequestInput.updatedAt = 123456 as never
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -292,7 +292,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
   // Test expected results
   //
   it(`returns the expected Success<IncomingSimulateRawEventRequest> with the expected data`, async () => {
-    const mockIncomingSimulateRawEventRequestInput = buildMockValidIncomingSimulateRawEventRequestInput()
+    const mockIncomingSimulateRawEventRequestInput = buildMockIncomingSimulateRawEventRequestInput()
     const result = IncomingSimulateRawEventRequest.validateAndBuild(mockIncomingSimulateRawEventRequestInput)
     const expectedRequest: IncomingSimulateRawEventRequest = {
       pk: mockIncomingSimulateRawEventRequestInput.pk,
@@ -303,6 +303,7 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
       updatedAt: mockIncomingSimulateRawEventRequestInput.updatedAt,
     }
     const expectedResult = Result.makeSuccess(expectedRequest)
+    expect(Result.isSuccess(result)).toBe(true)
     expect(result).toMatchObject(expectedResult)
   })
 })
