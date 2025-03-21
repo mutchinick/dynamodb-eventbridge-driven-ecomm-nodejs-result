@@ -34,6 +34,9 @@ function buildMockApiEvent(incomingSimulateRawEventRequest: IncomingSimulateRawE
   return mockApiEvent
 }
 
+//
+// Mock services
+//
 function buildMockSimulateRawEventApiService_succeeds(): ISimulateRawEventApiService {
   const mockServiceOutput = buildMockApiEventBody()
   const mockServiceOutputResult = Result.makeSuccess(mockServiceOutput)

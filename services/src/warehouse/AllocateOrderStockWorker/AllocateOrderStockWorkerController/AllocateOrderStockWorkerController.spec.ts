@@ -109,6 +109,9 @@ function buildMockTestObjects(ids: string[]): {
   }
 }
 
+//
+// Mock services
+//
 function buildMockAllocateOrderStockWorkerService_succeeds(): IAllocateOrderStockWorkerService {
   return { allocateOrderStock: jest.fn().mockResolvedValue(Result.makeSuccess()) }
 }

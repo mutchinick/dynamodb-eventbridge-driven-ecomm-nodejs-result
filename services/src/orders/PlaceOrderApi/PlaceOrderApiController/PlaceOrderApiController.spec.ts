@@ -34,7 +34,7 @@ function buildMockApiEvent(incomingPlaceOrderRequest: IncomingPlaceOrderRequest)
 }
 
 //
-// Mock clients
+// Mock services
 //
 function buildMockPlaceOrderApiService_succeeds(): IPlaceOrderApiService {
   const mockApiEventBody = buildMockApiEventBody()

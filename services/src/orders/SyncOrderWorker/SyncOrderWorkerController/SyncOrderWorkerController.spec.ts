@@ -99,7 +99,7 @@ function buildMockTestObjects(ids: string[]) {
 }
 
 //
-// Mock clients
+// Mock services
 //
 function buildMockSyncOrderWorkerService_succeeds(): ISyncOrderWorkerService {
   return { syncOrder: jest.fn().mockResolvedValue(Result.makeSuccess()) }

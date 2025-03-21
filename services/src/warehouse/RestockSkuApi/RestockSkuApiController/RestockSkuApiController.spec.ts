@@ -30,7 +30,7 @@ function buildMockApiEvent(incomingRestockSkuRequest: IncomingRestockSkuRequest)
 }
 
 //
-// Mock clients
+// Mock services
 //
 function buildMockRestockSkuApiService_succeeds(): IRestockSkuApiService {
   const mockApiEventBody = buildMockApiEventBody()

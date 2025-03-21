@@ -110,7 +110,7 @@ function buildMockTestObjects(ids: string[]): {
 }
 
 //
-// Mock clients
+// Mock services
 //
 function buildMockRestockSkuWorkerService_succeeds(): IRestockSkuWorkerService {
   return { restockSku: jest.fn().mockResolvedValue(Result.makeSuccess()) }

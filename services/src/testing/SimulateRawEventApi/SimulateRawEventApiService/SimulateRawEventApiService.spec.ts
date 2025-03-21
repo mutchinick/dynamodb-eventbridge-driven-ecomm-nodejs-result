@@ -130,7 +130,7 @@ describe(`Testing Service SimulateRawEventApi SimulateRawEventApiService tests`,
     const mockEsRaiseRawSimulatedEventClient = buildMockEsRaiseRawSimulatedEventClient_fails(failureKind)
     const simulateRawEventApiService = new SimulateRawEventApiService(mockEsRaiseRawSimulatedEventClient)
     const result = await simulateRawEventApiService.simulateRawEvent(mockIncomingSimulateRawEventRequest)
-    const expectedValue: SimulateRawEventApiServiceOutput = {
+    const expectedOutput: SimulateRawEventApiServiceOutput = {
       pk: mockIncomingSimulateRawEventRequest.pk,
       sk: mockIncomingSimulateRawEventRequest.sk,
       eventName: mockIncomingSimulateRawEventRequest.eventName,
@@ -138,7 +138,7 @@ describe(`Testing Service SimulateRawEventApi SimulateRawEventApiService tests`,
       createdAt: mockIncomingSimulateRawEventRequest.createdAt,
       updatedAt: mockIncomingSimulateRawEventRequest.updatedAt,
     }
-    const expectedResult = Result.makeSuccess(expectedValue)
+    const expectedResult = Result.makeSuccess(expectedOutput)
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)
   })
