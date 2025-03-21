@@ -32,15 +32,15 @@ function buildMockOrderCreatedEvent(): TypeUtilsMutable<OrderCreatedEvent> {
   return Result.getSuccessValueOrThrow(mockClass)
 }
 
-const mockValidEvent = buildMockOrderCreatedEvent()
+const mockOrderCreatedEvent = buildMockOrderCreatedEvent()
 
 const expectedDdbDocClientInput = new PutCommand({
   TableName: mockEventStoreTableName,
   Item: {
-    pk: `ORDER_ID#${mockValidEvent.eventData.orderId}`,
-    sk: `EVENT#${mockValidEvent.eventName}`,
+    pk: `ORDER_ID#${mockOrderCreatedEvent.eventData.orderId}`,
+    sk: `EVENT#${mockOrderCreatedEvent.eventName}`,
     _tn: '#EVENT',
-    ...mockValidEvent,
+    ...mockOrderCreatedEvent,
   },
   ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
 })
@@ -65,7 +65,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderCreatedEventClient tests`, ()
   it(`returns a Success if the input OrderCreatedEvent is valid`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderCreatedEventClient = new EsRaiseOrderCreatedEventClient(mockDdbDocClient)
-    const result = await esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(mockValidEvent)
+    const result = await esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(mockOrderCreatedEvent)
     expect(Result.isSuccess(result)).toBe(true)
   })
 
@@ -121,14 +121,14 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderCreatedEventClient tests`, ()
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderCreatedEventClient = new EsRaiseOrderCreatedEventClient(mockDdbDocClient)
-    await esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(mockValidEvent)
+    await esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(mockOrderCreatedEvent)
     expect(mockDdbDocClient.send).toHaveBeenCalledTimes(1)
   })
 
   it(`calls DynamoDBDocumentClient.send with the expected input`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderCreatedEventClient = new EsRaiseOrderCreatedEventClient(mockDdbDocClient)
-    await esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(mockValidEvent)
+    await esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(mockOrderCreatedEvent)
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(
       expect.objectContaining({ input: expectedDdbDocClientInput.input }),
     )
@@ -138,7 +138,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderCreatedEventClient tests`, ()
       DynamoDBDocumentClient.send throws a generic Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const esRaiseOrderCreatedEventClient = new EsRaiseOrderCreatedEventClient(mockDdbDocClient)
-    const result = await esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(mockValidEvent)
+    const result = await esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(mockOrderCreatedEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'UnrecognizedError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(true)
@@ -148,7 +148,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderCreatedEventClient tests`, ()
       if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws_ConditionalCheckFailedException()
     const esRaiseOrderCreatedEventClient = new EsRaiseOrderCreatedEventClient(mockDdbDocClient)
-    const result = await esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(mockValidEvent)
+    const result = await esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(mockOrderCreatedEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'DuplicateEventRaisedError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
@@ -160,7 +160,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderCreatedEventClient tests`, ()
   it(`returns the expected Success<void> with the expected data`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderCreatedEventClient = new EsRaiseOrderCreatedEventClient(mockDdbDocClient)
-    const result = await esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(mockValidEvent)
+    const result = await esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(mockOrderCreatedEvent)
     const expectedResult = Result.makeSuccess()
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)

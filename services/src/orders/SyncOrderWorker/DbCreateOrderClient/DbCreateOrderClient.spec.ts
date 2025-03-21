@@ -35,13 +35,13 @@ function buildMockCreateOrderCommand(): TypeUtilsMutable<CreateOrderCommand> {
   return Result.getSuccessValueOrThrow(mockClass)
 }
 
-const mockValidCommand = buildMockCreateOrderCommand()
+const mockCreateOrderCommand = buildMockCreateOrderCommand()
 
 const expectedDdbDocClientInput = new UpdateCommand({
   TableName: mockEventStoreTableName,
   Key: {
-    pk: `ORDER_ID#${mockValidCommand.orderData.orderId}`,
-    sk: `ORDER_ID#${mockValidCommand.orderData.orderId}`,
+    pk: `ORDER_ID#${mockCreateOrderCommand.orderData.orderId}`,
+    sk: `ORDER_ID#${mockCreateOrderCommand.orderData.orderId}`,
   },
   UpdateExpression:
     'SET ' +
@@ -67,14 +67,14 @@ const expectedDdbDocClientInput = new UpdateCommand({
   },
   ExpressionAttributeValues: {
     ':_tn': 'ORDERS#ORDER',
-    ':orderId': mockValidCommand.orderData.orderId,
-    ':orderStatus': mockValidCommand.orderData.orderStatus,
-    ':sku': mockValidCommand.orderData.sku,
-    ':units': mockValidCommand.orderData.units,
-    ':price': mockValidCommand.orderData.price,
-    ':userId': mockValidCommand.orderData.userId,
-    ':createdAt': mockValidCommand.orderData.createdAt,
-    ':updatedAt': mockValidCommand.orderData.updatedAt,
+    ':orderId': mockCreateOrderCommand.orderData.orderId,
+    ':orderStatus': mockCreateOrderCommand.orderData.orderStatus,
+    ':sku': mockCreateOrderCommand.orderData.sku,
+    ':units': mockCreateOrderCommand.orderData.units,
+    ':price': mockCreateOrderCommand.orderData.price,
+    ':userId': mockCreateOrderCommand.orderData.userId,
+    ':createdAt': mockCreateOrderCommand.orderData.createdAt,
+    ':updatedAt': mockCreateOrderCommand.orderData.updatedAt,
   },
   ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
   ReturnValuesOnConditionCheckFailure: 'ALL_OLD',
@@ -85,14 +85,14 @@ const expectedDdbDocClientInput = new UpdateCommand({
 // Mock clients
 //
 const expectedCreatedOrderData: OrderData = {
-  orderId: mockValidCommand.orderData.orderId,
-  orderStatus: mockValidCommand.orderData.orderStatus,
-  sku: mockValidCommand.orderData.sku,
-  units: mockValidCommand.orderData.units,
-  price: mockValidCommand.orderData.price,
-  userId: mockValidCommand.orderData.userId,
-  createdAt: mockValidCommand.orderData.createdAt,
-  updatedAt: mockValidCommand.orderData.updatedAt,
+  orderId: mockCreateOrderCommand.orderData.orderId,
+  orderStatus: mockCreateOrderCommand.orderData.orderStatus,
+  sku: mockCreateOrderCommand.orderData.sku,
+  units: mockCreateOrderCommand.orderData.units,
+  price: mockCreateOrderCommand.orderData.price,
+  userId: mockCreateOrderCommand.orderData.userId,
+  createdAt: mockCreateOrderCommand.orderData.createdAt,
+  updatedAt: mockCreateOrderCommand.orderData.updatedAt,
 }
 
 function buildMockDdbDocClient_resolves(): DynamoDBDocumentClient {
@@ -148,7 +148,7 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
   it(`returns a Success if the input CreateOrderCommand is valid`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
-    const result = await dbCreateOrderClient.createOrder(mockValidCommand)
+    const result = await dbCreateOrderClient.createOrder(mockCreateOrderCommand)
     expect(Result.isSuccess(result)).toBe(true)
   })
 
@@ -204,14 +204,14 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
-    await dbCreateOrderClient.createOrder(mockValidCommand)
+    await dbCreateOrderClient.createOrder(mockCreateOrderCommand)
     expect(mockDdbDocClient.send).toHaveBeenCalledTimes(1)
   })
 
   it(`calls DynamoDBDocumentClient.send with the expected input`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
-    await dbCreateOrderClient.createOrder(mockValidCommand)
+    await dbCreateOrderClient.createOrder(mockCreateOrderCommand)
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(
       expect.objectContaining({ input: expectedDdbDocClientInput.input }),
     )
@@ -221,7 +221,7 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
       DynamoDBDocumentClient.send throws a generic Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
-    const result = await dbCreateOrderClient.createOrder(mockValidCommand)
+    const result = await dbCreateOrderClient.createOrder(mockCreateOrderCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'UnrecognizedError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(true)
@@ -234,7 +234,7 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
       DynamoDBDocumentClient.send throws a ConditionalCheckFailedException`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws_ConditionalCheckFailedException()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
-    const result = await dbCreateOrderClient.createOrder(mockValidCommand)
+    const result = await dbCreateOrderClient.createOrder(mockCreateOrderCommand)
     const expectedResult = Result.makeSuccess(expectedExistingOrderData)
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)
@@ -243,7 +243,7 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
   it(`returns the expected Success<OrderData> updated in the database`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
-    const result = await dbCreateOrderClient.createOrder(mockValidCommand)
+    const result = await dbCreateOrderClient.createOrder(mockCreateOrderCommand)
     const expectedResult = Result.makeSuccess(expectedCreatedOrderData)
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)

@@ -25,11 +25,11 @@ function buildMockRawSimulatedEvent(): TypeUtilsMutable<RawSimulatedEvent> {
   return Result.getSuccessValueOrThrow(mockClass)
 }
 
-const mockValidEvent = buildMockRawSimulatedEvent()
+const mockRawSimulatedEvent = buildMockRawSimulatedEvent()
 
 const expectedDdbDocClientInput = new PutCommand({
   TableName: mockEventStoreTableName,
-  Item: { ...mockValidEvent },
+  Item: { ...mockRawSimulatedEvent },
   ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
 })
 
@@ -51,7 +51,7 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
   it(`returns a Success if the input RawSimulatedEvent is valid`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_succeeds()
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
-    const result = await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockValidEvent)
+    const result = await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockRawSimulatedEvent)
     expect(Result.isSuccess(result)).toBe(true)
   })
 
@@ -81,14 +81,14 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_succeeds()
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
-    await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockValidEvent)
+    await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockRawSimulatedEvent)
     expect(mockDdbDocClient.send).toHaveBeenCalledTimes(1)
   })
 
   it(`calls DynamoDBDocumentClient.send with the expected input`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_succeeds()
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
-    await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockValidEvent)
+    await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockRawSimulatedEvent)
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(
       expect.objectContaining({ input: expectedDdbDocClientInput.input }),
     )
@@ -98,7 +98,7 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
     const mockError = new Error('mockError')
     const mockDdbDocClient = buildMockDdbDocClient_throws(mockError)
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
-    const result = await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockValidEvent)
+    const result = await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockRawSimulatedEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'UnrecognizedError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(true)
@@ -109,7 +109,7 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
     const mockError = new ConditionalCheckFailedException({ $metadata: {}, message: '' })
     const mockDdbDocClient = buildMockDdbDocClient_throws(mockError)
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
-    const result = await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockValidEvent)
+    const result = await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockRawSimulatedEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'DuplicateEventRaisedError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
@@ -121,7 +121,7 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
   it(`returns the expected Success<void> with the expected data`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_succeeds()
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
-    const result = await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockValidEvent)
+    const result = await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockRawSimulatedEvent)
     const expectedResult = Result.makeSuccess()
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)

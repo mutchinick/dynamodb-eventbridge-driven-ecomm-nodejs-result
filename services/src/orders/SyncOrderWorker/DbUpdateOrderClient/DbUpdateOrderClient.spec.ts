@@ -47,13 +47,13 @@ function buildMockUpdateOrderCommand(): TypeUtilsMutable<UpdateOrderCommand> {
   return Result.getSuccessValueOrThrow(mockClass)
 }
 
-const mockValidCommand = buildMockUpdateOrderCommand()
+const mockUpdateOrderCommand = buildMockUpdateOrderCommand()
 
 const expectedDdbDocClientInput = new UpdateCommand({
   TableName: mockEventStoreTableName,
   Key: {
-    pk: `ORDER_ID#${mockValidCommand.orderData.orderId}`,
-    sk: `ORDER_ID#${mockValidCommand.orderData.orderId}`,
+    pk: `ORDER_ID#${mockUpdateOrderCommand.orderData.orderId}`,
+    sk: `ORDER_ID#${mockUpdateOrderCommand.orderData.orderId}`,
   },
   UpdateExpression: 'SET #orderStatus = :orderStatus, #updatedAt = :updatedAt',
   ExpressionAttributeNames: {
@@ -61,8 +61,8 @@ const expectedDdbDocClientInput = new UpdateCommand({
     '#updatedAt': 'updatedAt',
   },
   ExpressionAttributeValues: {
-    ':orderStatus': mockValidCommand.orderData.orderStatus,
-    ':updatedAt': mockValidCommand.orderData.updatedAt,
+    ':orderStatus': mockUpdateOrderCommand.orderData.orderStatus,
+    ':updatedAt': mockUpdateOrderCommand.orderData.updatedAt,
   },
   ConditionExpression: '#orderStatus <> :orderStatus',
   ReturnValuesOnConditionCheckFailure: 'ALL_OLD',
@@ -73,14 +73,14 @@ const expectedDdbDocClientInput = new UpdateCommand({
 // Mock clients
 //
 const expectedUpdatedOrderData: OrderData = {
-  orderId: mockValidCommand.orderData.orderId,
-  orderStatus: mockValidCommand.orderData.orderStatus,
+  orderId: mockUpdateOrderCommand.orderData.orderId,
+  orderStatus: mockUpdateOrderCommand.orderData.orderStatus,
   sku: 'mockSku',
   units: 2,
   price: 3.98,
   userId: 'mockUserId',
   createdAt: 'mockCreatedAt',
-  updatedAt: mockValidCommand.orderData.updatedAt,
+  updatedAt: mockUpdateOrderCommand.orderData.updatedAt,
 }
 
 function buildMockDdbDocClient_resolves(): DynamoDBDocumentClient {
@@ -136,7 +136,7 @@ describe(`Orders Service SyncOrderWorker DbUpdateOrderClient tests`, () => {
   it(`returns a Success if the input UpdateOrderCommand is valid`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbUpdateOrderClient = new DbUpdateOrderClient(mockDdbDocClient)
-    const result = await dbUpdateOrderClient.updateOrder(mockValidCommand)
+    const result = await dbUpdateOrderClient.updateOrder(mockUpdateOrderCommand)
     expect(Result.isSuccess(result)).toBe(true)
   })
 
@@ -192,14 +192,14 @@ describe(`Orders Service SyncOrderWorker DbUpdateOrderClient tests`, () => {
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbUpdateOrderClient = new DbUpdateOrderClient(mockDdbDocClient)
-    await dbUpdateOrderClient.updateOrder(mockValidCommand)
+    await dbUpdateOrderClient.updateOrder(mockUpdateOrderCommand)
     expect(mockDdbDocClient.send).toHaveBeenCalledTimes(1)
   })
 
   it(`calls DynamoDBDocumentClient.send with the expected input`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbUpdateOrderClient = new DbUpdateOrderClient(mockDdbDocClient)
-    await dbUpdateOrderClient.updateOrder(mockValidCommand)
+    await dbUpdateOrderClient.updateOrder(mockUpdateOrderCommand)
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(
       expect.objectContaining({ input: expectedDdbDocClientInput.input }),
     )
@@ -209,7 +209,7 @@ describe(`Orders Service SyncOrderWorker DbUpdateOrderClient tests`, () => {
       DynamoDBDocumentClient.send throws a generic Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbUpdateOrderClient = new DbUpdateOrderClient(mockDdbDocClient)
-    const result = await dbUpdateOrderClient.updateOrder(mockValidCommand)
+    const result = await dbUpdateOrderClient.updateOrder(mockUpdateOrderCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'UnrecognizedError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(true)
@@ -222,7 +222,7 @@ describe(`Orders Service SyncOrderWorker DbUpdateOrderClient tests`, () => {
       DynamoDBDocumentClient.send throws a ConditionalCheckFailedException`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws_ConditionalCheckFailedException()
     const dbUpdateOrderClient = new DbUpdateOrderClient(mockDdbDocClient)
-    const result = await dbUpdateOrderClient.updateOrder(mockValidCommand)
+    const result = await dbUpdateOrderClient.updateOrder(mockUpdateOrderCommand)
     const expectedResult = Result.makeSuccess(expectedExistingOrderData)
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)
@@ -231,7 +231,7 @@ describe(`Orders Service SyncOrderWorker DbUpdateOrderClient tests`, () => {
   it(`returns the expected Success<OrderData> updated in the database`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbUpdateOrderClient = new DbUpdateOrderClient(mockDdbDocClient)
-    const result = await dbUpdateOrderClient.updateOrder(mockValidCommand)
+    const result = await dbUpdateOrderClient.updateOrder(mockUpdateOrderCommand)
     const expectedResult = Result.makeSuccess(expectedUpdatedOrderData)
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)

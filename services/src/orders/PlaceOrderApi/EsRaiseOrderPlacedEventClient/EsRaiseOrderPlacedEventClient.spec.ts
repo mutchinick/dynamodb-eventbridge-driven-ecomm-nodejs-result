@@ -22,15 +22,15 @@ function buildMockOrderPlacedEvent(): TypeUtilsMutable<OrderPlacedEvent> {
   return Result.getSuccessValueOrThrow(mockClass)
 }
 
-const mockValidEvent = buildMockOrderPlacedEvent()
+const mockOrderPlacedEvent = buildMockOrderPlacedEvent()
 
 const expectedDdbDocClientInput = new PutCommand({
   TableName: mockEventStoreTableName,
   Item: {
-    pk: `ORDER_ID#${mockValidEvent.eventData.orderId}`,
-    sk: `EVENT#${mockValidEvent.eventName}`,
+    pk: `ORDER_ID#${mockOrderPlacedEvent.eventData.orderId}`,
+    sk: `EVENT#${mockOrderPlacedEvent.eventName}`,
     _tn: '#EVENT',
-    ...mockValidEvent,
+    ...mockOrderPlacedEvent,
   },
   ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
 })
@@ -58,7 +58,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderPlacedEventClient tests`, () 
   it(`returns a Success if the input OrderPlacedEvent is valid`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
-    const result = await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockValidEvent)
+    const result = await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockOrderPlacedEvent)
     expect(Result.isSuccess(result)).toBe(true)
   })
 
@@ -114,14 +114,14 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderPlacedEventClient tests`, () 
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
-    await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockValidEvent)
+    await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockOrderPlacedEvent)
     expect(mockDdbDocClient.send).toHaveBeenCalledTimes(1)
   })
 
   it(`calls DynamoDBDocumentClient.send with the expected input`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
-    await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockValidEvent)
+    await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockOrderPlacedEvent)
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(
       expect.objectContaining({ input: expectedDdbDocClientInput.input }),
     )
@@ -131,7 +131,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderPlacedEventClient tests`, () 
       DynamoDBDocumentClient.send throws a generic Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
-    const result = await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockValidEvent)
+    const result = await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockOrderPlacedEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'UnrecognizedError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(true)
@@ -141,7 +141,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderPlacedEventClient tests`, () 
       if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws_ConditionalCheckFailedException()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
-    const result = await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockValidEvent)
+    const result = await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockOrderPlacedEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'DuplicateEventRaisedError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
@@ -153,7 +153,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderPlacedEventClient tests`, () 
   it(`returns the expected Success<void> with the expected data`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
-    const result = await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockValidEvent)
+    const result = await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockOrderPlacedEvent)
     const expectedResult = Result.makeSuccess()
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)

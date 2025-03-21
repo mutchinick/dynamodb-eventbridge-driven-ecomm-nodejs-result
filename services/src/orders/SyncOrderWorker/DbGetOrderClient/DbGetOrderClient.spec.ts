@@ -17,18 +17,18 @@ function buildMockGetOrderCommand(): TypeUtilsMutable<GetOrderCommand> {
   return Result.getSuccessValueOrThrow(mockClass)
 }
 
-const mockValidCommand = buildMockGetOrderCommand()
+const mockGetOrderCommand = buildMockGetOrderCommand()
 
 const expectedDdbDocClientInput = new GetCommand({
   TableName: mockEventStoreTableName,
   Key: {
-    pk: `ORDER_ID#${mockValidCommand.orderData.orderId}`,
-    sk: `ORDER_ID#${mockValidCommand.orderData.orderId}`,
+    pk: `ORDER_ID#${mockGetOrderCommand.orderData.orderId}`,
+    sk: `ORDER_ID#${mockGetOrderCommand.orderData.orderId}`,
   },
 })
 
 const expectedOrderData: OrderData = {
-  orderId: mockValidCommand.orderData.orderId,
+  orderId: mockGetOrderCommand.orderData.orderId,
   orderStatus: OrderStatus.ORDER_CREATED_STATUS,
   sku: 'mockSku',
   units: 2,
@@ -68,7 +68,7 @@ describe(`Orders Service SyncOrderWorker DbGetOrderClient tests`, () => {
   it(`returns a Success if the input GetOrderCommand is valid`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
-    const result = await dbGetOrderClient.getOrder(mockValidCommand)
+    const result = await dbGetOrderClient.getOrder(mockGetOrderCommand)
     expect(Result.isSuccess(result)).toBe(true)
   })
 
@@ -124,14 +124,14 @@ describe(`Orders Service SyncOrderWorker DbGetOrderClient tests`, () => {
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
-    await dbGetOrderClient.getOrder(mockValidCommand)
+    await dbGetOrderClient.getOrder(mockGetOrderCommand)
     expect(mockDdbDocClient.send).toHaveBeenCalledTimes(1)
   })
 
   it(`calls DynamoDBDocumentClient.send with the expected input`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
-    await dbGetOrderClient.getOrder(mockValidCommand)
+    await dbGetOrderClient.getOrder(mockGetOrderCommand)
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(
       expect.objectContaining({ input: expectedDdbDocClientInput.input }),
     )
@@ -141,7 +141,7 @@ describe(`Orders Service SyncOrderWorker DbGetOrderClient tests`, () => {
       DynamoDBDocumentClient.send throws a generic Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
-    const result = await dbGetOrderClient.getOrder(mockValidCommand)
+    const result = await dbGetOrderClient.getOrder(mockGetOrderCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'UnrecognizedError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(true)
@@ -153,7 +153,7 @@ describe(`Orders Service SyncOrderWorker DbGetOrderClient tests`, () => {
   it(`returns the expected Success<null> if DynamoDBDocumentClient.send returns a null item`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_nullItem()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
-    const result = await dbGetOrderClient.getOrder(mockValidCommand)
+    const result = await dbGetOrderClient.getOrder(mockGetOrderCommand)
     const expectedResult = Result.makeSuccess(null)
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)
@@ -162,7 +162,7 @@ describe(`Orders Service SyncOrderWorker DbGetOrderClient tests`, () => {
   it(`returns the expected Success<OrderData> if DynamoDBDocumentClient.send returns a valid item`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
-    const result = await dbGetOrderClient.getOrder(mockValidCommand)
+    const result = await dbGetOrderClient.getOrder(mockGetOrderCommand)
     const expectedResult = Result.makeSuccess(expectedOrderData)
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)
