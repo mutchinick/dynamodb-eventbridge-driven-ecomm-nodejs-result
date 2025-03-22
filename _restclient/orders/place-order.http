@@ -6,10 +6,23 @@ Origin: https://localhost
 Content-Type: application/json
 
 {
-  "orderId": "ABC123",
+  "orderId": "ABC001",
   "sku": "APPLES",
-  "units": 2,
-  "price": 3.25,
+  "units": 20,
+  "price": 33.25,
+  "userId": "123456"
+}
+
+### POST ###
+POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "orderId": "ABC000",
+  "sku": "APPLES",
+  "units": 433,
+  "price": 933.25,
   "userId": "123456"
 }
 
@@ -21,8 +34,8 @@ Content-Type: application/json
 {
   "orderId": "CPQ909",
   "sku": "ORANGES",
-  "units": 3,
-  "price": 5.59,
+  "units": 24,
+  "price": 15.59,
   "userId": "123456"
 }
 
@@ -45,10 +58,10 @@ Origin: https://localhost
 Content-Type: application/json
 
 {
-  "orderId": "ZXF523",
+  "orderId": "ZXF533",
   "sku": "GRAPES",
-  "units": 4,
-  "price": 2.34,
+  "units": 1000,
+  "price": 500.99,
   "userId": "123456"
 }
 
