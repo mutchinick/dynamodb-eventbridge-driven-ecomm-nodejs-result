@@ -36,6 +36,23 @@ describe(`Warehouse Service ValueValidators tests`, () => {
     })
   })
 
+  describe(`validOrderId tests`, () => {
+    it(`throws if orderId is undefined`, () => {
+      const testValue = undefined as string
+      expect(() => ValueValidators.validOrderId().parse(testValue)).toThrow()
+    })
+
+    it(`throws if orderId length < 4`, () => {
+      const testValue = '123'
+      expect(() => ValueValidators.validOrderId().parse(testValue)).toThrow()
+    })
+
+    it(`is valid if orderId length >= 4`, () => {
+      const testValue = '1234'
+      expect(() => ValueValidators.validOrderId().parse(testValue)).not.toThrow()
+    })
+  })
+
   describe(`validSku tests`, () => {
     it(`throws if sku is undefined`, () => {
       const testValue = undefined as string
@@ -80,37 +97,42 @@ describe(`Warehouse Service ValueValidators tests`, () => {
     })
   })
 
-  describe(`validLotId tests`, () => {
-    it(`throws if lotId is undefined`, () => {
+  describe(`validPrice tests`, () => {
+    it(`throws if price is undefined`, () => {
       const testValue = undefined as string
-      expect(() => ValueValidators.validLotId().parse(testValue)).toThrow()
+      expect(() => ValueValidators.validPrice().parse(testValue)).toThrow()
     })
 
-    it(`throws if lotId length < 4`, () => {
-      const testValue = '123'
-      expect(() => ValueValidators.validLotId().parse(testValue)).toThrow()
+    it(`throws if price < 0`, () => {
+      const testValue = -1
+      expect(() => ValueValidators.validPrice().parse(testValue)).toThrow()
     })
 
-    it(`is valid if lotId length >= 4`, () => {
-      const testValue = '1234'
-      expect(() => ValueValidators.validLotId().parse(testValue)).not.toThrow()
+    it(`is valid if price == 0`, () => {
+      const testValue = 0
+      expect(() => ValueValidators.validPrice().parse(testValue)).not.toThrow()
+    })
+
+    it(`is valid if price > 0`, () => {
+      const testValue = 1
+      expect(() => ValueValidators.validPrice().parse(testValue)).not.toThrow()
     })
   })
 
-  describe(`validOrderId tests`, () => {
-    it(`throws if orderId is undefined`, () => {
+  describe(`validUserId tests`, () => {
+    it(`throws if userId is undefined`, () => {
       const testValue = undefined as string
-      expect(() => ValueValidators.validOrderId().parse(testValue)).toThrow()
+      expect(() => ValueValidators.validUserId().parse(testValue)).toThrow()
     })
 
-    it(`throws if orderId length < 4`, () => {
+    it(`throws if userId length < 4`, () => {
       const testValue = '123'
-      expect(() => ValueValidators.validOrderId().parse(testValue)).toThrow()
+      expect(() => ValueValidators.validUserId().parse(testValue)).toThrow()
     })
 
-    it(`is valid if orderId length >= 4`, () => {
+    it(`is valid if userId length >= 4`, () => {
       const testValue = '1234'
-      expect(() => ValueValidators.validOrderId().parse(testValue)).not.toThrow()
+      expect(() => ValueValidators.validUserId().parse(testValue)).not.toThrow()
     })
   })
 
@@ -145,6 +167,23 @@ describe(`Warehouse Service ValueValidators tests`, () => {
     it(`is valid if updatedAt length >= 4`, () => {
       const testValue = '1234'
       expect(() => ValueValidators.validUpdatedAt().parse(testValue)).not.toThrow()
+    })
+  })
+
+  describe(`validLotId tests`, () => {
+    it(`throws if lotId is undefined`, () => {
+      const testValue = undefined as string
+      expect(() => ValueValidators.validLotId().parse(testValue)).toThrow()
+    })
+
+    it(`throws if lotId length < 4`, () => {
+      const testValue = '123'
+      expect(() => ValueValidators.validLotId().parse(testValue)).toThrow()
+    })
+
+    it(`is valid if lotId length >= 4`, () => {
+      const testValue = '1234'
+      expect(() => ValueValidators.validLotId().parse(testValue)).not.toThrow()
     })
   })
 })

@@ -16,6 +16,8 @@ function buildMockOrderStockAllocatedEvent(): TypeUtilsMutable<OrderStockAllocat
     orderId: 'mockOrderId',
     sku: 'mockSku',
     units: 2,
+    price: 100.43,
+    userId: 'mockUserId',
   })
   return Result.getSuccessValueOrThrow(mockClass)
 }

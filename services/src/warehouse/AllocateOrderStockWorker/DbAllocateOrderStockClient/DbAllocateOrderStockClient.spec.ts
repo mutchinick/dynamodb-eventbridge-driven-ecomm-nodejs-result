@@ -2,10 +2,10 @@ import { TransactionCanceledException } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, TransactWriteCommand } from '@aws-sdk/lib-dynamodb'
 import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
+import { WarehouseEventName } from '../../model/WarehouseEventName'
 import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { AllocateOrderStockCommand } from '../model/AllocateOrderStockCommand'
 import { DbAllocateOrderStockClient } from './DbAllocateOrderStockClient'
-import { WarehouseEventName } from '../../model/WarehouseEventName'
 
 const mockWarehouseTableName = 'mockWarehouseTableName'
 
@@ -20,9 +20,11 @@ function buildMockAllocateOrderStockCommand(): TypeUtilsMutable<AllocateOrderSto
     incomingOrderCreatedEvent: {
       eventName: WarehouseEventName.ORDER_CREATED_EVENT,
       eventData: {
+        orderId: 'mockOrderId',
         sku: 'mockSku',
         units: 3,
-        orderId: 'mockOrderId',
+        price: 100.43,
+        userId: 'mockUserId',
       },
       createdAt: mockDate,
       updatedAt: mockDate,
@@ -33,8 +35,9 @@ function buildMockAllocateOrderStockCommand(): TypeUtilsMutable<AllocateOrderSto
 
 const mockAllocateOrderStockCommand = buildMockAllocateOrderStockCommand()
 
-const { sku, units, orderId, createdAt, updatedAt } = mockAllocateOrderStockCommand.allocateOrderStockData
-const status = 'ALLOCATED'
+const { allocateOrderStockData } = mockAllocateOrderStockCommand
+const { orderId, sku, units, price, userId, createdAt, updatedAt } = allocateOrderStockData
+const allocationStatus = 'ALLOCATED'
 
 const expectedTransactWriteCommand = new TransactWriteCommand({
   TransactItems: [
@@ -44,10 +47,12 @@ const expectedTransactWriteCommand = new TransactWriteCommand({
         Item: {
           pk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
           sk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
+          orderId,
           sku,
           units,
-          orderId,
-          status,
+          price,
+          userId,
+          allocationStatus,
           createdAt,
           updatedAt,
           _tn: 'WAREHOUSE#STOCK_ALLOCATION',

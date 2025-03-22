@@ -87,8 +87,9 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
     // is an external dependency and we don't know what happens internally, so we try-catch
     try {
       const tableName = process.env.WAREHOUSE_TABLE_NAME
-      const { sku, units, orderId, createdAt, updatedAt } = allocateOrderStockCommand.allocateOrderStockData
-      const status = 'ALLOCATED'
+      const { allocateOrderStockData } = allocateOrderStockCommand
+      const { orderId, sku, units, price, userId, createdAt, updatedAt } = allocateOrderStockData
+      const allocationStatus = 'ALLOCATED'
       const ddbTransactWriteCommand = new TransactWriteCommand({
         TransactItems: [
           {
@@ -97,10 +98,12 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
               Item: {
                 pk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
                 sk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
+                orderId,
                 sku,
                 units,
-                orderId,
-                status,
+                price,
+                userId,
+                allocationStatus,
                 createdAt,
                 updatedAt,
                 _tn: 'WAREHOUSE#STOCK_ALLOCATION',

@@ -5,7 +5,10 @@ import { ValueValidators } from '../../model/ValueValidators'
 import { WarehouseEvent } from '../../model/WarehouseEvent'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
 
-export type OrderStockDepletedEventData = Pick<AllocateOrderStockData, 'orderId' | 'sku' | 'units'>
+// TODO: Not all events provide the full Order data
+// https://github.com/mutchinick/dynamodb-eventbridge-driven-ecomm-nodejs-result/issues/2
+export type OrderStockDepletedEventData = Pick<AllocateOrderStockData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
+// export type OrderStockDepletedEventData = Pick<AllocateOrderStockData, 'orderId' | 'sku' | 'units'>
 
 export type OrderStockDepletedEventInput = OrderStockDepletedEventData
 
@@ -58,9 +61,9 @@ export class OrderStockDepletedEvent implements OrderStockDepletedEventProps {
       return inputValidationResult
     }
 
-    const { orderId, sku, units } = orderStockDepletedEventInput
+    const { orderId, sku, units, price, userId } = orderStockDepletedEventInput
     const date = new Date().toISOString()
-    const orderStockDepletedEventData: OrderStockDepletedEventData = { orderId, sku, units }
+    const orderStockDepletedEventData: OrderStockDepletedEventData = { orderId, sku, units, price, userId }
     const orderStockDepletedEventProps: OrderStockDepletedEventProps = {
       eventName: WarehouseEventName.ORDER_STOCK_DEPLETED_EVENT,
       eventData: orderStockDepletedEventData,
@@ -83,6 +86,8 @@ export class OrderStockDepletedEvent implements OrderStockDepletedEventProps {
       orderId: ValueValidators.validOrderId(),
       sku: ValueValidators.validSku(),
       units: ValueValidators.validUnits(),
+      price: ValueValidators.validPrice(),
+      userId: ValueValidators.validUserId(),
     })
 
     try {

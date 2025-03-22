@@ -1,7 +1,9 @@
 export type AllocateOrderStockData = {
+  orderId: string
   sku: string
   units: number
-  orderId: string
+  price: number
+  userId: string
   createdAt: string
   updatedAt: string
 }

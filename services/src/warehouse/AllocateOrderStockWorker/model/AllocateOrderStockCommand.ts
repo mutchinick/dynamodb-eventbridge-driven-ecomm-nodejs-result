@@ -8,6 +8,8 @@ export interface AllocateOrderStockCommandInput {
   incomingOrderCreatedEvent: IncomingOrderCreatedEvent
 }
 
+// TODO: Not all events provide the full Order data
+// https://github.com/mutchinick/dynamodb-eventbridge-driven-ecomm-nodejs-result/issues/2
 type AllocateOrderStockCommandData = AllocateOrderStockData
 
 type AllocateOrderStockCommandProps = {
@@ -57,13 +59,15 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
       return inputValidationResult
     }
     const { incomingOrderCreatedEvent } = allocateOrderStockCommandInput
-    const { sku, orderId, units } = incomingOrderCreatedEvent.eventData
+    const { orderId, sku, units, price, userId } = incomingOrderCreatedEvent.eventData
     const date = new Date().toISOString()
     const allocateOrderStockCommandProps: AllocateOrderStockCommandProps = {
       allocateOrderStockData: {
+        orderId,
         sku,
         units,
-        orderId,
+        price,
+        userId,
         createdAt: date,
         updatedAt: date,
       },
@@ -85,9 +89,11 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
       incomingOrderCreatedEvent: z.object({
         eventName: ValueValidators.validOrderCreatedEventName(),
         eventData: z.object({
+          orderId: ValueValidators.validOrderId(),
           sku: ValueValidators.validSku(),
           units: ValueValidators.validUnits(),
-          orderId: ValueValidators.validOrderId(),
+          price: ValueValidators.validPrice(),
+          userId: ValueValidators.validUserId(),
         }),
         createdAt: ValueValidators.validCreatedAt(),
         updatedAt: ValueValidators.validUpdatedAt(),
