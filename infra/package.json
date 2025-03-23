@@ -2,7 +2,7 @@
   "name": "dynamodb-eventbridge-driven-ecomm-nodejs-result-infra",
   "version": "0.1.0",
   "config": {
-    "prefix": "ddbEbEcommNjsRes"
+    "deployment_prefix": "ddbEbEcommNjsRes"
   },
   "bin": {
     "main": "bin/main.ts"
@@ -19,7 +19,7 @@
     "build:lint": "run-s format:check lint build",
     "bootstrap": "cross-env ts-node bin/cdk-runner.ts bootstrap",
     "synth": "cross-env ts-node bin/cdk-runner.ts synth",
-    "deploy": "cross-env ts-node bin/cdk-runner.ts deploy",
+    "deploy": "cross-env WRITE_ENV_FILES=true ts-node bin/cdk-runner.ts deploy",
     "destroy": "cross-env ts-node bin/cdk-runner.ts destroy"
   },
   "devDependencies": {

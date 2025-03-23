@@ -1,4 +1,6 @@
 import { Stack, StackProps } from 'aws-cdk-lib'
+import { Table } from 'aws-cdk-lib/aws-dynamodb'
+import { EventBus } from 'aws-cdk-lib/aws-events'
 import { Construct } from 'constructs'
 import { DynamoDbConstruct } from './common/DynamoDbConstruct'
 import { EventBusConstruct } from './common/EventBusConstruct'
@@ -8,12 +10,10 @@ import { SimulateRawEventApiConstruct } from './testing/SimulateRawEventApiConst
 import { AllocateOrderStockWorkerConstruct } from './warehouse/AllocateOrderStockWorkerConstruct'
 import { RestockSkuApiConstruct } from './warehouse/RestockSkuApiConstruct'
 import { RestockSkuWorkerConstruct } from './warehouse/RestockSkuWorkerConstruct'
-import { Table } from 'aws-cdk-lib/aws-dynamodb'
-import { EventBus } from 'aws-cdk-lib/aws-events'
 
 export interface IMainStackProps extends StackProps {
   config: {
-    prefix: string
+    deploymentPrefix: string
   }
 }
 

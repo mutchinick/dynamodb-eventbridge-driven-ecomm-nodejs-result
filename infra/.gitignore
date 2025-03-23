@@ -6,3 +6,6 @@ node_modules
 .cdk.staging
 cdk.out
 .build
+
+# CDK outputs file
+outputs.*.json
