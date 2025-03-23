@@ -35,6 +35,18 @@ export class DynamoDbConstruct extends Construct {
       stream: StreamViewType.NEW_IMAGE,
     })
 
+    dynamoDbTable.addGlobalSecondaryIndex({
+      indexName: 'gsi1pk-gsi1sk-index',
+      partitionKey: {
+        name: 'gsi1pk',
+        type: AttributeType.STRING,
+      },
+      sortKey: {
+        name: 'gsi1sk',
+        type: AttributeType.STRING,
+      },
+    })
+
     dynamoDbTable.applyRemovalPolicy(RemovalPolicy.DESTROY)
 
     return dynamoDbTable
