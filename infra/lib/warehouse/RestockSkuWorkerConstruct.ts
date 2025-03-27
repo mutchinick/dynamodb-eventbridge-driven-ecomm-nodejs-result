@@ -73,7 +73,6 @@ export class RestockSkuWorkerConstruct extends Construct {
       environment: {
         EVENT_STORE_TABLE_NAME: dynamoDbTable.tableName,
         WAREHOUSE_TABLE_NAME: dynamoDbTable.tableName,
-        RESTOCK_SKU_EVENT_QUEUE_URL: queue.queueUrl,
       },
       timeout: Duration.seconds(10),
     })

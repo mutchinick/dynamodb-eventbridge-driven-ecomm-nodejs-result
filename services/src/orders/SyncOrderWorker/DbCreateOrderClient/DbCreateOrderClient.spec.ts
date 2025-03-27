@@ -9,22 +9,31 @@ import { OrderStatus } from '../../model/OrderStatus'
 import { CreateOrderCommand } from '../model/CreateOrderCommand'
 import { DbCreateOrderClient } from './DbCreateOrderClient'
 
-const mockEventStoreTableName = 'mockEventStoreTableName'
+const mockOrdersTableName = 'mockOrdersTableName'
 
-process.env.ORDER_TABLE_NAME = mockEventStoreTableName
+process.env.ORDERS_TABLE_NAME = mockOrdersTableName
+
+jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
 const mockDate = new Date().toISOString()
+const mockIncomingEventName = OrderEventName.ORDER_PLACED_EVENT
+const mockOrderId = 'mockOrderId'
+const mockOrderStatus = OrderStatus.ORDER_CREATED_STATUS
+const mockSku = 'mockSku'
+const mockUnits = 2
+const mockPrice = 10.32
+const mockUserId = 'mockUserId'
 
 function buildMockCreateOrderCommand(): TypeUtilsMutable<CreateOrderCommand> {
   const mockClass = CreateOrderCommand.validateAndBuild({
     incomingOrderEvent: {
-      eventName: OrderEventName.ORDER_PLACED_EVENT,
+      eventName: mockIncomingEventName,
       eventData: {
-        orderId: 'mockOrderId',
-        sku: 'mockSku',
-        units: 2,
-        price: 3.98,
-        userId: 'mockUserId',
+        orderId: mockOrderId,
+        sku: mockSku,
+        units: mockUnits,
+        price: mockPrice,
+        userId: mockUserId,
         createdAt: mockDate,
         updatedAt: mockDate,
       },
@@ -37,49 +46,63 @@ function buildMockCreateOrderCommand(): TypeUtilsMutable<CreateOrderCommand> {
 
 const mockCreateOrderCommand = buildMockCreateOrderCommand()
 
-const expectedDdbDocClientInput = new UpdateCommand({
-  TableName: mockEventStoreTableName,
-  Key: {
-    pk: `ORDER_ID#${mockCreateOrderCommand.orderData.orderId}`,
-    sk: `ORDER_ID#${mockCreateOrderCommand.orderData.orderId}`,
-  },
-  UpdateExpression:
-    'SET ' +
-    '#_tn = :_tn, ' +
-    '#orderId = :orderId, ' +
-    '#orderStatus = :orderStatus, ' +
-    '#sku = :sku, ' +
-    '#units = :units, ' +
-    '#price = :price, ' +
-    '#userId = :userId, ' +
-    '#createdAt = :createdAt, ' +
-    '#updatedAt = :updatedAt',
-  ExpressionAttributeNames: {
-    '#_tn': '_tn',
-    '#orderId': 'orderId',
-    '#orderStatus': 'orderStatus',
-    '#sku': 'sku',
-    '#units': 'units',
-    '#price': 'price',
-    '#userId': 'userId',
-    '#createdAt': 'createdAt',
-    '#updatedAt': 'updatedAt',
-  },
-  ExpressionAttributeValues: {
-    ':_tn': 'ORDERS#ORDER',
-    ':orderId': mockCreateOrderCommand.orderData.orderId,
-    ':orderStatus': mockCreateOrderCommand.orderData.orderStatus,
-    ':sku': mockCreateOrderCommand.orderData.sku,
-    ':units': mockCreateOrderCommand.orderData.units,
-    ':price': mockCreateOrderCommand.orderData.price,
-    ':userId': mockCreateOrderCommand.orderData.userId,
-    ':createdAt': mockCreateOrderCommand.orderData.createdAt,
-    ':updatedAt': mockCreateOrderCommand.orderData.updatedAt,
-  },
-  ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
-  ReturnValuesOnConditionCheckFailure: 'ALL_OLD',
-  ReturnValues: 'ALL_NEW',
-})
+function buildMockDdbCommand(): UpdateCommand {
+  const ddbCommand = new UpdateCommand({
+    TableName: mockOrdersTableName,
+    Key: {
+      pk: `ORDERS#ORDER_ID#${mockOrderId}`,
+      sk: `ORDER_ID#${mockOrderId}`,
+    },
+    UpdateExpression:
+      'SET ' +
+      '#orderId = :orderId, ' +
+      '#orderStatus = :orderStatus, ' +
+      '#sku = :sku, ' +
+      '#units = :units, ' +
+      '#price = :price, ' +
+      '#userId = :userId, ' +
+      '#createdAt = :createdAt, ' +
+      '#updatedAt = :updatedAt, ' +
+      '#_tn = :_tn, ' +
+      '#_sn = :_sn, ' +
+      '#gsi1pk = :gsi1pk, ' +
+      '#gsi1sk = :gsi1sk',
+    ExpressionAttributeNames: {
+      '#orderId': 'orderId',
+      '#orderStatus': 'orderStatus',
+      '#sku': 'sku',
+      '#units': 'units',
+      '#price': 'price',
+      '#userId': 'userId',
+      '#createdAt': 'createdAt',
+      '#updatedAt': 'updatedAt',
+      '#_tn': '_tn',
+      '#_sn': '_sn',
+      '#gsi1pk': 'gsi1pk',
+      '#gsi1sk': 'gsi1sk',
+    },
+    ExpressionAttributeValues: {
+      ':orderId': mockOrderId,
+      ':orderStatus': mockOrderStatus,
+      ':sku': mockSku,
+      ':units': mockUnits,
+      ':price': mockPrice,
+      ':userId': mockUserId,
+      ':createdAt': mockDate,
+      ':updatedAt': mockDate,
+      ':_tn': `ORDERS#ORDER`,
+      ':_sn': `ORDERS`,
+      ':gsi1pk': `ORDERS#ORDER`,
+      ':gsi1sk': `CREATED_AT#${mockDate}`,
+    },
+    ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
+    ReturnValuesOnConditionCheckFailure: 'ALL_OLD',
+    ReturnValues: 'ALL_NEW',
+  })
+  return ddbCommand
+}
+
+const expectedDdbCommand = buildMockDdbCommand()
 
 //
 // Mock clients
@@ -212,9 +235,7 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
     await dbCreateOrderClient.createOrder(mockCreateOrderCommand)
-    expect(mockDdbDocClient.send).toHaveBeenCalledWith(
-      expect.objectContaining({ input: expectedDdbDocClientInput.input }),
-    )
+    expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
   it(`returns a transient Failure of kind UnrecognizedError if

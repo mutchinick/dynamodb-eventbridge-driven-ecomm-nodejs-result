@@ -1,5 +1,6 @@
 @placeOrderBaseUrl = {{$dotenv PLACE_ORDER_BASE_URL}}
 
+### ORDER_PLACED_EVENT
 ### POST ###
 POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
@@ -13,6 +14,7 @@ Content-Type: application/json
   "userId": "123456"
 }
 
+### ORDER_PLACED_EVENT
 ### POST ###
 POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
@@ -26,6 +28,7 @@ Content-Type: application/json
   "userId": "123456"
 }
 
+### ORDER_PLACED_EVENT
 ### POST ###
 POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
@@ -39,6 +42,7 @@ Content-Type: application/json
   "userId": "123456"
 }
 
+### ORDER_PLACED_EVENT
 ### POST ###
 POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
@@ -52,6 +56,7 @@ Content-Type: application/json
   "userId": "123456"
 }
 
+### ORDER_PLACED_EVENT
 ### POST ###
 POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
@@ -65,7 +70,8 @@ Content-Type: application/json
   "userId": "123456"
 }
 
+### CORS QUERY
 ### OPTIONS ###
-OPTIONS  {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
+OPTIONS {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
 Access-Control-Request-Method: POST

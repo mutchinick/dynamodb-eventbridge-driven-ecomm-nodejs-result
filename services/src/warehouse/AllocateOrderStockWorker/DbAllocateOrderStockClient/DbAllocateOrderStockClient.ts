@@ -42,14 +42,14 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
       return inputValidationResult
     }
 
-    const buildCommandResult = this.buildDdbUpdateCommand(allocateOrderStockCommand)
+    const buildCommandResult = this.buildDdbCommand(allocateOrderStockCommand)
     if (Result.isFailure(buildCommandResult)) {
       console.error(`${logContext} exit failure:`, { buildCommandResult, allocateOrderStockCommand })
       return buildCommandResult
     }
 
     const ddbCommand = buildCommandResult.value
-    const sendCommandResult = await this.sendDdbUpdateCommand(ddbCommand)
+    const sendCommandResult = await this.sendDdbCommand(ddbCommand)
     Result.isFailure(sendCommandResult)
       ? console.error(`${logContext} exit failure:`, { sendCommandResult, allocateOrderStockCommand })
       : console.info(`${logContext} exit success:`, { sendCommandResult, allocateOrderStockCommand })
@@ -78,35 +78,50 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
   //
   //
   //
-  private buildDdbUpdateCommand(
+  private buildDdbCommand(
     allocateOrderStockCommand: AllocateOrderStockCommand,
   ): Success<TransactWriteCommand> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'DbAllocateOrderStockClient.buildDdbUpdateCommand'
+    const logContext = 'DbAllocateOrderStockClient.buildDdbCommand'
 
     // Perhaps we can prevent all errors by validating the arguments, but TransactWriteCommand
     // is an external dependency and we don't know what happens internally, so we try-catch
     try {
       const tableName = process.env.WAREHOUSE_TABLE_NAME
+
       const { allocateOrderStockData } = allocateOrderStockCommand
       const { orderId, sku, units, price, userId, createdAt, updatedAt } = allocateOrderStockData
-      const allocationStatus = 'ALLOCATED'
-      const ddbTransactWriteCommand = new TransactWriteCommand({
+
+      const allocationPk = `WAREHOUSE#SKU#${sku}`
+      const allocationSk = `SKU#${sku}#ORDER_ID#${orderId}#ALLOCATION`
+      const allocationTn = `WAREHOUSE#ALLOCATION`
+      const allocationSn = `WAREHOUSE`
+      const allocationGsi1Pk = `WAREHOUSE#ALLOCATION`
+      const allocationGsi1Sk = `CREATED_AT#${createdAt}`
+      const allocationStatus = `ALLOCATED`
+
+      const skuItemPk = `WAREHOUSE#SKU#${sku}`
+      const skuItemSk = `SKU#${sku}`
+
+      const ddbCommand = new TransactWriteCommand({
         TransactItems: [
           {
             Put: {
               TableName: tableName,
               Item: {
-                pk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
-                sk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
-                orderId,
+                pk: allocationPk,
+                sk: allocationSk,
                 sku,
+                orderId,
                 units,
                 price,
                 userId,
                 allocationStatus,
                 createdAt,
                 updatedAt,
-                _tn: 'WAREHOUSE#STOCK_ALLOCATION',
+                _tn: allocationTn,
+                _sn: allocationSn,
+                gsi1pk: allocationGsi1Pk,
+                gsi1sk: allocationGsi1Sk,
               },
               ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
             },
@@ -115,36 +130,24 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
             Update: {
               TableName: tableName,
               Key: {
-                pk: `SKU#${sku}`,
-                sk: `SKU#${sku}`,
+                pk: skuItemPk,
+                sk: skuItemSk,
               },
-              UpdateExpression:
-                `SET ` +
-                `#sku = :sku, ` +
-                `#units = #units - :units, ` +
-                `#createdAt = if_not_exists(#createdAt, :createdAt), ` +
-                `#updatedAt = :updatedAt, ` +
-                `#_tn = :_tn`,
+              UpdateExpression: `SET #units = #units - :units, #updatedAt = :updatedAt`,
               ExpressionAttributeNames: {
-                '#sku': 'sku',
                 '#units': 'units',
-                '#createdAt': 'createdAt',
                 '#updatedAt': 'updatedAt',
-                '#_tn': '_tn',
               },
               ExpressionAttributeValues: {
-                ':sku': sku,
                 ':units': units,
-                ':createdAt': createdAt,
                 ':updatedAt': updatedAt,
-                ':_tn': 'WAREHOUSE#SKU',
               },
               ConditionExpression: 'attribute_exists(pk) AND attribute_exists(sk) and #units >= :units',
             },
           },
         ],
       })
-      return Result.makeSuccess(ddbTransactWriteCommand)
+      return Result.makeSuccess(ddbCommand)
     } catch (error) {
       console.error(`${logContext} error caught:`, { error, allocateOrderStockCommand })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
@@ -156,7 +159,7 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
   //
   //
   //
-  private async sendDdbUpdateCommand(
+  private async sendDdbCommand(
     ddbCommand: TransactWriteCommand,
   ): Promise<
     | Success<void>
@@ -164,7 +167,7 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
     | Failure<'DepletedStockAllocationError'>
     | Failure<'UnrecognizedError'>
   > {
-    const logContext = 'DbAllocateOrderStockClient.sendDdbUpdateCommand'
+    const logContext = 'DbAllocateOrderStockClient.sendDdbCommand'
     console.info(`${logContext} init:`, { ddbCommand })
 
     try {

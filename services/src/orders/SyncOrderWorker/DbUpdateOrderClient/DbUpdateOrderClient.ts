@@ -70,11 +70,18 @@ export class DbUpdateOrderClient implements IDbUpdateOrderClient {
     const logContext = 'DbUpdateOrderClient.buildDdbCommand'
 
     try {
+      const tableName = process.env.ORDERS_TABLE_NAME
+
+      const { orderId, orderStatus, updatedAt } = updateOrderCommand.orderData
+
+      const orderItemPk = `ORDERS#ORDER_ID#${orderId}`
+      const orderItemSk = `ORDER_ID#${orderId}`
+
       const ddbCommand = new UpdateCommand({
-        TableName: process.env.ORDER_TABLE_NAME,
+        TableName: tableName,
         Key: {
-          pk: `ORDER_ID#${updateOrderCommand.orderData.orderId}`,
-          sk: `ORDER_ID#${updateOrderCommand.orderData.orderId}`,
+          pk: orderItemPk,
+          sk: orderItemSk,
         },
         UpdateExpression: 'SET #orderStatus = :orderStatus, #updatedAt = :updatedAt',
         ExpressionAttributeNames: {
@@ -82,8 +89,8 @@ export class DbUpdateOrderClient implements IDbUpdateOrderClient {
           '#updatedAt': 'updatedAt',
         },
         ExpressionAttributeValues: {
-          ':orderStatus': updateOrderCommand.orderData.orderStatus,
-          ':updatedAt': updateOrderCommand.orderData.updatedAt,
+          ':orderStatus': orderStatus,
+          ':updatedAt': updatedAt,
         },
         ConditionExpression: '#orderStatus <> :orderStatus',
         ReturnValuesOnConditionCheckFailure: 'ALL_OLD',

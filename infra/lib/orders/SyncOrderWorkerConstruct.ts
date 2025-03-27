@@ -72,8 +72,7 @@ export class SyncOrderWorkerConstruct extends Construct {
       entry: join(__dirname, './syncOrderWorkerEntry.ts'),
       environment: {
         EVENT_STORE_TABLE_NAME: dynamoDbTable.tableName,
-        ORDER_TABLE_NAME: dynamoDbTable.tableName,
-        ORDER_PLACED_EVENT_QUEUE_URL: queue.queueUrl,
+        ORDERS_TABLE_NAME: dynamoDbTable.tableName,
       },
       timeout: Duration.seconds(10),
     })

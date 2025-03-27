@@ -68,11 +68,16 @@ export class DbGetOrderClient implements IDbGetOrderClient {
     const logContext = 'DbGetOrderClient.buildDdbCommand'
 
     try {
+      const tableName = process.env.ORDERS_TABLE_NAME
+
+      const orderItemPk = `ORDERS#ORDER_ID#${getOrderCommand.orderData.orderId}`
+      const orderItemSk = `ORDER_ID#${getOrderCommand.orderData.orderId}`
+
       const ddbCommand = new GetCommand({
-        TableName: process.env.EVENT_STORE_TABLE_NAME,
+        TableName: tableName,
         Key: {
-          pk: `ORDER_ID#${getOrderCommand.orderData.orderId}`,
-          sk: `ORDER_ID#${getOrderCommand.orderData.orderId}`,
+          pk: orderItemPk,
+          sk: orderItemSk,
         },
       })
       return Result.makeSuccess(ddbCommand)

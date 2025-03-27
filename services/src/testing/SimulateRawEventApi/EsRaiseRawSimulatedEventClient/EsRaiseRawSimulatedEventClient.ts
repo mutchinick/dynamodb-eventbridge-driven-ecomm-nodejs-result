@@ -74,6 +74,46 @@ export class EsRaiseRawSimulatedEventClient implements IEsRaiseRawSimulatedEvent
   //
   //
   //
+  private buildDdbCommand(
+    rawSimulatedEvent: RawSimulatedEvent,
+  ): Success<PutCommand> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'EsRaiseRawSimulatedEventClient.buildDdbCommand'
+
+    try {
+      const tableName = process.env.EVENT_STORE_TABLE_NAME
+
+      const eventPk = rawSimulatedEvent.pk
+      const eventSk = rawSimulatedEvent.sk
+      const eventTn = `EVENTS#EVENT`
+      const eventSn = `EVENTS`
+      const eventGsi1pk = `EVENTS#EVENT`
+      const eventGsi1sk = `CREATED_AT#${rawSimulatedEvent.createdAt}`
+
+      const ddbCommand = new PutCommand({
+        TableName: tableName,
+        Item: {
+          pk: eventPk,
+          sk: eventSk,
+          ...rawSimulatedEvent,
+          _tn: eventTn,
+          _sn: eventSn,
+          gsi1pk: eventGsi1pk,
+          gsi1sk: eventGsi1sk,
+        },
+        ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
+      })
+      return Result.makeSuccess(ddbCommand)
+    } catch (error) {
+      console.error(`${logContext} error caught:`, { error, rawSimulatedEvent })
+      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
+      console.error(`${logContext} exit error:`, { invalidArgsFailure, rawSimulatedEvent })
+      return invalidArgsFailure
+    }
+  }
+
+  //
+  //
+  //
   private async sendDdbCommand(
     ddbCommand: PutCommand,
   ): Promise<Success<void> | Failure<'DuplicateEventRaisedError'> | Failure<'UnrecognizedError'>> {
@@ -101,38 +141,6 @@ export class EsRaiseRawSimulatedEventClient implements IEsRaiseRawSimulatedEvent
       const unrecognizedFailure = Result.makeFailure('UnrecognizedError', error, true)
       console.error(`${logContext} exit error:`, { unrecognizedFailure, ddbCommand })
       return unrecognizedFailure
-    }
-  }
-
-  //
-  //
-  //
-  private buildDdbCommand(
-    rawSimulatedEvent: RawSimulatedEvent,
-  ): Success<PutCommand> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'EsRaiseRawSimulatedEventClient.buildDdbCommand'
-
-    try {
-      const { pk, sk, eventName, eventData, createdAt, updatedAt, _tn } = rawSimulatedEvent
-      const ddbCommand = new PutCommand({
-        TableName: process.env.EVENT_STORE_TABLE_NAME,
-        Item: {
-          pk,
-          sk,
-          eventName,
-          eventData,
-          createdAt,
-          updatedAt,
-          _tn,
-        },
-        ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
-      })
-      return Result.makeSuccess(ddbCommand)
-    } catch (error) {
-      console.error(`${logContext} error caught:`, { error, rawSimulatedEvent })
-      const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
-      console.error(`${logContext} exit error:`, { invalidArgsFailure, rawSimulatedEvent })
-      return invalidArgsFailure
     }
   }
 }

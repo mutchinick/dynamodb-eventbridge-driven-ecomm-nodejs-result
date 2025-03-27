@@ -2,36 +2,58 @@ import { ConditionalCheckFailedException } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
 import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
+import { WarehouseEventName } from '../../model/WarehouseEventName'
 import { SkuRestockedEvent } from '../model/SkuRestockedEvent'
 import { EsRaiseSkuRestockedEventClient } from './EsRaiseSkuRestockedEventClient'
-
-jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
 const mockEventStoreTableName = 'mockEventStoreTableName'
 
 process.env.EVENT_STORE_TABLE_NAME = mockEventStoreTableName
 
+jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
+
+const mockDate = new Date().toISOString()
+const mockEventName = WarehouseEventName.SKU_RESTOCKED_EVENT
+const mockSku = 'mockSku'
+const mockUnits = 8
+const mockLotId = 'mockLotId'
+
 function buildMockSkuRestockedEvent(): TypeUtilsMutable<SkuRestockedEvent> {
   const mockClass = SkuRestockedEvent.validateAndBuild({
-    sku: 'mockSku',
-    units: 2,
-    lotId: 'mockLotId',
+    sku: mockSku,
+    units: mockUnits,
+    lotId: mockLotId,
   })
   return Result.getSuccessValueOrThrow(mockClass)
 }
 
 const mockSkuRestockedEvent = buildMockSkuRestockedEvent()
 
-const expectedDdbDocClientInput = new PutCommand({
-  TableName: mockEventStoreTableName,
-  Item: {
-    pk: `SKU#${mockSkuRestockedEvent.eventData.sku}`,
-    sk: `EVENT#${mockSkuRestockedEvent.eventName}#LOT_ID#${mockSkuRestockedEvent.eventData.lotId}`,
-    _tn: '#EVENT',
-    ...mockSkuRestockedEvent,
-  },
-  ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
-})
+function buildMockDdbCommand(): PutCommand {
+  const ddbCommand = new PutCommand({
+    TableName: mockEventStoreTableName,
+    Item: {
+      pk: `EVENTS#SKU#${mockSku}`,
+      sk: `EVENT#${mockEventName}#LOT_ID#${mockLotId}`,
+      _tn: `EVENTS#EVENT`,
+      _sn: `EVENTS`,
+      eventName: WarehouseEventName.SKU_RESTOCKED_EVENT,
+      eventData: {
+        sku: mockSku,
+        units: mockUnits,
+        lotId: mockLotId,
+      },
+      createdAt: mockDate,
+      updatedAt: mockDate,
+      gsi1pk: `EVENTS#EVENT`,
+      gsi1sk: `CREATED_AT#${mockDate}`,
+    },
+    ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
+  })
+  return ddbCommand
+}
+
+const expectedDdbCommand = buildMockDdbCommand()
 
 //
 // Mock clients
@@ -120,9 +142,7 @@ describe(`Warehouse Service RestockSkuApi EsRaiseSkuRestockedEventClient tests`,
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseSkuRestockedEventClient = new EsRaiseSkuRestockedEventClient(mockDdbDocClient)
     await esRaiseSkuRestockedEventClient.raiseSkuRestockedEvent(mockSkuRestockedEvent)
-    expect(mockDdbDocClient.send).toHaveBeenCalledWith(
-      expect.objectContaining({ input: expectedDdbDocClientInput.input }),
-    )
+    expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
   it(`returns a transient Failure of kind UnrecognizedError if

@@ -4,36 +4,62 @@ import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
 import { OrderPlacedEvent } from '../model/OrderPlacedEvent'
 import { EsRaiseOrderPlacedEventClient } from './EsRaiseOrderPlacedEventClient'
-
-jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
+import { OrderEventName } from '../../model/OrderEventName'
 
 const mockEventStoreTableName = 'mockEventStoreTableName'
 
 process.env.EVENT_STORE_TABLE_NAME = mockEventStoreTableName
 
+jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
+
+const mockDate = new Date().toISOString()
+const mockEventName = OrderEventName.ORDER_PLACED_EVENT
+const mockOrderId = 'mockOrderId'
+const mockSku = 'mockSku'
+const mockUnits = 2
+const mockPrice = 10.32
+const mockUserId = 'mockUserId'
+
 function buildMockOrderPlacedEvent(): TypeUtilsMutable<OrderPlacedEvent> {
   const mockClass = OrderPlacedEvent.validateAndBuild({
-    orderId: 'mockOrderId',
-    sku: 'mockSku',
-    units: 2,
-    price: 3.98,
-    userId: 'mockUserId',
+    orderId: mockOrderId,
+    sku: mockSku,
+    units: mockUnits,
+    price: mockPrice,
+    userId: mockUserId,
   })
   return Result.getSuccessValueOrThrow(mockClass)
 }
 
 const mockOrderPlacedEvent = buildMockOrderPlacedEvent()
 
-const expectedDdbDocClientInput = new PutCommand({
-  TableName: mockEventStoreTableName,
-  Item: {
-    pk: `ORDER_ID#${mockOrderPlacedEvent.eventData.orderId}`,
-    sk: `EVENT#${mockOrderPlacedEvent.eventName}`,
-    _tn: '#EVENT',
-    ...mockOrderPlacedEvent,
-  },
-  ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
-})
+function buildMockDdbCommand(): PutCommand {
+  const ddbCommand = new PutCommand({
+    TableName: mockEventStoreTableName,
+    Item: {
+      pk: `EVENTS#ORDER_ID#${mockOrderId}`,
+      sk: `EVENT#${mockEventName}`,
+      eventName: mockEventName,
+      eventData: {
+        orderId: mockOrderId,
+        sku: mockSku,
+        units: mockUnits,
+        price: mockPrice,
+        userId: mockUserId,
+      },
+      createdAt: mockDate,
+      updatedAt: mockDate,
+      _tn: `EVENTS#EVENT`,
+      _sn: `EVENTS`,
+      gsi1pk: `EVENTS#EVENT`,
+      gsi1sk: `CREATED_AT#${mockDate}`,
+    },
+    ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
+  })
+  return ddbCommand
+}
+
+const expectedDdbCommand = buildMockDdbCommand()
 
 //
 //  Mock clients
@@ -122,9 +148,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderPlacedEventClient tests`, () 
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
     await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockOrderPlacedEvent)
-    expect(mockDdbDocClient.send).toHaveBeenCalledWith(
-      expect.objectContaining({ input: expectedDdbDocClientInput.input }),
-    )
+    expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
   it(`returns a transient Failure of kind UnrecognizedError if 

@@ -7,24 +7,30 @@ import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { AllocateOrderStockCommand } from '../model/AllocateOrderStockCommand'
 import { DbAllocateOrderStockClient } from './DbAllocateOrderStockClient'
 
-const mockWarehouseTableName = 'mockWarehouseTableName'
+const mockWarehouseName = 'mockDynamoDbTableName'
 
-process.env.WAREHOUSE_TABLE_NAME = mockWarehouseTableName
+process.env.WAREHOUSE_TABLE_NAME = mockWarehouseName
 
 jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
 const mockDate = new Date().toISOString()
+const mockEventName = WarehouseEventName.ORDER_CREATED_EVENT
+const mockOrderId = 'mockOrderId'
+const mockSku = 'mockSku'
+const mockUnits = 2
+const mockPrice = 10.32
+const mockUserId = 'mockUserId'
 
 function buildMockAllocateOrderStockCommand(): TypeUtilsMutable<AllocateOrderStockCommand> {
   const mockClass = AllocateOrderStockCommand.validateAndBuild({
     incomingOrderCreatedEvent: {
-      eventName: WarehouseEventName.ORDER_CREATED_EVENT,
+      eventName: mockEventName,
       eventData: {
-        orderId: 'mockOrderId',
-        sku: 'mockSku',
-        units: 3,
-        price: 100.43,
-        userId: 'mockUserId',
+        orderId: mockOrderId,
+        sku: mockSku,
+        units: mockUnits,
+        price: mockPrice,
+        userId: mockUserId,
       },
       createdAt: mockDate,
       updatedAt: mockDate,
@@ -35,64 +41,56 @@ function buildMockAllocateOrderStockCommand(): TypeUtilsMutable<AllocateOrderSto
 
 const mockAllocateOrderStockCommand = buildMockAllocateOrderStockCommand()
 
-const { allocateOrderStockData } = mockAllocateOrderStockCommand
-const { orderId, sku, units, price, userId, createdAt, updatedAt } = allocateOrderStockData
-const allocationStatus = 'ALLOCATED'
+function buildMockDdbCommand(): TransactWriteCommand {
+  const ddbCommand = new TransactWriteCommand({
+    TransactItems: [
+      {
+        Put: {
+          TableName: mockWarehouseName,
+          Item: {
+            pk: `WAREHOUSE#SKU#${mockSku}`,
+            sk: `SKU#${mockSku}#ORDER_ID#${mockOrderId}#ALLOCATION`,
+            sku: mockSku,
+            orderId: mockOrderId,
+            units: mockUnits,
+            price: mockPrice,
+            userId: mockUserId,
+            allocationStatus: `ALLOCATED`,
+            createdAt: mockDate,
+            updatedAt: mockDate,
+            _tn: `WAREHOUSE#ALLOCATION`,
+            _sn: `WAREHOUSE`,
+            gsi1pk: `WAREHOUSE#ALLOCATION`,
+            gsi1sk: `CREATED_AT#${mockDate}`,
+          },
+          ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
+        },
+      },
+      {
+        Update: {
+          TableName: mockWarehouseName,
+          Key: {
+            pk: `WAREHOUSE#SKU#${mockSku}`,
+            sk: `SKU#${mockSku}`,
+          },
+          UpdateExpression: 'SET #units = #units - :units, #updatedAt = :updatedAt',
+          ExpressionAttributeNames: {
+            '#units': 'units',
+            '#updatedAt': 'updatedAt',
+          },
+          ExpressionAttributeValues: {
+            ':units': mockUnits,
+            ':updatedAt': mockDate,
+          },
+          ConditionExpression: 'attribute_exists(pk) AND attribute_exists(sk) and #units >= :units',
+        },
+      },
+    ],
+  })
+  return ddbCommand
+}
 
-const expectedTransactWriteCommand = new TransactWriteCommand({
-  TransactItems: [
-    {
-      Put: {
-        TableName: mockWarehouseTableName,
-        Item: {
-          pk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
-          sk: `SKU_ID#${sku}#ORDER_ID#${orderId}#STOCK_ALLOCATION`,
-          orderId,
-          sku,
-          units,
-          price,
-          userId,
-          allocationStatus,
-          createdAt,
-          updatedAt,
-          _tn: 'WAREHOUSE#STOCK_ALLOCATION',
-        },
-        ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
-      },
-    },
-    {
-      Update: {
-        TableName: mockWarehouseTableName,
-        Key: {
-          pk: `SKU#${sku}`,
-          sk: `SKU#${sku}`,
-        },
-        UpdateExpression:
-          `SET ` +
-          `#sku = :sku, ` +
-          `#units = #units - :units, ` +
-          `#createdAt = if_not_exists(#createdAt, :createdAt), ` +
-          `#updatedAt = :updatedAt, ` +
-          `#_tn = :_tn`,
-        ExpressionAttributeNames: {
-          '#sku': 'sku',
-          '#units': 'units',
-          '#createdAt': 'createdAt',
-          '#updatedAt': 'updatedAt',
-          '#_tn': '_tn',
-        },
-        ExpressionAttributeValues: {
-          ':sku': sku,
-          ':units': units,
-          ':createdAt': createdAt,
-          ':updatedAt': updatedAt,
-          ':_tn': 'WAREHOUSE#SKU',
-        },
-        ConditionExpression: 'attribute_exists(pk) AND attribute_exists(sk) and #units >= :units',
-      },
-    },
-  ],
-})
+const expectedDdbCommand = buildMockDdbCommand()
 
 //
 // Mock clients
@@ -214,9 +212,7 @@ describe(`Warehouse Service AllocateOrderStockWorker DbAllocateOrderStockClient 
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
     await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
-    expect(mockDdbDocClient.send).toHaveBeenCalledWith(
-      expect.objectContaining({ input: expectedTransactWriteCommand.input }),
-    )
+    expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
   //

@@ -7,22 +7,25 @@ import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { RestockSkuCommand } from '../model/RestockSkuCommand'
 import { DbRestockSkuClient } from './DbRestockSkuClient'
 
-const mockWarehouseTableName = 'mockWarehouseTableName'
+const mockWarehouseName = 'mockWarehouseTableName'
 
-process.env.WAREHOUSE_TABLE_NAME = mockWarehouseTableName
+process.env.WAREHOUSE_TABLE_NAME = mockWarehouseName
 
 jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
 const mockDate = new Date().toISOString()
+const mockSku = 'mockSku'
+const mockUnits = 3
+const mockLotId = 'mockLotId'
 
 function buildMockRestockSkuCommand(): TypeUtilsMutable<RestockSkuCommand> {
   const mockClass = RestockSkuCommand.validateAndBuild({
     incomingSkuRestockedEvent: {
       eventName: WarehouseEventName.SKU_RESTOCKED_EVENT,
       eventData: {
-        sku: 'mockSku',
-        units: 3,
-        lotId: 'mockLotId',
+        sku: mockSku,
+        units: mockUnits,
+        lotId: mockLotId,
       },
       createdAt: mockDate,
       updatedAt: mockDate,
@@ -33,57 +36,74 @@ function buildMockRestockSkuCommand(): TypeUtilsMutable<RestockSkuCommand> {
 
 const mockRestockSkuCommand = buildMockRestockSkuCommand()
 
-const expectedTransactWriteCommand = new TransactWriteCommand({
-  TransactItems: [
-    {
-      Put: {
-        TableName: mockWarehouseTableName,
-        Item: {
-          pk: `LOT_ID#${mockRestockSkuCommand.restockSkuData.lotId}`,
-          sk: `LOT_ID#${mockRestockSkuCommand.restockSkuData.lotId}`,
-          sku: mockRestockSkuCommand.restockSkuData.sku,
-          units: mockRestockSkuCommand.restockSkuData.units,
-          lotId: mockRestockSkuCommand.restockSkuData.lotId,
-          createdAt: mockRestockSkuCommand.restockSkuData.createdAt,
-          updatedAt: mockRestockSkuCommand.restockSkuData.updatedAt,
-          _tn: 'WAREHOUSE#LOT',
-        },
-        ConditionExpression: 'attribute_not_exists(pk)',
-      },
-    },
-    {
-      Update: {
-        TableName: mockWarehouseTableName,
-        Key: {
-          pk: `SKU#${mockRestockSkuCommand.restockSkuData.sku}`,
-          sk: `SKU#${mockRestockSkuCommand.restockSkuData.sku}`,
-        },
-        UpdateExpression:
-          `SET ` +
-          `#sku = :sku, ` +
-          `#units = if_not_exists(#units, :zero) + :units, ` +
-          `#createdAt = if_not_exists(#createdAt, :createdAt), ` +
-          `#updatedAt = :updatedAt, ` +
-          `#_tn = :_tn`,
-        ExpressionAttributeNames: {
-          '#sku': 'sku',
-          '#units': 'units',
-          '#createdAt': 'createdAt',
-          '#updatedAt': 'updatedAt',
-          '#_tn': '_tn',
-        },
-        ExpressionAttributeValues: {
-          ':sku': mockRestockSkuCommand.restockSkuData.sku,
-          ':units': mockRestockSkuCommand.restockSkuData.units,
-          ':createdAt': mockRestockSkuCommand.restockSkuData.createdAt,
-          ':updatedAt': mockRestockSkuCommand.restockSkuData.updatedAt,
-          ':zero': 0,
-          ':_tn': 'WAREHOUSE#SKU',
+function buildMockDdbCommand(): TransactWriteCommand {
+  const ddbCommand = new TransactWriteCommand({
+    TransactItems: [
+      {
+        Put: {
+          TableName: mockWarehouseName,
+          Item: {
+            pk: `WAREHOUSE#SKU#${mockSku}`,
+            sk: `LOT_ID#${mockLotId}`,
+            sku: mockSku,
+            units: mockUnits,
+            lotId: mockLotId,
+            createdAt: mockDate,
+            updatedAt: mockDate,
+            _tn: 'WAREHOUSE#RESTOCK',
+            _sn: `WAREHOUSE`,
+            gsi1pk: 'WAREHOUSE#RESTOCK',
+            gsi1sk: `CREATED_AT#${mockDate}`,
+          },
+          ConditionExpression: 'attribute_not_exists(pk)',
         },
       },
-    },
-  ],
-})
+      {
+        Update: {
+          TableName: mockWarehouseName,
+          Key: {
+            pk: `WAREHOUSE#SKU#${mockSku}`,
+            sk: `SKU#${mockSku}`,
+          },
+          UpdateExpression:
+            `SET ` +
+            `#sku = :sku, ` +
+            `#units = if_not_exists(#units, :zero) + :units, ` +
+            `#createdAt = if_not_exists(#createdAt, :createdAt), ` +
+            `#updatedAt = :updatedAt, ` +
+            `#_tn = :_tn, ` +
+            `#_sn = :_sn, ` +
+            `#gsi1pk = :gsi1pk, ` +
+            `#gsi1sk = :gsi1sk`,
+          ExpressionAttributeNames: {
+            '#sku': 'sku',
+            '#units': 'units',
+            '#createdAt': 'createdAt',
+            '#updatedAt': 'updatedAt',
+            '#_tn': '_tn',
+            '#_sn': '_sn',
+            '#gsi1pk': 'gsi1pk',
+            '#gsi1sk': 'gsi1sk',
+          },
+          ExpressionAttributeValues: {
+            ':sku': mockSku,
+            ':units': mockUnits,
+            ':createdAt': mockDate,
+            ':updatedAt': mockDate,
+            ':zero': 0,
+            ':_tn': 'WAREHOUSE#SKU',
+            ':_sn': 'WAREHOUSE',
+            ':gsi1pk': 'WAREHOUSE#SKU',
+            ':gsi1sk': `CREATED_AT#${mockDate}`,
+          },
+        },
+      },
+    ],
+  })
+  return ddbCommand
+}
+
+const expectedDdbCommand = buildMockDdbCommand()
 
 //
 // Mock clients
@@ -178,9 +198,7 @@ describe(`Warehouse Service RestockSkuWorker DbRestockSkuClient tests`, () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
     await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
-    expect(mockDdbDocClient.send).toHaveBeenCalledWith(
-      expect.objectContaining({ input: expectedTransactWriteCommand.input }),
-    )
+    expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
   it(`returns a transient Failure of kind UnrecognizedError

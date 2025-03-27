@@ -279,7 +279,6 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
       eventData: {},
       createdAt: mockDate,
       updatedAt: mockDate,
-      _tn: '#EVENT',
     }
     const expectedResult = Result.makeSuccess(expectedEvent)
     expect(Result.isSuccess(result)).toBe(true)

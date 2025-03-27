@@ -80,13 +80,37 @@ export class EsRaiseOrderPlacedEventClient implements IEsRaiseOrderPlacedEventCl
     // Perhaps we can prevent all errors by validating the arguments, but PutCommand
     // is an external dependency and we don't know what happens internally, so we try-catch
     try {
+      const tableName = process.env.EVENT_STORE_TABLE_NAME
+
+      const { eventName, eventData, createdAt, updatedAt } = orderPlacedEvent
+      const { orderId, sku, units, price, userId } = eventData
+
+      const eventPk = `EVENTS#ORDER_ID#${orderPlacedEvent.eventData.orderId}`
+      const eventSk = `EVENT#${orderPlacedEvent.eventName}`
+      const eventTn = `EVENTS#EVENT`
+      const eventSn = `EVENTS`
+      const eventGsi1pk = `EVENTS#EVENT`
+      const eventGsi1sk = `CREATED_AT#${orderPlacedEvent.createdAt}`
+
       const ddbCommand = new PutCommand({
-        TableName: process.env.EVENT_STORE_TABLE_NAME,
+        TableName: tableName,
         Item: {
-          pk: `ORDER_ID#${orderPlacedEvent.eventData.orderId}`,
-          sk: `EVENT#${orderPlacedEvent.eventName}`,
-          _tn: '#EVENT',
-          ...orderPlacedEvent,
+          pk: eventPk,
+          sk: eventSk,
+          eventName,
+          eventData: {
+            orderId,
+            sku,
+            units,
+            price,
+            userId,
+          },
+          createdAt,
+          updatedAt,
+          _tn: eventTn,
+          _sn: eventSn,
+          gsi1pk: eventGsi1pk,
+          gsi1sk: eventGsi1sk,
         },
         ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
       })

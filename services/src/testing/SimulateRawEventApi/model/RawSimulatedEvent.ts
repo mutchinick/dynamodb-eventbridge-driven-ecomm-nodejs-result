@@ -4,7 +4,7 @@ import { EventProps } from './EventProps'
 
 export type RawSimulatedEventInput = EventProps
 
-type RawSimulatedEventProps = EventProps & { _tn: '#EVENT' }
+type RawSimulatedEventProps = EventProps
 
 export class RawSimulatedEvent implements RawSimulatedEventProps {
   //
@@ -17,7 +17,6 @@ export class RawSimulatedEvent implements RawSimulatedEventProps {
     readonly eventData: unknown,
     readonly createdAt: string,
     readonly updatedAt: string,
-    readonly _tn: '#EVENT',
   ) {}
 
   //
@@ -33,8 +32,8 @@ export class RawSimulatedEvent implements RawSimulatedEventProps {
       return propsResult
     }
 
-    const { pk, sk, eventName, eventData, createdAt, updatedAt, _tn } = propsResult.value
-    const rawSimulatedEvent = new RawSimulatedEvent(pk, sk, eventName, eventData, createdAt, updatedAt, _tn)
+    const { pk, sk, eventName, eventData, createdAt, updatedAt } = propsResult.value
+    const rawSimulatedEvent = new RawSimulatedEvent(pk, sk, eventName, eventData, createdAt, updatedAt)
     const rawSimulatedEventResult = Result.makeSuccess(rawSimulatedEvent)
     console.info(`${logContext} exit success:`, { rawSimulatedEventResult, rawSimulatedEventInput })
     return rawSimulatedEventResult
@@ -60,7 +59,6 @@ export class RawSimulatedEvent implements RawSimulatedEventProps {
       eventData,
       createdAt: createdAt?.trim() || date,
       updatedAt: updatedAt?.trim() || date,
-      _tn: '#EVENT',
     }
     return Result.makeSuccess(rawSimulatedEventProps)
   }

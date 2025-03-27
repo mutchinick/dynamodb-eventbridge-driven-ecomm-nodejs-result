@@ -6,44 +6,54 @@ import { OrderStatus } from '../../model/OrderStatus'
 import { GetOrderCommand } from '../model/GetOrderCommand'
 import { DbGetOrderClient } from './DbGetOrderClient'
 
-const mockEventStoreTableName = 'mockEventStoreTableName'
+const mockOrdersTableName = 'mockOrdersTableName'
 
-process.env.EVENT_STORE_TABLE_NAME = mockEventStoreTableName
+process.env.ORDERS_TABLE_NAME = mockOrdersTableName
+
+jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
+
+const mockDate = new Date().toISOString()
+const mockOrderId = 'mockOrderId'
 
 function buildMockGetOrderCommand(): TypeUtilsMutable<GetOrderCommand> {
   const mockClass = GetOrderCommand.validateAndBuild({
-    orderId: 'mockOrderId',
+    orderId: mockOrderId,
   })
   return Result.getSuccessValueOrThrow(mockClass)
 }
 
 const mockGetOrderCommand = buildMockGetOrderCommand()
 
-const expectedDdbDocClientInput = new GetCommand({
-  TableName: mockEventStoreTableName,
-  Key: {
-    pk: `ORDER_ID#${mockGetOrderCommand.orderData.orderId}`,
-    sk: `ORDER_ID#${mockGetOrderCommand.orderData.orderId}`,
-  },
-})
+function buildMockDdbCommand(): GetCommand {
+  const ddbCommand = new GetCommand({
+    TableName: mockOrdersTableName,
+    Key: {
+      pk: `ORDERS#ORDER_ID#${mockOrderId}`,
+      sk: `ORDER_ID#${mockOrderId}`,
+    },
+  })
+  return ddbCommand
+}
 
-const expectedOrderData: OrderData = {
+const expectedDdbCommand = buildMockDdbCommand()
+
+//
+// Mock clients
+//
+const mockExistingOrderData: OrderData = {
   orderId: mockGetOrderCommand.orderData.orderId,
   orderStatus: OrderStatus.ORDER_CREATED_STATUS,
   sku: 'mockSku',
   units: 2,
   price: 5.55,
   userId: 'mockUserId',
-  createdAt: 'mockCreatedAt',
-  updatedAt: 'mockUpdatedAt',
+  createdAt: mockDate,
+  updatedAt: mockDate,
 }
 
-//
-// Mock clients
-//
 function buildMockDdbDocClient_resolves_validItem(): DynamoDBDocumentClient {
   const mockGetCommandResult: GetCommandOutput = {
-    Item: expectedOrderData,
+    Item: mockExistingOrderData,
     $metadata: {},
   }
   return { send: jest.fn().mockResolvedValue(mockGetCommandResult) } as unknown as DynamoDBDocumentClient
@@ -132,9 +142,7 @@ describe(`Orders Service SyncOrderWorker DbGetOrderClient tests`, () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
     await dbGetOrderClient.getOrder(mockGetOrderCommand)
-    expect(mockDdbDocClient.send).toHaveBeenCalledWith(
-      expect.objectContaining({ input: expectedDdbDocClientInput.input }),
-    )
+    expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
   it(`returns a transient Failure of kind UnrecognizedError if
@@ -163,7 +171,7 @@ describe(`Orders Service SyncOrderWorker DbGetOrderClient tests`, () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
     const result = await dbGetOrderClient.getOrder(mockGetOrderCommand)
-    const expectedResult = Result.makeSuccess(expectedOrderData)
+    const expectedResult = Result.makeSuccess(mockExistingOrderData)
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)
   })

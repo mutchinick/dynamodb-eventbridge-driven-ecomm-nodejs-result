@@ -40,14 +40,14 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
       return inputValidationResult
     }
 
-    const buildCommandResult = this.buildDdbUpdateCommand(restockSkuCommand)
+    const buildCommandResult = this.buildDdbCommand(restockSkuCommand)
     if (Result.isFailure(buildCommandResult)) {
       console.error(`${logContext} exit failure:`, { buildCommandResult, restockSkuCommand })
       return buildCommandResult
     }
 
     const ddbCommand = buildCommandResult.value
-    const sendCommandResult = await this.sendDdbUpdateCommand(ddbCommand)
+    const sendCommandResult = await this.sendDdbCommand(ddbCommand)
     Result.isFailure(sendCommandResult)
       ? console.error(`${logContext} exit failure:`, { sendCommandResult, restockSkuCommand })
       : console.info(`${logContext} exit success:`, { sendCommandResult, restockSkuCommand })
@@ -74,30 +74,49 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
   //
   //
   //
-  private buildDdbUpdateCommand(
+  private buildDdbCommand(
     restockSkuCommand: RestockSkuCommand,
   ): Success<TransactWriteCommand> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'DbRestockSkuClient.buildDdbUpdateCommand'
+    const logContext = 'DbRestockSkuClient.buildDdbCommand'
 
     // Perhaps we can prevent all errors by validating the arguments, but TransactWriteCommand
     // is an external dependency and we don't know what happens internally, so we try-catch
     try {
       const tableName = process.env.WAREHOUSE_TABLE_NAME
+
       const { sku, units, lotId, createdAt, updatedAt } = restockSkuCommand.restockSkuData
+
+      const restockPk = `WAREHOUSE#SKU#${sku}`
+      const restockSk = `LOT_ID#${lotId}`
+      const restockTn = `WAREHOUSE#RESTOCK`
+      const restockSn = `WAREHOUSE`
+      const restockGsi1Pk = `WAREHOUSE#RESTOCK`
+      const restockGsi1Sk = `CREATED_AT#${createdAt}`
+
+      const skuItemPk = `WAREHOUSE#SKU#${sku}`
+      const skuItemSk = `SKU#${sku}`
+      const skuItemTn = `WAREHOUSE#SKU`
+      const skuItemSn = `WAREHOUSE`
+      const skuItemGsi1Pk = `WAREHOUSE#SKU`
+      const skuItemGsi1Sk = `CREATED_AT#${createdAt}`
+
       const ddbCommand = new TransactWriteCommand({
         TransactItems: [
           {
             Put: {
               TableName: tableName,
               Item: {
-                pk: `LOT_ID#${lotId}`,
-                sk: `LOT_ID#${lotId}`,
+                pk: restockPk,
+                sk: restockSk,
                 sku,
                 units,
                 lotId,
                 createdAt,
                 updatedAt,
-                _tn: 'WAREHOUSE#LOT',
+                _tn: restockTn,
+                _sn: restockSn,
+                gsi1pk: restockGsi1Pk,
+                gsi1sk: restockGsi1Sk,
               },
               ConditionExpression: 'attribute_not_exists(pk)',
             },
@@ -106,8 +125,8 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
             Update: {
               TableName: tableName,
               Key: {
-                pk: `SKU#${sku}`,
-                sk: `SKU#${sku}`,
+                pk: skuItemPk,
+                sk: skuItemSk,
               },
               UpdateExpression:
                 `SET ` +
@@ -115,13 +134,19 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
                 `#units = if_not_exists(#units, :zero) + :units, ` +
                 `#createdAt = if_not_exists(#createdAt, :createdAt), ` +
                 `#updatedAt = :updatedAt, ` +
-                `#_tn = :_tn`,
+                `#_tn = :_tn, ` +
+                `#_sn = :_sn, ` +
+                `#gsi1pk = :gsi1pk, ` +
+                `#gsi1sk = :gsi1sk`,
               ExpressionAttributeNames: {
                 '#sku': 'sku',
                 '#units': 'units',
                 '#createdAt': 'createdAt',
                 '#updatedAt': 'updatedAt',
                 '#_tn': '_tn',
+                '#_sn': '_sn',
+                '#gsi1pk': 'gsi1pk',
+                '#gsi1sk': 'gsi1sk',
               },
               ExpressionAttributeValues: {
                 ':sku': sku,
@@ -129,7 +154,10 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
                 ':createdAt': createdAt,
                 ':updatedAt': updatedAt,
                 ':zero': 0,
-                ':_tn': 'WAREHOUSE#SKU',
+                ':_tn': skuItemTn,
+                ':_sn': skuItemSn,
+                ':gsi1pk': skuItemGsi1Pk,
+                ':gsi1sk': skuItemGsi1Sk,
               },
             },
           },
@@ -147,10 +175,10 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
   //
   //
   //
-  private async sendDdbUpdateCommand(
+  private async sendDdbCommand(
     ddbCommand: TransactWriteCommand,
   ): Promise<Success<void> | Failure<'DuplicateRestockOperationError'> | Failure<'UnrecognizedError'>> {
-    const logContext = 'DbRestockSkuClient.sendDdbUpdateCommand'
+    const logContext = 'DbRestockSkuClient.sendDdbCommand'
     console.info(`${logContext} init:`, { ddbCommand })
 
     try {

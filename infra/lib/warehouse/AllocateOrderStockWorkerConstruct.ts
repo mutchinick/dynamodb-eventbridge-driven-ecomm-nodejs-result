@@ -73,7 +73,6 @@ export class AllocateOrderStockWorkerConstruct extends Construct {
       environment: {
         EVENT_STORE_TABLE_NAME: dynamoDbTable.tableName,
         WAREHOUSE_TABLE_NAME: dynamoDbTable.tableName,
-        ALLOCATE_ORDER_STOCK_EVENT_QUEUE_URL: queue.queueUrl,
       },
       timeout: Duration.seconds(10),
     })

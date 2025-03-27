@@ -1,0 +1,43 @@
+@simulateRawEventBaseUrl = {{$dotenv SIMULATE_RAW_EVENT_BASE_URL}}
+
+@sku = ORANGES
+
+### SKU_RESTOCKED_EVENT
+### POST ###
+POST {{simulateRawEventBaseUrl}}/api/v1/testing/simulateRawEvent
+Origin: https://localhost
+Content-Type: application/json
+
+{
+ "pk": "EVENTS#SKU#{{sku}}",
+ "sk": "EVENT#SKU_RESTOCKED_EVENT#LOT_ID#000001",
+ "eventName": "SKU_RESTOCKED_EVENT",
+ "eventData": {
+  "sku": "ORANGES",
+  "units": 50,
+  "lotId": "000001"
+ }
+}
+
+### SKU_RESTOCKED_EVENT
+### POST ###
+POST {{simulateRawEventBaseUrl}}/api/v1/testing/simulateRawEvent
+Origin: https://localhost
+Content-Type: application/json
+
+{
+ "pk": "EVENTS#SKU#{{sku}}",
+ "sk": "EVENT#SKU_RESTOCKED_EVENT#LOT_ID#000002",
+ "eventName": "SKU_RESTOCKED_EVENT",
+ "eventData": {
+  "sku": "ORANGES",
+  "units": 75,
+  "lotId": "000002"
+ }
+}
+
+### CORS QUERY
+### OPTIONS ###
+OPTIONS {{simulateRawEventBaseUrl}}/api/v1/testing/simulateRawEvent
+Origin: https://localhost
+Access-Control-Request-Method: POST

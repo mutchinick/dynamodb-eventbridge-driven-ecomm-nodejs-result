@@ -4,39 +4,47 @@ import { marshall } from '@aws-sdk/util-dynamodb'
 import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
+import { OrderEventName } from '../../model/OrderEventName'
 import { OrderStatus } from '../../model/OrderStatus'
 import { UpdateOrderCommand } from '../model/UpdateOrderCommand'
 import { DbUpdateOrderClient } from './DbUpdateOrderClient'
-import { OrderEventName } from '../../model/OrderEventName'
 
-const mockEventStoreTableName = 'mockEventStoreTableName'
+const mockOrdersTableName = 'mockOrdersTableName'
 
-process.env.ORDER_TABLE_NAME = mockEventStoreTableName
+process.env.ORDERS_TABLE_NAME = mockOrdersTableName
 
 jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
 const mockDate = new Date().toISOString()
+const mockIncomingEventName = OrderEventName.ORDER_STOCK_ALLOCATED_EVENT
+const mockOrderId = 'mockOrderId'
+const mockExistingOrderStatus = OrderStatus.ORDER_CREATED_STATUS
+const mockNewOrderStatus = OrderStatus.ORDER_STOCK_ALLOCATED_STATUS
+const mockSku = 'mockSku'
+const mockUnits = 2
+const mockPrice = 10.32
+const mockUserId = 'mockUserId'
 
 function buildMockUpdateOrderCommand(): TypeUtilsMutable<UpdateOrderCommand> {
   const mockClass = UpdateOrderCommand.validateAndBuild({
     existingOrderData: {
-      orderId: 'mockOrderId',
-      orderStatus: OrderStatus.ORDER_CREATED_STATUS,
-      sku: 'mockSku',
-      units: 4,
-      price: 10.99,
-      userId: 'mockUserIId',
+      orderId: mockOrderId,
+      orderStatus: mockExistingOrderStatus,
+      sku: mockSku,
+      units: mockUnits,
+      price: mockPrice,
+      userId: mockUserId,
       createdAt: mockDate,
       updatedAt: mockDate,
     },
     incomingOrderEvent: {
-      eventName: OrderEventName.ORDER_STOCK_ALLOCATED_EVENT,
+      eventName: mockIncomingEventName,
       eventData: {
-        orderId: 'mockOrderId',
-        sku: 'mockSku',
-        units: 4,
-        price: 10.99,
-        userId: 'mockUserIId',
+        orderId: mockOrderId,
+        sku: mockSku,
+        units: mockUnits,
+        price: mockPrice,
+        userId: mockUserId,
         createdAt: mockDate,
         updatedAt: mockDate,
       },
@@ -49,25 +57,30 @@ function buildMockUpdateOrderCommand(): TypeUtilsMutable<UpdateOrderCommand> {
 
 const mockUpdateOrderCommand = buildMockUpdateOrderCommand()
 
-const expectedDdbDocClientInput = new UpdateCommand({
-  TableName: mockEventStoreTableName,
-  Key: {
-    pk: `ORDER_ID#${mockUpdateOrderCommand.orderData.orderId}`,
-    sk: `ORDER_ID#${mockUpdateOrderCommand.orderData.orderId}`,
-  },
-  UpdateExpression: 'SET #orderStatus = :orderStatus, #updatedAt = :updatedAt',
-  ExpressionAttributeNames: {
-    '#orderStatus': 'orderStatus',
-    '#updatedAt': 'updatedAt',
-  },
-  ExpressionAttributeValues: {
-    ':orderStatus': mockUpdateOrderCommand.orderData.orderStatus,
-    ':updatedAt': mockUpdateOrderCommand.orderData.updatedAt,
-  },
-  ConditionExpression: '#orderStatus <> :orderStatus',
-  ReturnValuesOnConditionCheckFailure: 'ALL_OLD',
-  ReturnValues: 'ALL_NEW',
-})
+function buildMockDdbCommand(): UpdateCommand {
+  const ddbCommand = new UpdateCommand({
+    TableName: mockOrdersTableName,
+    Key: {
+      pk: `ORDERS#ORDER_ID#${mockOrderId}`,
+      sk: `ORDER_ID#${mockOrderId}`,
+    },
+    UpdateExpression: 'SET #orderStatus = :orderStatus, #updatedAt = :updatedAt',
+    ExpressionAttributeNames: {
+      '#orderStatus': 'orderStatus',
+      '#updatedAt': 'updatedAt',
+    },
+    ExpressionAttributeValues: {
+      ':orderStatus': mockNewOrderStatus,
+      ':updatedAt': mockDate,
+    },
+    ConditionExpression: '#orderStatus <> :orderStatus',
+    ReturnValuesOnConditionCheckFailure: 'ALL_OLD',
+    ReturnValues: 'ALL_NEW',
+  })
+  return ddbCommand
+}
+
+const expectedDdbCommand = buildMockDdbCommand()
 
 //
 // Mock clients
@@ -200,9 +213,7 @@ describe(`Orders Service SyncOrderWorker DbUpdateOrderClient tests`, () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbUpdateOrderClient = new DbUpdateOrderClient(mockDdbDocClient)
     await dbUpdateOrderClient.updateOrder(mockUpdateOrderCommand)
-    expect(mockDdbDocClient.send).toHaveBeenCalledWith(
-      expect.objectContaining({ input: expectedDdbDocClientInput.input }),
-    )
+    expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
   it(`returns a transient Failure of kind UnrecognizedError if

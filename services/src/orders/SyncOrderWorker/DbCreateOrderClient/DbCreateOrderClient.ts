@@ -70,15 +70,26 @@ export class DbCreateOrderClient implements IDbCreateOrderClient {
     const logContext = 'DbCreateOrderClient.buildDdbCommand'
 
     try {
+      const tableName = process.env.ORDERS_TABLE_NAME
+
+      const { orderData } = createOrderCommand
+      const { orderId, orderStatus, sku, units, price, userId, createdAt, updatedAt } = orderData
+
+      const orderItemPk = `ORDERS#ORDER_ID#${orderId}`
+      const orderItemSk = `ORDER_ID#${orderId}`
+      const orderItemTn = `ORDERS#ORDER`
+      const orderItemSn = `ORDERS`
+      const orderItemGsi1Pk = `ORDERS#ORDER`
+      const orderItemGsi1Sk = `CREATED_AT#${createdAt}`
+
       const ddbCommand = new UpdateCommand({
-        TableName: process.env.ORDER_TABLE_NAME,
+        TableName: tableName,
         Key: {
-          pk: `ORDER_ID#${createOrderCommand.orderData.orderId}`,
-          sk: `ORDER_ID#${createOrderCommand.orderData.orderId}`,
+          pk: orderItemPk,
+          sk: orderItemSk,
         },
         UpdateExpression:
           'SET ' +
-          '#_tn = :_tn, ' +
           '#orderId = :orderId, ' +
           '#orderStatus = :orderStatus, ' +
           '#sku = :sku, ' +
@@ -86,9 +97,12 @@ export class DbCreateOrderClient implements IDbCreateOrderClient {
           '#price = :price, ' +
           '#userId = :userId, ' +
           '#createdAt = :createdAt, ' +
-          '#updatedAt = :updatedAt',
+          '#updatedAt = :updatedAt, ' +
+          '#_tn = :_tn, ' +
+          '#_sn = :_sn, ' +
+          '#gsi1pk = :gsi1pk, ' +
+          '#gsi1sk = :gsi1sk',
         ExpressionAttributeNames: {
-          '#_tn': '_tn',
           '#orderId': 'orderId',
           '#orderStatus': 'orderStatus',
           '#sku': 'sku',
@@ -97,17 +111,24 @@ export class DbCreateOrderClient implements IDbCreateOrderClient {
           '#userId': 'userId',
           '#createdAt': 'createdAt',
           '#updatedAt': 'updatedAt',
+          '#_tn': '_tn',
+          '#_sn': '_sn',
+          '#gsi1pk': 'gsi1pk',
+          '#gsi1sk': 'gsi1sk',
         },
         ExpressionAttributeValues: {
-          ':_tn': 'ORDERS#ORDER',
-          ':orderId': createOrderCommand.orderData.orderId,
-          ':orderStatus': createOrderCommand.orderData.orderStatus,
-          ':sku': createOrderCommand.orderData.sku,
-          ':units': createOrderCommand.orderData.units,
-          ':price': createOrderCommand.orderData.price,
-          ':userId': createOrderCommand.orderData.userId,
-          ':createdAt': createOrderCommand.orderData.createdAt,
-          ':updatedAt': createOrderCommand.orderData.updatedAt,
+          ':orderId': orderId,
+          ':orderStatus': orderStatus,
+          ':sku': sku,
+          ':units': units,
+          ':price': price,
+          ':userId': userId,
+          ':createdAt': createdAt,
+          ':updatedAt': updatedAt,
+          ':_tn': orderItemTn,
+          ':_sn': orderItemSn,
+          ':gsi1pk': orderItemGsi1Pk,
+          ':gsi1sk': orderItemGsi1Sk,
         },
         ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
         ReturnValuesOnConditionCheckFailure: 'ALL_OLD',

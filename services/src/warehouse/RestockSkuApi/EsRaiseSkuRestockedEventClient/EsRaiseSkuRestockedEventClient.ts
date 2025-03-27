@@ -40,14 +40,14 @@ export class EsRaiseSkuRestockedEventClient implements IEsRaiseSkuRestockedEvent
       return inputValidationResult
     }
 
-    const buildCommandResult = this.buildDdbPutCommand(skuRestockedEvent)
+    const buildCommandResult = this.buildDdbCommand(skuRestockedEvent)
     if (Result.isFailure(buildCommandResult)) {
       console.error(`${logContext} exit failure:`, { buildCommandResult, skuRestockedEvent })
       return buildCommandResult
     }
 
     const ddbCommand = buildCommandResult.value
-    const sendCommandResult = await this.sendDdbPutCommand(ddbCommand)
+    const sendCommandResult = await this.sendDdbCommand(ddbCommand)
     Result.isFailure(sendCommandResult)
       ? console.error(`${logContext} exit failure:`, { sendCommandResult, skuRestockedEvent })
       : console.info(`${logContext} exit success:`, { sendCommandResult, skuRestockedEvent })
@@ -74,21 +74,43 @@ export class EsRaiseSkuRestockedEventClient implements IEsRaiseSkuRestockedEvent
   //
   //
   //
-  private buildDdbPutCommand(
+  private buildDdbCommand(
     skuRestockedEvent: SkuRestockedEvent,
   ): Success<PutCommand> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'EsRaiseSkuRestockedEventClient.buildDdbPutCommand'
+    const logContext = 'EsRaiseSkuRestockedEventClient.buildDdbCommand'
 
     // Perhaps we can prevent all errors by validating the arguments, but TransactWriteCommand
     // is an external dependency and we don't know what happens internally, so we try-catch
     try {
+      const tableName = process.env.EVENT_STORE_TABLE_NAME
+
+      const { eventName, eventData, createdAt, updatedAt } = skuRestockedEvent
+      const { sku, units, lotId } = eventData
+
+      const eventPk = `EVENTS#SKU#${sku}`
+      const eventSk = `EVENT#${eventName}#LOT_ID#${lotId}`
+      const eventTn = `EVENTS#EVENT`
+      const eventSn = `EVENTS`
+      const eventGsi1pk = `EVENTS#EVENT`
+      const eventGsi1sk = `CREATED_AT#${createdAt}`
+
       const ddbCommand = new PutCommand({
-        TableName: process.env.EVENT_STORE_TABLE_NAME,
+        TableName: tableName,
         Item: {
-          pk: `SKU#${skuRestockedEvent.eventData.sku}`,
-          sk: `EVENT#${skuRestockedEvent.eventName}#LOT_ID#${skuRestockedEvent.eventData.lotId}`,
-          _tn: '#EVENT',
-          ...skuRestockedEvent,
+          pk: eventPk,
+          sk: eventSk,
+          eventName,
+          eventData: {
+            sku,
+            units,
+            lotId,
+          },
+          createdAt,
+          updatedAt,
+          _tn: eventTn,
+          _sn: eventSn,
+          gsi1pk: eventGsi1pk,
+          gsi1sk: eventGsi1sk,
         },
         ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
       })
@@ -104,10 +126,10 @@ export class EsRaiseSkuRestockedEventClient implements IEsRaiseSkuRestockedEvent
   //
   //
   //
-  private async sendDdbPutCommand(
+  private async sendDdbCommand(
     ddbCommand: PutCommand,
   ): Promise<Success<void> | Failure<'DuplicateEventRaisedError'> | Failure<'UnrecognizedError'>> {
-    const logContext = 'EsRaiseSkuRestockedEventClient.sendDdbPutCommand'
+    const logContext = 'EsRaiseSkuRestockedEventClient.sendDdbCommand'
     console.info(`${logContext} init:`)
 
     try {
