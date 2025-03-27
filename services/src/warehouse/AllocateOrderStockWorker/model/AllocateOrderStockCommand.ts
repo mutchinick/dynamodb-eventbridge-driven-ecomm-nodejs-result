@@ -8,8 +8,6 @@ export interface AllocateOrderStockCommandInput {
   incomingOrderCreatedEvent: IncomingOrderCreatedEvent
 }
 
-// TODO: Not all events provide the full Order data
-// https://github.com/mutchinick/dynamodb-eventbridge-driven-ecomm-nodejs-result/issues/2
 type AllocateOrderStockCommandData = AllocateOrderStockData
 
 type AllocateOrderStockCommandProps = {

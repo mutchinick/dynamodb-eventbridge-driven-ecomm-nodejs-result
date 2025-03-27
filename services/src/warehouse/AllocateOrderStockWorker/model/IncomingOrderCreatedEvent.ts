@@ -21,10 +21,7 @@ type EventDetail = {
 
 export type IncomingOrderCreatedEventInput = EventBridgeEvent<string, EventDetail>
 
-// TODO: Not all events provide the full Order data
-// https://github.com/mutchinick/dynamodb-eventbridge-driven-ecomm-nodejs-result/issues/2
 type IncomingOrderCreatedEventData = Pick<AllocateOrderStockData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
-// type IncomingOrderCreatedEventData = Pick<AllocateOrderStockData, 'orderId' | 'sku' | 'units'>
 
 type IncomingOrderCreatedEventProps = WarehouseEvent<
   WarehouseEventName.ORDER_CREATED_EVENT,
