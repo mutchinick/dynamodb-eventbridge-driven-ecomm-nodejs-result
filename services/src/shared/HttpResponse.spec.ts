@@ -7,8 +7,8 @@ describe('Shared Common HttpResponse tests', () => {
       statusCode: 200,
       body: JSON.stringify(mockResponseBody),
     }
-    const result = HttpResponse.OK(mockResponseBody)
-    expect(result).toStrictEqual(expectedResponse)
+    const response = HttpResponse.OK(mockResponseBody)
+    expect(response).toStrictEqual(expectedResponse)
   })
 
   test('HttpResponse.Created returns the expected 201 Created APIGatewayProxyStructuredResultV2 response', () => {
@@ -17,8 +17,8 @@ describe('Shared Common HttpResponse tests', () => {
       statusCode: 201,
       body: JSON.stringify(mockResponseBody),
     }
-    const result = HttpResponse.Created(mockResponseBody)
-    expect(result).toStrictEqual(expectedResponse)
+    const response = HttpResponse.Created(mockResponseBody)
+    expect(response).toStrictEqual(expectedResponse)
   })
 
   test('HttpResponse.Accepted returns the expected 202 Accepted APIGatewayProxyStructuredResultV2 response', () => {
@@ -27,8 +27,8 @@ describe('Shared Common HttpResponse tests', () => {
       statusCode: 202,
       body: JSON.stringify(mockResponseBody),
     }
-    const result = HttpResponse.Accepted(mockResponseBody)
-    expect(result).toStrictEqual(expectedResponse)
+    const response = HttpResponse.Accepted(mockResponseBody)
+    expect(response).toStrictEqual(expectedResponse)
   })
 
   test('HttpResponse.InternalServerError returns the expected 500 Internal Server Error APIGatewayProxyStructuredResultV2 response', () => {
@@ -37,8 +37,8 @@ describe('Shared Common HttpResponse tests', () => {
       statusCode: 500,
       body: JSON.stringify(mockResponseBody),
     }
-    const result = HttpResponse.InternalServerError()
-    expect(result).toStrictEqual(expectedResponse)
+    const response = HttpResponse.InternalServerError()
+    expect(response).toStrictEqual(expectedResponse)
   })
 
   test('HttpResponse.BadRequestError returns the expected 400 Bad Request APIGatewayProxyStructuredResultV2 response', () => {
@@ -47,7 +47,7 @@ describe('Shared Common HttpResponse tests', () => {
       statusCode: 400,
       body: JSON.stringify(mockResponseBody),
     }
-    const result = HttpResponse.BadRequestError()
-    expect(result).toStrictEqual(expectedResponse)
+    const response = HttpResponse.BadRequestError()
+    expect(response).toStrictEqual(expectedResponse)
   })
 })
