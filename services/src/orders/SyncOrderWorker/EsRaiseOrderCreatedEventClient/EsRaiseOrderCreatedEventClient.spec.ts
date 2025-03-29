@@ -123,7 +123,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderCreatedEventClient tests`, ()
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEvent.eventDate is undefined`, async () => {
+      OrderCreatedEvent.eventData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderCreatedEventClient = new EsRaiseOrderCreatedEventClient(mockDdbDocClient)
     const mockTestEvent = buildMockOrderCreatedEvent()
@@ -135,7 +135,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderCreatedEventClient tests`, ()
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEvent.eventDate is null`, async () => {
+      OrderCreatedEvent.eventData is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderCreatedEventClient = new EsRaiseOrderCreatedEventClient(mockDdbDocClient)
     const mockTestEvent = buildMockOrderCreatedEvent()
