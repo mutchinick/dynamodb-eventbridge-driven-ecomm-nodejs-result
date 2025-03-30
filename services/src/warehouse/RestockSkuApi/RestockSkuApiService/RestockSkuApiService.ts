@@ -16,7 +16,7 @@ export class RestockSkuApiService implements IRestockSkuApiService {
   //
   //
   //
-  constructor(private readonly ddbSkuRestockedEventClient: IEsRaiseSkuRestockedEventClient) {}
+  constructor(private readonly esRaiseSkuRestockedEventClient: IEsRaiseSkuRestockedEventClient) {}
 
   //
   //
@@ -85,7 +85,7 @@ export class RestockSkuApiService implements IRestockSkuApiService {
     }
 
     const skuRestockedEvent = skuRestockedEventResult.value
-    const raiseEventResult = await this.ddbSkuRestockedEventClient.raiseSkuRestockedEvent(skuRestockedEvent)
+    const raiseEventResult = await this.esRaiseSkuRestockedEventClient.raiseSkuRestockedEvent(skuRestockedEvent)
     Result.isFailure(raiseEventResult)
       ? console.error(`${logContext} exit failure:`, { raiseEventResult, incomingRestockSkuRequest })
       : console.info(`${logContext} exit success:`, { raiseEventResult, incomingRestockSkuRequest })
