@@ -50,7 +50,7 @@ describe(`Warehouse Service Result tests`, () => {
     it(`returns a Failure with an Error with an "Unrecognized Error" message when
         the error parameter is not a string`, () => {
       const errorParameter = null as unknown
-      const expectedErrorMessage = 'Unrecognized Error'
+      const expectedErrorMessage = '[UnrecognizedError]: Unrecognized error'
       const failureKind: FailureKind = 'UnrecognizedError'
       const result = Result.makeFailure(failureKind, errorParameter, false)
       expect(result.error instanceof Error).toBe(true)
