@@ -7,10 +7,10 @@ import { SkuRestockedEvent } from '../model/SkuRestockedEvent'
 export interface IRestockSkuApiService {
   restockSku: (
     incomingRestockSkuRequest: IncomingRestockSkuRequest,
-  ) => Promise<Success<RestockSkuServiceOutput> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>>
+  ) => Promise<Success<RestockSkuApiServiceOutput> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>>
 }
 
-export type RestockSkuServiceOutput = TypeUtilsPretty<IncomingRestockSkuRequest>
+export type RestockSkuApiServiceOutput = TypeUtilsPretty<IncomingRestockSkuRequest>
 
 export class RestockSkuApiService implements IRestockSkuApiService {
   //
@@ -23,7 +23,7 @@ export class RestockSkuApiService implements IRestockSkuApiService {
   //
   public async restockSku(
     incomingRestockSkuRequest: IncomingRestockSkuRequest,
-  ): Promise<Success<RestockSkuServiceOutput> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
+  ): Promise<Success<RestockSkuApiServiceOutput> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
     const logContext = 'RestockSkuApiService.restockSku'
     console.info(`${logContext} init:`, { incomingRestockSkuRequest })
 
@@ -35,7 +35,7 @@ export class RestockSkuApiService implements IRestockSkuApiService {
 
     const raiseEventResult = await this.raiseSkuRestockedEvent(incomingRestockSkuRequest)
     if (Result.isSuccess(raiseEventResult) || Result.isFailureOfKind(raiseEventResult, 'DuplicateEventRaisedError')) {
-      const serviceOutput: RestockSkuServiceOutput = { ...incomingRestockSkuRequest }
+      const serviceOutput: RestockSkuApiServiceOutput = { ...incomingRestockSkuRequest }
       const serviceOutputResult = Result.makeSuccess(serviceOutput)
       console.info(`${logContext} exit success:`, { serviceOutputResult, incomingRestockSkuRequest })
       return serviceOutputResult

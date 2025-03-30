@@ -4,7 +4,7 @@ import { Result } from '../../errors/Result'
 import { IEsRaiseSkuRestockedEventClient } from '../EsRaiseSkuRestockedEventClient/EsRaiseSkuRestockedEventClient'
 import { IncomingRestockSkuRequest } from '../model/IncomingRestockSkuRequest'
 import { SkuRestockedEvent } from '../model/SkuRestockedEvent'
-import { RestockSkuApiService, RestockSkuServiceOutput } from './RestockSkuApiService'
+import { RestockSkuApiService, RestockSkuApiServiceOutput } from './RestockSkuApiService'
 
 jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
@@ -119,13 +119,13 @@ describe(`Warehouse Service RestockSkuApi RestockSkuApiService tests`, () => {
   //
   // Test expected results
   //
-  it(`returns a Success<RestockSkuServiceOutput> with the expected data if 
+  it(`returns a Success<RestockSkuApiServiceOutput> with the expected data if 
       EsRaiseSkuRestockedEventClient.restockSku returns a Failure of kind DuplicateEventRaisedError`, async () => {
     const mockEsRaiseSkuRestockedEventClient =
       buildMockEsRaiseSkuRestockedEventClient_fails('DuplicateEventRaisedError')
     const restockSkuApiService = new RestockSkuApiService(mockEsRaiseSkuRestockedEventClient)
     const result = await restockSkuApiService.restockSku(mockIncomingRestockSkuRequest)
-    const expectedOutput: RestockSkuServiceOutput = {
+    const expectedOutput: RestockSkuApiServiceOutput = {
       sku: mockIncomingRestockSkuRequest.sku,
       units: mockIncomingRestockSkuRequest.units,
       lotId: mockIncomingRestockSkuRequest.lotId,
@@ -135,11 +135,11 @@ describe(`Warehouse Service RestockSkuApi RestockSkuApiService tests`, () => {
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it(`returns a Success<RestockSkuServiceOutput> with the expected data`, async () => {
+  it(`returns a Success<RestockSkuApiServiceOutput> with the expected data`, async () => {
     const mockEsRaiseSkuRestockedEventClient = buildMockEsRaiseSkuRestockedEventClient_succeeds()
     const restockSkuApiService = new RestockSkuApiService(mockEsRaiseSkuRestockedEventClient)
     const result = await restockSkuApiService.restockSku(mockIncomingRestockSkuRequest)
-    const expectedOutput: RestockSkuServiceOutput = {
+    const expectedOutput: RestockSkuApiServiceOutput = {
       sku: mockIncomingRestockSkuRequest.sku,
       units: mockIncomingRestockSkuRequest.units,
       lotId: mockIncomingRestockSkuRequest.lotId,
