@@ -231,7 +231,7 @@ describe(`Orders Service ListOrdersApi DbListOrdersClient tests`, () => {
   })
 
   it(`returns a transient Failure of kind UnrecognizedError if 
-      DynamoDBDocumentClient.send throws a generic Error`, async () => {
+      DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockTestCommand = buildMockListOrdersCommand({})
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)

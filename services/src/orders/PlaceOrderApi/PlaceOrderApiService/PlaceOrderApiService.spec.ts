@@ -76,13 +76,17 @@ describe(`Orders Service PlaceOrderApi PlaceOrderApiService tests`, () => {
   //
   // Test internal logic
   //
-  it(`returns an Failure if OrderPlacedEvent.validateAndBuild returns a Failure`, async () => {
+  it(`returns the same Failure if OrderPlacedEvent.validateAndBuild returns a Failure`, async () => {
     const mockEsRaiseOrderPlacedEventClient = buildMockEsRaiseOrderPlacedEventClient_succeeds()
     const placeOrderApiService = new PlaceOrderApiService(mockEsRaiseOrderPlacedEventClient)
-    const mockFailure = Result.makeFailure('InvalidArgumentsError', '', false)
-    jest.spyOn(OrderPlacedEvent, 'validateAndBuild').mockReturnValueOnce(mockFailure)
+    const mockFailureKind = 'mockFailureKind' as never
+    const mockError = 'mockError'
+    const mockTransient = 'mockTransient' as never
+    const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
+    jest.spyOn(OrderPlacedEvent, 'validateAndBuild').mockReturnValueOnce(expectedResult)
     const result = await placeOrderApiService.placeOrder(mockIncomingPlaceOrderRequest)
     expect(Result.isFailure(result)).toBe(true)
+    expect(result).toStrictEqual(expectedResult)
   })
 
   it(`calls EsRaiseOrderPlacedEventClient.raiseOrderPlacedEvent a single time`, async () => {

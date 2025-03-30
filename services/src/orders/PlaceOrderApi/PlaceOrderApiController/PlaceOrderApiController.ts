@@ -26,18 +26,20 @@ export class PlaceOrderApiController implements IPlaceOrderApiController {
     const placeOrderResult = await this.placeOrderSafe(apiEvent)
     if (Result.isSuccess(placeOrderResult)) {
       const placeOrderOutput = placeOrderResult.value
-      const apiResponse = HttpResponse.Accepted(placeOrderOutput)
-      console.info(`${logContext} exit success:`, { apiResponse, apiEvent })
-      return apiResponse
+      const successResponse = HttpResponse.Accepted(placeOrderOutput)
+      console.info(`${logContext} exit success:`, { successResponse, apiEvent })
+      return successResponse
     }
 
     if (Result.isFailureOfKind(placeOrderResult, 'InvalidArgumentsError')) {
-      console.error(`${logContext} failure exit:`, { apiEvent })
-      return HttpResponse.BadRequestError()
+      const badRequestError = HttpResponse.BadRequestError()
+      console.error(`${logContext} failure exit:`, { badRequestError, apiEvent })
+      return badRequestError
     }
 
-    console.error(`${logContext} failure exit:`, { apiEvent })
-    return HttpResponse.InternalServerError()
+    const internalServerError = HttpResponse.InternalServerError()
+    console.error(`${logContext} failure exit:`, { internalServerError, apiEvent })
+    return internalServerError
   }
 
   //

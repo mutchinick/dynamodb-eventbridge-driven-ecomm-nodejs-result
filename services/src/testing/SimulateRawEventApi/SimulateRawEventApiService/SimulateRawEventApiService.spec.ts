@@ -79,13 +79,17 @@ describe(`Testing Service SimulateRawEventApi SimulateRawEventApiService tests`,
   //
   // Test internal logic
   //
-  it(`returns an Failure if RawSimulatedEvent.validateAndBuild returns a Failure`, async () => {
+  it(`returns the same Failure if RawSimulatedEvent.validateAndBuild returns a Failure`, async () => {
     const mockEsRaiseRawSimulatedEventClient = buildMockEsRaiseRawSimulatedEventClient_succeeds()
     const simulateRawEventApiService = new SimulateRawEventApiService(mockEsRaiseRawSimulatedEventClient)
-    const mockFailure = Result.makeFailure('InvalidArgumentsError', '', false)
-    jest.spyOn(RawSimulatedEvent, 'validateAndBuild').mockReturnValueOnce(mockFailure)
+    const mockFailureKind = 'mockFailureKind' as never
+    const mockError = 'mockError'
+    const mockTransient = 'mockTransient' as never
+    const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
+    jest.spyOn(RawSimulatedEvent, 'validateAndBuild').mockReturnValueOnce(expectedResult)
     const result = await simulateRawEventApiService.simulateRawEvent(mockIncomingSimulateRawEventRequest)
     expect(Result.isFailure(result)).toBe(true)
+    expect(result).toStrictEqual(expectedResult)
   })
 
   it(`calls EsRaiseRawSimulatedEventClient.simulateRawEvent a single time`, async () => {

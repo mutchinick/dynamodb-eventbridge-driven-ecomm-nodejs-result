@@ -29,18 +29,20 @@ export class SimulateRawEventApiController implements ISimulateRawEventApiContro
     const simulateRawEventResult = await this.simulateRawEventSafe(apiEvent)
     if (Result.isSuccess(simulateRawEventResult)) {
       const simulateRawEventOutput = simulateRawEventResult.value
-      const apiResponse = HttpResponse.Accepted(simulateRawEventOutput)
-      console.info(`${logContext} exit success:`, { apiResponse, apiEvent })
-      return apiResponse
+      const successResponse = HttpResponse.Accepted(simulateRawEventOutput)
+      console.info(`${logContext} exit success:`, { successResponse, apiEvent })
+      return successResponse
     }
 
     if (Result.isFailureOfKind(simulateRawEventResult, 'InvalidArgumentsError')) {
-      console.error(`${logContext} failure exit:`, { apiEvent })
-      return HttpResponse.BadRequestError()
+      const badRequestError = HttpResponse.BadRequestError()
+      console.error(`${logContext} failure exit:`, { badRequestError, apiEvent })
+      return badRequestError
     }
 
-    console.error(`${logContext} failure exit:`, { apiEvent })
-    return HttpResponse.InternalServerError()
+    const internalServerError = HttpResponse.InternalServerError()
+    console.error(`${logContext} failure exit:`, { internalServerError, apiEvent })
+    return internalServerError
   }
 
   //

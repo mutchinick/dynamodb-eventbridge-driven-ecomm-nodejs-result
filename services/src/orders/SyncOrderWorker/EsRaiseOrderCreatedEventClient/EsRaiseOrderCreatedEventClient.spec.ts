@@ -164,7 +164,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderCreatedEventClient tests`, ()
   })
 
   it(`returns a transient Failure of kind UnrecognizedError if 
-      DynamoDBDocumentClient.send throws a generic Error`, async () => {
+      DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const esRaiseOrderCreatedEventClient = new EsRaiseOrderCreatedEventClient(mockDdbDocClient)
     const result = await esRaiseOrderCreatedEventClient.raiseOrderCreatedEvent(mockOrderCreatedEvent)

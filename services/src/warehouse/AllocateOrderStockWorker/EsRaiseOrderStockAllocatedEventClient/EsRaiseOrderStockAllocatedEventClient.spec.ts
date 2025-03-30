@@ -156,7 +156,7 @@ describe(`Warehouse Service AllocateOrderStockWorker EsRaiseOrderStockAllocatedE
   })
 
   it(`returns a transient Failure of kind UnrecognizedError
-      if DynamoDBDocumentClient.send throws a generic Error`, async () => {
+      if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const esRaiseOrderStockAllocatedEventClient = new EsRaiseOrderStockAllocatedEventClient(mockDdbDocClient)
     const result =

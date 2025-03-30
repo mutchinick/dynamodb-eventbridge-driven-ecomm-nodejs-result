@@ -217,7 +217,7 @@ describe(`Orders Service SyncOrderWorker DbUpdateOrderClient tests`, () => {
   })
 
   it(`returns a transient Failure of kind UnrecognizedError if
-      DynamoDBDocumentClient.send throws a generic Error`, async () => {
+      DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbUpdateOrderClient = new DbUpdateOrderClient(mockDdbDocClient)
     const result = await dbUpdateOrderClient.updateOrder(mockUpdateOrderCommand)

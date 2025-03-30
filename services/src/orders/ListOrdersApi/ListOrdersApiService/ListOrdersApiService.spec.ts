@@ -98,14 +98,18 @@ describe(`Orders Service ListOrdersApi ListOrdersApiService tests`, () => {
   //
   // Test internal logic
   //
-  it(`returns an Failure if ListOrdersCommand.validateAndBuild returns a Failure`, async () => {
+  it(`returns the same Failure if ListOrdersCommand.validateAndBuild returns a Failure`, async () => {
     const mockDbListOrdersClient = buildMockDbListOrdersClient_succeeds()
     const listOrdersApiService = new ListOrdersApiService(mockDbListOrdersClient)
-    const mockFailure = Result.makeFailure('InvalidArgumentsError', '', false)
-    jest.spyOn(ListOrdersCommand, 'validateAndBuild').mockReturnValueOnce(mockFailure)
+    const mockFailureKind = 'mockFailureKind' as never
+    const mockError = 'mockError'
+    const mockTransient = 'mockTransient' as never
+    const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
+    jest.spyOn(ListOrdersCommand, 'validateAndBuild').mockReturnValueOnce(expectedResult)
     const mockTestRequest = buildMockIncomingListOrdersRequest_ListDefault()
     const result = await listOrdersApiService.listOrders(mockTestRequest)
     expect(Result.isFailure(result)).toBe(true)
+    expect(result).toStrictEqual(expectedResult)
   })
 
   it(`calls DbListOrdersClient.raiseListOrdersCommand a single time`, async () => {

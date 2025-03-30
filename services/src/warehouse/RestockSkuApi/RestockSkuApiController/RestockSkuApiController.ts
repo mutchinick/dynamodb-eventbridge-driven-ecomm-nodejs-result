@@ -26,18 +26,20 @@ export class RestockSkuApiController implements IRestockSkuApiController {
     const restockSkuResult = await this.restockSkuSafe(apiEvent)
     if (Result.isSuccess(restockSkuResult)) {
       const restockSkuOutput = restockSkuResult.value
-      const apiResponse = HttpResponse.Accepted(restockSkuOutput)
-      console.info(`${logContext} exit success:`, { apiResponse, apiEvent })
-      return apiResponse
+      const successResponse = HttpResponse.Accepted(restockSkuOutput)
+      console.info(`${logContext} exit success:`, { successResponse, apiEvent })
+      return successResponse
     }
 
     if (Result.isFailureOfKind(restockSkuResult, 'InvalidArgumentsError')) {
-      console.error(`${logContext} failure exit:`, { apiEvent })
-      return HttpResponse.BadRequestError()
+      const badRequestError = HttpResponse.BadRequestError()
+      console.error(`${logContext} failure exit:`, { badRequestError, apiEvent })
+      return badRequestError
     }
 
-    console.error(`${logContext} failure exit:`, { apiEvent })
-    return HttpResponse.InternalServerError()
+    const internalServerError = HttpResponse.InternalServerError()
+    console.error(`${logContext} failure exit:`, { internalServerError, apiEvent })
+    return internalServerError
   }
 
   //

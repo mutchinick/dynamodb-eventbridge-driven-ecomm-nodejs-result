@@ -113,13 +113,17 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuWorkerService tests`, () 
   //
   // Test internal logic
   //
-  it(`returns an Failure if RestockSkuCommand.validateAndBuild returns a Failure`, async () => {
+  it(`returns the same Failure if RestockSkuCommand.validateAndBuild returns a Failure`, async () => {
     const mockDbRestockSkuClient = buildMockDbRestockSkuClient_succeeds()
     const restockSkuWorkerService = new RestockSkuWorkerService(mockDbRestockSkuClient)
-    const mockFailure = Result.makeFailure('InvalidArgumentsError', '', false)
-    jest.spyOn(RestockSkuCommand, 'validateAndBuild').mockReturnValueOnce(mockFailure)
+    const mockFailureKind = 'mockFailureKind' as never
+    const mockError = 'mockError'
+    const mockTransient = 'mockTransient' as never
+    const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
+    jest.spyOn(RestockSkuCommand, 'validateAndBuild').mockReturnValueOnce(expectedResult)
     const result = await restockSkuWorkerService.restockSku(mockIncomingSkuRestockedEvent)
     expect(Result.isFailure(result)).toBe(true)
+    expect(result).toStrictEqual(expectedResult)
   })
 
   it(`calls DbRestockSkuClient.restockSku a single time`, async () => {

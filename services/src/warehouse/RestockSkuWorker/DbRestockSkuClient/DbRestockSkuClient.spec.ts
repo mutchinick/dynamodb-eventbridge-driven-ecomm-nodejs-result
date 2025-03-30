@@ -202,7 +202,7 @@ describe(`Warehouse Service RestockSkuWorker DbRestockSkuClient tests`, () => {
   })
 
   it(`returns a transient Failure of kind UnrecognizedError
-      if DynamoDBDocumentClient.send throws a generic Error`, async () => {
+      if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
     const result = await dbRestockSkuClient.restockSku(mockRestockSkuCommand)

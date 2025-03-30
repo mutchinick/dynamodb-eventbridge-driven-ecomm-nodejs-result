@@ -236,7 +236,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
   //
   // Test that it reads the Order from the database
   //
-  it(`returns an Failure if GetOrderCommand.validateAndBuild returns a Failure`, async () => {
+  it(`returns the same Failure if GetOrderCommand.validateAndBuild returns a Failure`, async () => {
     const mockDbGetOrderClient = buildMockDbGetOrderClient_succeeds_OrderData()
     const mockDbCreateOrderClient = buildMockDbCreateOrderClient_succeeds()
     const mockDbUpdateOrderClient = buildMockDbUpdateOrderClient_succeeds()
@@ -247,11 +247,15 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
       mockDbUpdateOrderClient,
       mockEsRaiseOrderCreatedEventClient,
     )
+    const mockFailureKind = 'mockFailureKind' as never
+    const mockError = 'mockError'
+    const mockTransient = 'mockTransient' as never
+    const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
+    jest.spyOn(GetOrderCommand, 'validateAndBuild').mockReturnValueOnce(expectedResult)
     const mockTestEvent = buildMockIncomingOrderEvent(mockTestIncomingOrderEventProps)
-    const mockFailure = Result.makeFailure('InvalidArgumentsError', '', false)
-    jest.spyOn(GetOrderCommand, 'validateAndBuild').mockReturnValueOnce(mockFailure)
     const result = await syncOrderWorkerService.syncOrder(mockTestEvent)
     expect(Result.isFailure(result)).toBe(true)
+    expect(result).toStrictEqual(expectedResult)
   })
 
   it(`calls DbGetOrderClient.getOrder a single time`, async () => {
@@ -340,7 +344,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
     const expectedCreateOrderCommandResult = CreateOrderCommand.validateAndBuild(mockValidCreateOrderCommandInput)
     const expectedCreateOrderCommand = Result.getSuccessValueOrThrow(expectedCreateOrderCommandResult)
 
-    it(`returns an Failure if CreateOrderCommand.validateAndBuild returns a Failure`, async () => {
+    it(`returns the same Failure if CreateOrderCommand.validateAndBuild returns a Failure`, async () => {
       const mockDbGetOrderClient = buildMockDbGetOrderClient_succeeds_null()
       const mockDbCreateOrderClient = buildMockDbCreateOrderClient_succeeds()
       const mockDbUpdateOrderClient = buildMockDbUpdateOrderClient_succeeds()
@@ -351,10 +355,14 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
         mockDbUpdateOrderClient,
         mockEsRaiseOrderCreatedEventClient,
       )
-      const mockFailure = Result.makeFailure('InvalidArgumentsError', '', false)
-      jest.spyOn(CreateOrderCommand, 'validateAndBuild').mockReturnValueOnce(mockFailure)
+      const mockFailureKind = 'mockFailureKind' as never
+      const mockError = 'mockError'
+      const mockTransient = 'mockTransient' as never
+      const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
+      jest.spyOn(CreateOrderCommand, 'validateAndBuild').mockReturnValueOnce(expectedResult)
       const result = await syncOrderWorkerService.syncOrder(mockValidOrderPlacedEvent)
       expect(Result.isFailure(result)).toBe(true)
+      expect(result).toStrictEqual(expectedResult)
     })
 
     it(`calls DbCreateOrderClient.createOrder a single time`, async () => {
@@ -406,7 +414,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
       expect(result).toStrictEqual(expectedResult)
     })
 
-    it(`returns an Failure if OrderCreatedEvent.validateAndBuild returns a Failure`, async () => {
+    it(`returns the same Failure if OrderCreatedEvent.validateAndBuild returns a Failure`, async () => {
       const mockDbGetOrderClient = buildMockDbGetOrderClient_succeeds_null()
       const mockDbCreateOrderClient = buildMockDbCreateOrderClient_succeeds()
       const mockDbUpdateOrderClient = buildMockDbUpdateOrderClient_succeeds()
@@ -417,10 +425,14 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
         mockDbUpdateOrderClient,
         mockEsRaiseOrderCreatedEventClient,
       )
-      const mockFailure = Result.makeFailure('InvalidArgumentsError', '', false)
-      jest.spyOn(OrderCreatedEvent, 'validateAndBuild').mockReturnValueOnce(mockFailure)
+      const mockFailureKind = 'mockFailureKind' as never
+      const mockError = 'mockError'
+      const mockTransient = 'mockTransient' as never
+      const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
+      jest.spyOn(OrderCreatedEvent, 'validateAndBuild').mockReturnValueOnce(expectedResult)
       const result = await syncOrderWorkerService.syncOrder(mockValidOrderPlacedEvent)
       expect(Result.isFailure(result)).toBe(true)
+      expect(result).toStrictEqual(expectedResult)
     })
 
     it(`calls EsRaiseOrderCreatedEventClient.raiseOrderCreatedEvent a single time`, async () => {
@@ -534,7 +546,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
       expect(mockDbCreateOrderClient.createOrder).toHaveBeenCalledTimes(0)
     })
 
-    it(`returns an Failure if OrderCreatedEvent.validateAndBuild returns a Failure`, async () => {
+    it(`returns the same Failure if OrderCreatedEvent.validateAndBuild returns a Failure`, async () => {
       const mockDbGetOrderClient = buildMockDbGetOrderClient_succeeds_OrderData()
       const mockDbCreateOrderClient = buildMockDbCreateOrderClient_succeeds()
       const mockDbUpdateOrderClient = buildMockDbUpdateOrderClient_succeeds()
@@ -545,10 +557,14 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
         mockDbUpdateOrderClient,
         mockEsRaiseOrderCreatedEventClient,
       )
-      const mockFailure = Result.makeFailure('InvalidArgumentsError', '', false)
-      jest.spyOn(OrderCreatedEvent, 'validateAndBuild').mockReturnValueOnce(mockFailure)
+      const mockFailureKind = 'mockFailureKind' as never
+      const mockError = 'mockError'
+      const mockTransient = 'mockTransient' as never
+      const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
+      jest.spyOn(OrderCreatedEvent, 'validateAndBuild').mockReturnValueOnce(expectedResult)
       const result = await syncOrderWorkerService.syncOrder(mockValidOrderPlacedEvent)
       expect(Result.isFailure(result)).toBe(true)
+      expect(result).toStrictEqual(expectedResult)
     })
 
     it(`calls EsRaiseOrderCreatedEventClient.raiseOrderCreatedEvent a single time`, async () => {

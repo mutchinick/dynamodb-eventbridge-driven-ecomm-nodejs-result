@@ -146,7 +146,7 @@ describe(`Warehouse Service RestockSkuApi EsRaiseSkuRestockedEventClient tests`,
   })
 
   it(`returns a transient Failure of kind UnrecognizedError if
-      DynamoDBDocumentClient.send throws a generic Error`, async () => {
+      DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const esRaiseSkuRestockedEventClient = new EsRaiseSkuRestockedEventClient(mockDdbDocClient)
     const result = await esRaiseSkuRestockedEventClient.raiseSkuRestockedEvent(mockSkuRestockedEvent)

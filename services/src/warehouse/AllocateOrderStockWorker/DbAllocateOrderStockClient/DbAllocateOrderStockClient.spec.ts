@@ -7,7 +7,7 @@ import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { AllocateOrderStockCommand } from '../model/AllocateOrderStockCommand'
 import { DbAllocateOrderStockClient } from './DbAllocateOrderStockClient'
 
-const mockWarehouseName = 'mockDynamoDbTableName'
+const mockWarehouseName = 'mockWarehouseTableName'
 
 process.env.WAREHOUSE_TABLE_NAME = mockWarehouseName
 
@@ -217,7 +217,7 @@ describe(`Warehouse Service AllocateOrderStockWorker DbAllocateOrderStockClient 
 
   //
   it(`returns a transient Failure of kind UnrecognizedError
-      if DynamoDBDocumentClient.send throws a generic Error`, async () => {
+      if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
     const result = await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)

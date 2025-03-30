@@ -74,14 +74,17 @@ describe(`Warehouse Service RestockSkuApi RestockSkuApiService tests`, () => {
   //
   // Test internal logic
   //
-  // SkuRestockedEvent.validateAndBuild
-  it(`returns an Failure if SkuRestockedEvent.validateAndBuild returns a Failure`, async () => {
+  it(`returns the same Failure if SkuRestockedEvent.validateAndBuild returns a Failure`, async () => {
     const mockEsRaiseSkuRestockedEventClient = buildMockEsRaiseSkuRestockedEventClient_succeeds()
     const restockSkuApiService = new RestockSkuApiService(mockEsRaiseSkuRestockedEventClient)
-    const mockFailure = Result.makeFailure('InvalidArgumentsError', '', false)
-    jest.spyOn(SkuRestockedEvent, 'validateAndBuild').mockReturnValueOnce(mockFailure)
+    const mockFailureKind = 'mockFailureKind' as never
+    const mockError = 'mockError'
+    const mockTransient = 'mockTransient' as never
+    const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
+    jest.spyOn(SkuRestockedEvent, 'validateAndBuild').mockReturnValueOnce(expectedResult)
     const result = await restockSkuApiService.restockSku(mockIncomingRestockSkuRequest)
     expect(Result.isFailure(result)).toBe(true)
+    expect(result).toStrictEqual(expectedResult)
   })
 
   it(`calls EsRaiseSkuRestockedEventClient.restockSku a single time`, async () => {

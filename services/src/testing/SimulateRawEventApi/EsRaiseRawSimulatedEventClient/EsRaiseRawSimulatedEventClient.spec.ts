@@ -112,7 +112,7 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
-  it(`returns a transient Failure of kind UnrecognizedError if DynamoDBDocumentClient.send throws a native Error`, async () => {
+  it(`returns a transient Failure of kind UnrecognizedError if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockError = new Error('mockError')
     const mockDdbDocClient = buildMockDdbDocClient_throws(mockError)
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)

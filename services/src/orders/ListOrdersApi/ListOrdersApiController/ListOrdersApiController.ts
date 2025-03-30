@@ -32,12 +32,14 @@ export class ListOrdersApiController implements IListOrdersApiController {
     }
 
     if (Result.isFailureOfKind(listOrdersResult, 'InvalidArgumentsError')) {
-      console.error(`${logContext} failure exit:`, { apiEvent })
-      return HttpResponse.BadRequestError()
+      const badRequestError = HttpResponse.BadRequestError()
+      console.error(`${logContext} failure exit:`, { badRequestError, apiEvent })
+      return badRequestError
     }
 
-    console.error(`${logContext} failure exit:`, { apiEvent })
-    return HttpResponse.InternalServerError()
+    const internalServerError = HttpResponse.InternalServerError()
+    console.error(`${logContext} failure exit:`, { internalServerError, apiEvent })
+    return internalServerError
   }
 
   //
