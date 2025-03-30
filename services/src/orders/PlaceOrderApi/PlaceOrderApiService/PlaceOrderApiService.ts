@@ -15,7 +15,7 @@ export class PlaceOrderApiService implements IPlaceOrderApiService {
   //
   //
   //
-  constructor(private readonly ddbOrderPlacedEventClient: IEsRaiseOrderPlacedEventClient) {}
+  constructor(private readonly esRaiseOrderPlacedEventClient: IEsRaiseOrderPlacedEventClient) {}
 
   //
   //
@@ -82,7 +82,7 @@ export class PlaceOrderApiService implements IPlaceOrderApiService {
     }
 
     const orderPlacedEvent = orderPlacedEventResult.value
-    const raiseEventResult = await this.ddbOrderPlacedEventClient.raiseOrderPlacedEvent(orderPlacedEvent)
+    const raiseEventResult = await this.esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(orderPlacedEvent)
     Result.isFailure(raiseEventResult)
       ? console.error(`${logContext} exit failure:`, { raiseEventResult, incomingPlaceOrderRequest })
       : console.info(`${logContext} exit success:`, { raiseEventResult, incomingPlaceOrderRequest })
