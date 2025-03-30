@@ -4,7 +4,7 @@ import { Result } from '../../errors/Result'
 import { IEsRaiseOrderPlacedEventClient } from '../EsRaiseOrderPlacedEventClient/EsRaiseOrderPlacedEventClient'
 import { IncomingPlaceOrderRequest } from '../model/IncomingPlaceOrderRequest'
 import { OrderPlacedEvent, OrderPlacedEventInput } from '../model/OrderPlacedEvent'
-import { PlaceOrderApiService, PlaceOrderServiceOutput } from './PlaceOrderApiService'
+import { PlaceOrderApiService, PlaceOrderApiServiceOutput } from './PlaceOrderApiService'
 
 jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
@@ -133,7 +133,7 @@ describe(`Orders Service PlaceOrderApi PlaceOrderApiService tests`, () => {
     const mockEsRaiseOrderPlacedEventClient = buildMockEsRaiseOrderPlacedEventClient_succeeds()
     const placeOrderApiService = new PlaceOrderApiService(mockEsRaiseOrderPlacedEventClient)
     const result = await placeOrderApiService.placeOrder(mockIncomingPlaceOrderRequest)
-    const expectedOutput: PlaceOrderServiceOutput = {
+    const expectedOutput: PlaceOrderApiServiceOutput = {
       orderId: mockIncomingPlaceOrderRequest.orderId,
       sku: mockIncomingPlaceOrderRequest.sku,
       units: mockIncomingPlaceOrderRequest.units,

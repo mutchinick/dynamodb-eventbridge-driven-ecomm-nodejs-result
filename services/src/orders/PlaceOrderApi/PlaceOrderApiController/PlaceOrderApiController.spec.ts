@@ -2,7 +2,7 @@ import { APIGatewayProxyEventV2 } from 'aws-lambda'
 import { HttpResponse } from '../../../shared/HttpResponse'
 import { Result } from '../../errors/Result'
 import { IncomingPlaceOrderRequest } from '../model/IncomingPlaceOrderRequest'
-import { IPlaceOrderApiService, PlaceOrderServiceOutput } from '../PlaceOrderApiService/PlaceOrderApiService'
+import { IPlaceOrderApiService, PlaceOrderApiServiceOutput } from '../PlaceOrderApiService/PlaceOrderApiService'
 import { PlaceOrderApiController } from './PlaceOrderApiController'
 
 const mockOrderId = 'mockOrderId'
@@ -38,7 +38,7 @@ function buildMockApiEvent(incomingPlaceOrderRequest: IncomingPlaceOrderRequest)
 //
 function buildMockPlaceOrderApiService_succeeds(): IPlaceOrderApiService {
   const mockApiEventBody = buildMockApiEventBody()
-  const mockServiceOutput: PlaceOrderServiceOutput = mockApiEventBody
+  const mockServiceOutput: PlaceOrderApiServiceOutput = mockApiEventBody
   const mockServiceOutputResult = Result.makeSuccess(mockServiceOutput)
   return { placeOrder: jest.fn().mockResolvedValue(mockServiceOutputResult) }
 }

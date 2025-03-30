@@ -9,7 +9,7 @@ export interface IPlaceOrderApiService {
   ) => Promise<Success<IncomingPlaceOrderRequest> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>>
 }
 
-export type PlaceOrderServiceOutput = IncomingPlaceOrderRequest
+export type PlaceOrderApiServiceOutput = IncomingPlaceOrderRequest
 
 export class PlaceOrderApiService implements IPlaceOrderApiService {
   //
@@ -34,7 +34,7 @@ export class PlaceOrderApiService implements IPlaceOrderApiService {
 
     const raiseEventResult = await this.raiseOrderPlacedEvent(incomingPlaceOrderRequest)
     if (Result.isSuccess(raiseEventResult) || Result.isFailureOfKind(raiseEventResult, 'DuplicateEventRaisedError')) {
-      const serviceOutput: PlaceOrderServiceOutput = { ...incomingPlaceOrderRequest }
+      const serviceOutput: PlaceOrderApiServiceOutput = { ...incomingPlaceOrderRequest }
       const serviceOutputResult = Result.makeSuccess(serviceOutput)
       console.info(`${logContext} exit success:`, { serviceOutputResult, incomingPlaceOrderRequest })
       return serviceOutputResult
