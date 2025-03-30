@@ -474,6 +474,6 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockCommand t
     }
     const expectedResult = Result.makeSuccess(expectedCommand)
     expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toMatchObject(expectedResult)
+    expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 })

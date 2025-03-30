@@ -1014,7 +1014,7 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     }
     const expectedResult = Result.makeSuccess(expectedEvent)
     expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toMatchObject(expectedResult)
+    expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 
   it(`returns the expected Success<IncomingOrderEvent> if the input is valid and sku is missing`, () => {
@@ -1038,7 +1038,7 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     }
     const expectedResult = Result.makeSuccess(expectedEvent)
     expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toMatchObject(expectedResult)
+    expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 
   it(`returns the expected Success<IncomingOrderEvent> if the input is valid and units is missing`, () => {
@@ -1062,7 +1062,7 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     }
     const expectedResult = Result.makeSuccess(expectedEvent)
     expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toMatchObject(expectedResult)
+    expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 
   it(`returns the expected Success<IncomingOrderEvent> if the input is valid and price is missing`, () => {
@@ -1086,7 +1086,7 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     }
     const expectedResult = Result.makeSuccess(expectedEvent)
     expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toMatchObject(expectedResult)
+    expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 
   it(`returns the expected Success<IncomingOrderEvent> if the input is valid and userId is missing`, () => {
@@ -1110,7 +1110,7 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     }
     const expectedResult = Result.makeSuccess(expectedEvent)
     expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toMatchObject(expectedResult)
+    expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 
   it(`returns the expected Success<IncomingOrderEvent> if the input is valid and createdAt is missing`, () => {
@@ -1134,7 +1134,7 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     }
     const expectedResult = Result.makeSuccess(expectedEvent)
     expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toMatchObject(expectedResult)
+    expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 
   it(`returns the expected Success<IncomingOrderEvent> if the input is valid and updatedAt is missing`, () => {
@@ -1158,6 +1158,6 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     }
     const expectedResult = Result.makeSuccess(expectedEvent)
     expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toMatchObject(expectedResult)
+    expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 })

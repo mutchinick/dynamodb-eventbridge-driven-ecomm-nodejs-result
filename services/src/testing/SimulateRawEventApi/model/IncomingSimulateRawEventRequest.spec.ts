@@ -304,6 +304,6 @@ describe(`Testing Service SimulateRawEventApi IncomingSimulateRawEventRequest te
     }
     const expectedResult = Result.makeSuccess(expectedRequest)
     expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toMatchObject(expectedResult)
+    expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 })

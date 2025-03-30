@@ -470,6 +470,6 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
     }
     const expectedResult = Result.makeSuccess(expectedCommand)
     expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toMatchObject(expectedResult)
+    expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 })

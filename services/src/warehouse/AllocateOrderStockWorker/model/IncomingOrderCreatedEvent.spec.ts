@@ -711,6 +711,6 @@ describe(`Warehouse Service AllocateOrderStockWorker IncomingOrderCreatedEvent t
     }
     const expectedResult = Result.makeSuccess(expectedEvent)
     expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toMatchObject(expectedResult)
+    expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 })

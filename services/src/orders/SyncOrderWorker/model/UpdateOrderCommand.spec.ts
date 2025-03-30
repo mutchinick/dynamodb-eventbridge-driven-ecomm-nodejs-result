@@ -1289,7 +1289,7 @@ describe(`Orders Service SyncOrderWorker UpdateOrderCommand tests`, () => {
     }
     const expectedResult = Result.makeSuccess(expectedCommand)
     expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toMatchObject(expectedResult)
+    expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 
   it(`returns the expected Success<UpdateOrderCommand> with orderStatus === ORDER_STOCK_DEPLETED_STATUS`, () => {
@@ -1306,6 +1306,6 @@ describe(`Orders Service SyncOrderWorker UpdateOrderCommand tests`, () => {
     }
     const expectedResult = Result.makeSuccess(expectedCommand)
     expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toMatchObject(expectedResult)
+    expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 })

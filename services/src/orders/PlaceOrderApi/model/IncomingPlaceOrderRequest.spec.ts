@@ -399,6 +399,6 @@ describe(`Orders Service PlaceOrderApi IncomingPlaceOrderRequest tests`, () => {
     }
     const expectedResult = Result.makeSuccess(expectedRequest)
     expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toMatchObject(expectedResult)
+    expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 })
