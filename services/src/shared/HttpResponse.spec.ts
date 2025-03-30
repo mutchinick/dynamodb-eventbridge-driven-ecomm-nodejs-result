@@ -1,6 +1,6 @@
 import { HttpResponse } from './HttpResponse'
 
-describe('Shared Common HttpResponse tests', () => {
+describe('Shared HttpResponse tests', () => {
   test('HttpResponse.OK returns the expected 200 OK APIGatewayProxyStructuredResultV2 response', () => {
     const mockResponseBody = { mockItem1: 1, mockItem2: 'mockItem2' }
     const expectedResponse = {
