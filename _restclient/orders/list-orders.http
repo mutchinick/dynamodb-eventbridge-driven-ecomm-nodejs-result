@@ -1,0 +1,32 @@
+@orderApiBaseUrl = {{$dotenv ORDERS_API_BASE_URL}}
+
+### LIST BY ORDER_ID
+### POST ###
+POST {{orderApiBaseUrl}}/api/v1/orders/listOrders
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "orderId": "ABC001"
+}
+
+### LIST MANY
+### POST ###
+POST {{orderApiBaseUrl}}/api/v1/orders/listOrders
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "limit": 10,
+  "sortOrder": "desc"
+}
+
+### LIST DEFAULT
+### POST ###
+POST {{orderApiBaseUrl}}/api/v1/orders/listOrders
+Origin: https://localhost
+Content-Type: application/json
+
+{
+}
+

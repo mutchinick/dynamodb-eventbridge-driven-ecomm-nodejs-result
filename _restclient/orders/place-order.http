@@ -1,8 +1,8 @@
-@placeOrderBaseUrl = {{$dotenv PLACE_ORDER_BASE_URL}}
+@orderApiBaseUrl = {{$dotenv ORDERS_API_BASE_URL}}
 
 ### ORDER_PLACED_EVENT
 ### POST ###
-POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
+POST {{orderApiBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
 Content-Type: application/json
 
@@ -16,7 +16,7 @@ Content-Type: application/json
 
 ### ORDER_PLACED_EVENT
 ### POST ###
-POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
+POST {{orderApiBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
 Content-Type: application/json
 
@@ -30,7 +30,7 @@ Content-Type: application/json
 
 ### ORDER_PLACED_EVENT
 ### POST ###
-POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
+POST {{orderApiBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
 Content-Type: application/json
 
@@ -44,7 +44,7 @@ Content-Type: application/json
 
 ### ORDER_PLACED_EVENT
 ### POST ###
-POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
+POST {{orderApiBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
 Content-Type: application/json
 
@@ -58,7 +58,7 @@ Content-Type: application/json
 
 ### ORDER_PLACED_EVENT
 ### POST ###
-POST {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
+POST {{orderApiBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
 Content-Type: application/json
 
@@ -70,8 +70,27 @@ Content-Type: application/json
   "userId": "123456"
 }
 
+### RANDOM
+### ORDER_PLACED_EVENT
+### POST ###
+@randomOrderId = "QQ{{$randomInt 1000 9999}}"
+@randomUnits = {{$randomInt 1 75}}
+@randomPrice = {{$randomInt 40 400}}.{{$randomInt 11 99}}
+@randomUserId = "{{$randomInt 123124 999999}}"
+POST {{orderApiBaseUrl}}/api/v1/orders/placeOrder
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "orderId": {{randomOrderId}},
+  "sku": "ORANGES",
+  "units": {{randomUnits}},
+  "price": {{randomPrice}},
+  "userId": {{randomUserId}}
+}
+
 ### CORS QUERY
 ### OPTIONS ###
-OPTIONS {{placeOrderBaseUrl}}/api/v1/orders/placeOrder
+OPTIONS {{orderApiBaseUrl}}/api/v1/orders/placeOrder
 Origin: https://localhost
 Access-Control-Request-Method: POST

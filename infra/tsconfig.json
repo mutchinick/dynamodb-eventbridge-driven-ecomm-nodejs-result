@@ -27,7 +27,7 @@
     "removeComments": true,
     "composite": true
   },
-  "include": ["bin", "lib", "src", "test", "settings/settings.ts", "settings/endpoints.ts"],
+  "include": ["bin", "lib"],
   "references": [
     {
       "path": "../services"

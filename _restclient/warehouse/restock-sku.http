@@ -1,8 +1,8 @@
-@restockSkuBaseUrl = {{$dotenv RESTOCK_SKU_BASE_URL}}
+@warehouseApiBaseUrl = {{$dotenv WAREHOUSE_API_BASE_URL}}
 
 ### SKU_RESTOCKED_EVENT
 ### POST ###
-POST {{restockSkuBaseUrl}}/api/v1/warehouse/restockSku
+POST {{warehouseApiBaseUrl}}/api/v1/warehouse/restockSku
 Origin: https://localhost
 Content-Type: application/json
 
@@ -14,7 +14,7 @@ Content-Type: application/json
 
 ### SKU_RESTOCKED_EVENT
 ### POST ###
-POST {{restockSkuBaseUrl}}/api/v1/warehouse/restockSku
+POST {{warehouseApiBaseUrl}}/api/v1/warehouse/restockSku
 Origin: https://localhost
 Content-Type: application/json
 
@@ -26,7 +26,7 @@ Content-Type: application/json
 
 ### SKU_RESTOCKED_EVENT
 ### POST ###
-POST {{restockSkuBaseUrl}}/api/v1/warehouse/restockSku
+POST {{warehouseApiBaseUrl}}/api/v1/warehouse/restockSku
 Origin: https://localhost
 Content-Type: application/json
 
@@ -36,8 +36,23 @@ Content-Type: application/json
   "lotId": "C00001"
 }
 
+### RANDOM
+### SKU_RESTOCKED_EVENT
+### POST ###
+@randomUnits = {{$randomInt 20 500}}
+@randomLodId = "ZZ{{$randomInt 1000 9999}}"
+POST {{warehouseApiBaseUrl}}/api/v1/warehouse/restockSku
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "sku": "ORANGES",
+  "units": {{randomUnits}},
+  "lotId": {{randomLodId}}
+}
+
 ### CORS QUERY
 ### OPTIONS ###
-OPTIONS {{restockSkuBaseUrl}}/api/v1/warehouse/restockSku
+OPTIONS {{warehouseApiBaseUrl}}/api/v1/warehouse/restockSku
 Origin: https://localhost
 Access-Control-Request-Method: POST

@@ -1,10 +1,10 @@
-@simulateRawEventBaseUrl = {{$dotenv SIMULATE_RAW_EVENT_BASE_URL}}
+@testingApiBaseUrl = {{$dotenv TESTING_API_BASE_URL}}
 
 @sku = ORANGES
 
 ### SKU_RESTOCKED_EVENT
 ### POST ###
-POST {{simulateRawEventBaseUrl}}/api/v1/testing/simulateRawEvent
+POST {{testingApiBaseUrl}}/api/v1/testing/simulateRawEvent
 Origin: https://localhost
 Content-Type: application/json
 
@@ -21,7 +21,7 @@ Content-Type: application/json
 
 ### SKU_RESTOCKED_EVENT
 ### POST ###
-POST {{simulateRawEventBaseUrl}}/api/v1/testing/simulateRawEvent
+POST {{testingApiBaseUrl}}/api/v1/testing/simulateRawEvent
 Origin: https://localhost
 Content-Type: application/json
 
@@ -38,6 +38,6 @@ Content-Type: application/json
 
 ### CORS QUERY
 ### OPTIONS ###
-OPTIONS {{simulateRawEventBaseUrl}}/api/v1/testing/simulateRawEvent
+OPTIONS {{testingApiBaseUrl}}/api/v1/testing/simulateRawEvent
 Origin: https://localhost
 Access-Control-Request-Method: POST

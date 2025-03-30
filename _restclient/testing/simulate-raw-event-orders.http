@@ -1,4 +1,4 @@
-@simulateRawEventBaseUrl = {{$dotenv SIMULATE_RAW_EVENT_BASE_URL}}
+@simulateRawEventBaseUrl = {{$dotenv TESTING_API_BASE_URL}}
 
 @orderId = ORD001
 

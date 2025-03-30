@@ -4,11 +4,14 @@ import { EventBus } from 'aws-cdk-lib/aws-events'
 import { Construct } from 'constructs'
 import { DynamoDbConstruct } from './common/DynamoDbConstruct'
 import { EventBusConstruct } from './common/EventBusConstruct'
-import { PlaceOrderApiConstruct } from './orders/PlaceOrderApiConstruct'
+import { ListOrdersApiLambdaConstruct } from './orders/ListOrdersApiLambdaConstruct'
+import { OrdersApiConstruct } from './orders/OrdersApiConstruct'
+import { PlaceOrderApiLambdaConstruct } from './orders/PlaceOrderApiLambdaConstruct'
 import { SyncOrderWorkerConstruct } from './orders/SyncOrderWorkerConstruct'
-import { SimulateRawEventApiConstruct } from './testing/SimulateRawEventApiConstruct'
+import { SimulateRawEventApiLambdaConstruct } from './testing/SimulateRawEventApiLambdaConstruct'
+import { TestingApiConstruct } from './testing/TestingApiConstruct'
 import { AllocateOrderStockWorkerConstruct } from './warehouse/AllocateOrderStockWorkerConstruct'
-import { RestockSkuApiConstruct } from './warehouse/RestockSkuApiConstruct'
+import { RestockSkuApiLambdaConstruct } from './warehouse/RestockSkuApiLambdaConstruct'
 import { RestockSkuWorkerConstruct } from './warehouse/RestockSkuWorkerConstruct'
 
 export interface IMainStackProps extends StackProps {
@@ -64,8 +67,19 @@ export class MainStack extends Stack {
   //
   private createOrdersService(id: string, dynamoDbTable: Table, eventBus: EventBus): void {
     const serviceId = `${id}-Orders`
-    const placeOrderApiConstructName = `${serviceId}-PlaceOrderApi`
-    new PlaceOrderApiConstruct(this, placeOrderApiConstructName, {
+
+    const ordersApiConstructName = `${serviceId}-Api`
+    const { httpApi } = new OrdersApiConstruct(this, ordersApiConstructName)
+
+    const placeOrderApiLambdaName = `${serviceId}-PlaceOrderApi`
+    new PlaceOrderApiLambdaConstruct(this, placeOrderApiLambdaName, {
+      httpApi,
+      dynamoDbTable,
+    })
+
+    const listOrdersApiLambdaName = `${serviceId}-ListOrdersApi`
+    new ListOrdersApiLambdaConstruct(this, listOrdersApiLambdaName, {
+      httpApi,
       dynamoDbTable,
     })
 
@@ -81,8 +95,13 @@ export class MainStack extends Stack {
   //
   private createTestingService(id: string, dynamoDbTable: Table): void {
     const serviceId = `${id}-Testing`
-    const simulateRawEventApiConstructName = `${serviceId}-SimulateRawEventApi`
-    new SimulateRawEventApiConstruct(this, simulateRawEventApiConstructName, {
+
+    const testingApiConstructName = `${serviceId}-Api`
+    const { httpApi } = new TestingApiConstruct(this, testingApiConstructName)
+
+    const simulateRawEventApiLambdaName = `${serviceId}-SimulateRawEventApi`
+    new SimulateRawEventApiLambdaConstruct(this, simulateRawEventApiLambdaName, {
+      httpApi,
       dynamoDbTable,
     })
   }
@@ -92,8 +111,13 @@ export class MainStack extends Stack {
   //
   private createWarehouseService(id: string, dynamoDbTable: Table, eventBus: EventBus) {
     const serviceId = `${id}-Warehouse`
+
+    const warehouseApiConstructName = `${serviceId}-Api`
+    const { httpApi } = new TestingApiConstruct(this, warehouseApiConstructName)
+
     const restockSkuApiConstructName = `${serviceId}-RestockSkuApi`
-    new RestockSkuApiConstruct(this, restockSkuApiConstructName, {
+    new RestockSkuApiLambdaConstruct(this, restockSkuApiConstructName, {
+      httpApi,
       dynamoDbTable,
     })
 

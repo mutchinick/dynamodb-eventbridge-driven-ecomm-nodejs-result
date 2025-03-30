@@ -107,19 +107,19 @@ function writeOutputsToEnvFiles(outputsFilePath: string, deploymentPrefix: strin
 
   const envFilesConfig = [
     {
-      cdkOutputName: `${outputPrefix}OrdersPlaceOrderApiHttpApiUrl`,
+      cdkOutputName: `${outputPrefix}OrdersApiHttpApiUrl`,
       envFilePath: '../_restclient/orders/.env',
-      envVarName: 'PLACE_ORDER_BASE_URL',
+      envVarName: 'ORDERS_API_BASE_URL',
     },
     {
-      cdkOutputName: `${outputPrefix}TestingSimulateRawEventApiHttpApiUrl`,
+      cdkOutputName: `${outputPrefix}TestingApiHttpApiUrl`,
       envFilePath: '../_restclient/testing/.env',
-      envVarName: 'SIMULATE_RAW_EVENT_BASE_URL',
+      envVarName: 'TESTING_API_BASE_URL',
     },
     {
-      cdkOutputName: `${outputPrefix}WarehouseRestockSkuApiHttpApiUrl`,
+      cdkOutputName: `${outputPrefix}WarehouseApiHttpApiUrl`,
       envFilePath: '../_restclient/warehouse/.env',
-      envVarName: 'RESTOCK_SKU_BASE_URL',
+      envVarName: 'WAREHOUSE_API_BASE_URL',
     },
   ]
 
