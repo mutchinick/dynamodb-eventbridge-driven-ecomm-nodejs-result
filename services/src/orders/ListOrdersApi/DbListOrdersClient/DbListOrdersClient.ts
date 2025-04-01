@@ -1,7 +1,7 @@
 import { DynamoDBDocumentClient, NativeAttributeValue, QueryCommand, QueryCommandInput } from '@aws-sdk/lib-dynamodb'
 import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
-import { SortOrder } from '../../model/SortOrder'
+import { SortDirection } from '../../model/SortDirection'
 import { ListOrdersCommand } from '../model/ListOrdersCommand'
 
 export interface IDbListOrdersClient {
@@ -12,7 +12,7 @@ export interface IDbListOrdersClient {
 
 export class DbListOrdersClient implements IDbListOrdersClient {
   public static readonly DEFAULT_LIMIT = 50
-  public static readonly DEFAULT_SORT_ORDER = SortOrder['asc']
+  public static readonly DEFAULT_SORT_DIRECTION = SortDirection['asc']
 
   //
   //
@@ -78,7 +78,7 @@ export class DbListOrdersClient implements IDbListOrdersClient {
     try {
       const tableName = process.env.ORDERS_TABLE_NAME
 
-      const { orderId, sortOrder, limit } = listOrdersCommand.queryData
+      const { orderId, sortDirection, limit } = listOrdersCommand.queryData
 
       let params: QueryCommandInput
       if (orderId) {
@@ -99,8 +99,8 @@ export class DbListOrdersClient implements IDbListOrdersClient {
       } else {
         const orderListIndexName = 'gsi1pk-gsi1sk-index'
         const orderListGsi1pk = `ORDERS#ORDER`
-        const orderListSortOrder = SortOrder[sortOrder] ?? DbListOrdersClient.DEFAULT_SORT_ORDER
-        const orderListScanIndexForward = orderListSortOrder === DbListOrdersClient.DEFAULT_SORT_ORDER
+        const orderListSortDirection = SortDirection[sortDirection] ?? DbListOrdersClient.DEFAULT_SORT_DIRECTION
+        const orderListScanIndexForward = orderListSortDirection === DbListOrdersClient.DEFAULT_SORT_DIRECTION
         const orderListLimit = limit || DbListOrdersClient.DEFAULT_LIMIT
         params = {
           TableName: tableName,

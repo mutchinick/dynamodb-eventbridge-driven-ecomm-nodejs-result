@@ -1,10 +1,12 @@
 import { z } from 'zod'
 import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
-import { SortOrder } from '../../model/SortOrder'
+import { SortDirection } from '../../model/SortDirection'
 import { ValueValidators } from '../../model/ValueValidators'
 
-type IncomingListOrdersRequestData = Partial<Pick<OrderData, 'orderId'> & { sortOrder: SortOrder } & { limit: number }>
+type IncomingListOrdersRequestData = Partial<
+  Pick<OrderData, 'orderId'> & { sortDirection: SortDirection } & { limit: number }
+>
 
 export type IncomingListOrdersRequestInput = IncomingListOrdersRequestData
 
@@ -16,7 +18,7 @@ export class IncomingListOrdersRequest implements IncomingListOrdersRequestProps
   //
   private constructor(
     public readonly orderId?: string,
-    public readonly sortOrder?: 'asc' | 'desc',
+    public readonly sortDirection?: 'asc' | 'desc',
     public readonly limit?: number,
   ) {}
 
@@ -35,8 +37,8 @@ export class IncomingListOrdersRequest implements IncomingListOrdersRequestProps
       return propsResult
     }
 
-    const { orderId, sortOrder, limit } = propsResult.value
-    const incomingListOrdersRequest = new IncomingListOrdersRequest(orderId, sortOrder, limit)
+    const { orderId, sortDirection, limit } = propsResult.value
+    const incomingListOrdersRequest = new IncomingListOrdersRequest(orderId, sortDirection, limit)
     const incomingListOrdersRequestResult = Result.makeSuccess(incomingListOrdersRequest)
     console.info(`${logContext} exit success:`, { incomingListOrdersRequestResult, incomingListOrdersRequestInput })
     return incomingListOrdersRequestResult
@@ -53,10 +55,10 @@ export class IncomingListOrdersRequest implements IncomingListOrdersRequestProps
       return inputValidationResult
     }
 
-    const { orderId, sortOrder, limit } = incomingListOrdersRequestInput
+    const { orderId, sortDirection, limit } = incomingListOrdersRequestInput
     const incomingListOrdersRequestProps: IncomingListOrdersRequestProps = {
       orderId,
-      sortOrder,
+      sortDirection,
       limit,
     }
     return Result.makeSuccess(incomingListOrdersRequestProps)
@@ -73,7 +75,7 @@ export class IncomingListOrdersRequest implements IncomingListOrdersRequestProps
     // COMBAK: Maybe some schemas can be converted to shared models at some point
     const schema = z.object({
       orderId: ValueValidators.validOrderId().optional(),
-      sortOrder: ValueValidators.validSortOrder().optional(),
+      sortDirection: ValueValidators.validSortDirection().optional(),
       limit: ValueValidators.validLimit().optional(),
     })
 

@@ -4,7 +4,7 @@ import { Result } from '../../errors/Result'
 import { IncomingListOrdersRequest } from '../model/IncomingListOrdersRequest'
 import { IListOrdersApiService, ListOrdersApiServiceOutput } from '../ListOrdersApiService/ListOrdersApiService'
 import { ListOrdersApiController } from './ListOrdersApiController'
-import { type SortOrder } from '../../model/SortOrder'
+import { type SortDirection } from '../../model/SortDirection'
 import { OrderStatus } from '../../model/OrderStatus'
 
 jest.useFakeTimers().setSystemTime(new Date('2004-10-19Z03:24:00'))
@@ -14,7 +14,7 @@ const mockOrderId = 'mockOrderId'
 
 type MockApiEventBody = {
   orderId?: string
-  sortOrder?: SortOrder
+  sortDirection?: SortDirection
   limit?: number
 }
 
@@ -220,46 +220,46 @@ describe(`Orders Service ListOrdersApi ListOrdersApiController tests`, () => {
   })
 
   //
-  // Test APIGatewayProxyEventV2.body.sortOrder edge cases
+  // Test APIGatewayProxyEventV2.body.sortDirection edge cases
   //
-  it(`responds with 200 OK if the APIGatewayProxyEventV2.body.sortOrder is missing`, async () => {
+  it(`responds with 200 OK if the APIGatewayProxyEventV2.body.sortDirection is missing`, async () => {
     const mockListOrdersApiService = buildMockListOrdersApiService_succeeds()
     const listOrdersApiController = new ListOrdersApiController(mockListOrdersApiService)
     const mockApiEventBody = buildMockApiEventBody()
-    delete mockApiEventBody.sortOrder
+    delete mockApiEventBody.sortDirection
     const mockApiEvent = buildMockApiEvent(mockApiEventBody)
     const response = await listOrdersApiController.listOrders(mockApiEvent)
     const expectedResponse = HttpResponse.OK(mockServiceOutput)
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`responds with 200 OK if the APIGatewayProxyEventV2.body.sortOrder is undefined`, async () => {
+  it(`responds with 200 OK if the APIGatewayProxyEventV2.body.sortDirection is undefined`, async () => {
     const mockListOrdersApiService = buildMockListOrdersApiService_succeeds()
     const listOrdersApiController = new ListOrdersApiController(mockListOrdersApiService)
     const mockApiEventBody = buildMockApiEventBody()
-    mockApiEventBody.sortOrder = undefined as never
+    mockApiEventBody.sortDirection = undefined as never
     const mockApiEvent = buildMockApiEvent(mockApiEventBody)
     const response = await listOrdersApiController.listOrders(mockApiEvent)
     const expectedResponse = HttpResponse.OK(mockServiceOutput)
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`responds with 400 Bad Request if the APIGatewayProxyEventV2.body.sortOrder is null`, async () => {
+  it(`responds with 400 Bad Request if the APIGatewayProxyEventV2.body.sortDirection is null`, async () => {
     const mockListOrdersApiService = buildMockListOrdersApiService_succeeds()
     const listOrdersApiController = new ListOrdersApiController(mockListOrdersApiService)
     const mockApiEventBody = buildMockApiEventBody()
-    mockApiEventBody.sortOrder = null as never
+    mockApiEventBody.sortDirection = null as never
     const mockApiEvent = buildMockApiEvent(mockApiEventBody)
     const response = await listOrdersApiController.listOrders(mockApiEvent)
     const expectedResponse = HttpResponse.BadRequestError()
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`responds with 400 Bad Request if the APIGatewayProxyEventV2.body.sortOrder is not a string`, async () => {
+  it(`responds with 400 Bad Request if the APIGatewayProxyEventV2.body.sortDirection is not a string`, async () => {
     const mockListOrdersApiService = buildMockListOrdersApiService_succeeds()
     const listOrdersApiController = new ListOrdersApiController(mockListOrdersApiService)
     const mockApiEventBody = buildMockApiEventBody()
-    mockApiEventBody.sortOrder = 123456 as never
+    mockApiEventBody.sortDirection = 123456 as never
     const mockApiEvent = buildMockApiEvent(mockApiEventBody)
     const response = await listOrdersApiController.listOrders(mockApiEvent)
     const expectedResponse = HttpResponse.BadRequestError()

@@ -18,7 +18,7 @@ Content-Type: application/json
 
 {
   "limit": 10,
-  "sortOrder": "desc"
+  "sortDirection": "desc"
 }
 
 ### LIST DEFAULT

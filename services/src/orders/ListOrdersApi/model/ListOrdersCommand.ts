@@ -1,10 +1,12 @@
 import { z } from 'zod'
 import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
-import { SortOrder } from '../../model/SortOrder'
+import { SortDirection } from '../../model/SortDirection'
 import { ValueValidators } from '../../model/ValueValidators'
 
-type ListOrdersCommandQueryData = Partial<Pick<OrderData, 'orderId'> & { sortOrder: SortOrder } & { limit: number }>
+type ListOrdersCommandQueryData = Partial<
+  Pick<OrderData, 'orderId'> & { sortDirection: SortDirection } & { limit: number }
+>
 
 export type ListOrdersCommandInput = ListOrdersCommandQueryData
 
@@ -55,9 +57,9 @@ export class ListOrdersCommand implements ListOrdersCommandProps {
       return inputValidationResult
     }
 
-    const { orderId, sortOrder, limit } = listOrdersCommandInput
+    const { orderId, sortDirection, limit } = listOrdersCommandInput
     const listOrdersCommandProps: ListOrdersCommandProps = {
-      queryData: { orderId, sortOrder, limit },
+      queryData: { orderId, sortDirection, limit },
       options: {},
     }
     return Result.makeSuccess(listOrdersCommandProps)
@@ -74,7 +76,7 @@ export class ListOrdersCommand implements ListOrdersCommandProps {
     // COMBAK: Maybe some schemas can be converted to shared models at some point
     const schema = z.object({
       orderId: ValueValidators.validOrderId().optional(),
-      sortOrder: ValueValidators.validSortOrder().optional(),
+      sortDirection: ValueValidators.validSortDirection().optional(),
       limit: ValueValidators.validLimit().optional(),
     })
 

@@ -3,7 +3,7 @@ import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
 import { OrderStatus } from '../../model/OrderStatus'
-import { type SortOrder } from '../../model/SortOrder'
+import { type SortDirection } from '../../model/SortDirection'
 import { ListOrdersCommand, ListOrdersCommandInput } from '../model/ListOrdersCommand'
 import { DbListOrdersClient } from './DbListOrdersClient'
 
@@ -15,7 +15,7 @@ jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
 const mockDate = new Date().toISOString()
 const mockOrderId = 'mockOrderId'
-const mockSortOrder = 'desc'
+const mockSortDirection = 'desc'
 const mockLimit = 30
 
 function buildMockListOrdersCommand(
@@ -47,9 +47,9 @@ function buildMockDdbCommand_ByOrderId(orderId: string): QueryCommand {
 }
 
 //
-// List many (sortOrder and limit)
+// List many (sortDirection and limit)
 //
-function buildMockDdbCommand_ListMany(sortOrder: SortOrder, limit: number): QueryCommand {
+function buildMockDdbCommand_ListMany(sortDirection: SortDirection, limit: number): QueryCommand {
   const indexName = 'gsi1pk-gsi1sk-index'
   const orderListGsi1pk = `ORDERS#ORDER`
   const ddbCommand = new QueryCommand({
@@ -62,7 +62,7 @@ function buildMockDdbCommand_ListMany(sortOrder: SortOrder, limit: number): Quer
     ExpressionAttributeValues: {
       ':gsi1pk': orderListGsi1pk,
     },
-    ScanIndexForward: sortOrder !== 'desc',
+    ScanIndexForward: sortDirection !== 'desc',
     Limit: limit,
   })
   return ddbCommand
@@ -84,7 +84,7 @@ function buildMockDdbCommand_ListDefault(): QueryCommand {
     ExpressionAttributeValues: {
       ':gsi1pk': orderListGsi1pk,
     },
-    ScanIndexForward: DbListOrdersClient.DEFAULT_SORT_ORDER === 'asc',
+    ScanIndexForward: DbListOrdersClient.DEFAULT_SORT_DIRECTION === 'asc',
     Limit: DbListOrdersClient.DEFAULT_LIMIT,
   })
   return ddbCommand
@@ -216,11 +216,11 @@ describe(`Orders Service ListOrdersApi DbListOrdersClient tests`, () => {
   })
 
   it(`calls DynamoDBDocumentClient.send with the expected input (list many)`, async () => {
-    const mockTestCommand = buildMockListOrdersCommand({ sortOrder: mockSortOrder, limit: mockLimit })
+    const mockTestCommand = buildMockListOrdersCommand({ sortDirection: mockSortDirection, limit: mockLimit })
     const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
     await dbListOrdersClient.listOrders(mockTestCommand)
-    const expectedDdbCommand = buildMockDdbCommand_ListMany(mockSortOrder, mockLimit)
+    const expectedDdbCommand = buildMockDdbCommand_ListMany(mockSortDirection, mockLimit)
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
@@ -283,7 +283,7 @@ describe(`Orders Service ListOrdersApi DbListOrdersClient tests`, () => {
 
   it(`returns the expected Success<OrderData[]> if DynamoDBDocumentClient.send
       returns Items with data (list many)`, async () => {
-    const mockTestCommand = buildMockListOrdersCommand({ sortOrder: mockSortOrder, limit: mockLimit })
+    const mockTestCommand = buildMockListOrdersCommand({ sortDirection: mockSortDirection, limit: mockLimit })
     const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
     const result = await dbListOrdersClient.listOrders(mockTestCommand)

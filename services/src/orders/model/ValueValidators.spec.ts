@@ -193,25 +193,25 @@ describe(`Orders Service ValueValidators tests`, () => {
     })
   })
 
-  describe(`validSortOrder tests`, () => {
-    it(`throws if sortOrder is undefined`, () => {
+  describe(`validSortDirection tests`, () => {
+    it(`throws if sortDirection is undefined`, () => {
       const testValue = undefined as string
-      expect(() => ValueValidators.validSortOrder().parse(testValue)).toThrow()
+      expect(() => ValueValidators.validSortDirection().parse(testValue)).toThrow()
     })
 
-    it(`throws if sortOrder a random string`, () => {
+    it(`throws if sortDirection a random string`, () => {
       const testValue = 'xyz'
-      expect(() => ValueValidators.validSortOrder().parse(testValue)).toThrow()
+      expect(() => ValueValidators.validSortDirection().parse(testValue)).toThrow()
     })
 
-    it(`is valid if sortOrder === 'asc`, () => {
+    it(`is valid if sortDirection === 'asc`, () => {
       const testValue = 'asc'
-      expect(() => ValueValidators.validSortOrder().parse(testValue)).not.toThrow()
+      expect(() => ValueValidators.validSortDirection().parse(testValue)).not.toThrow()
     })
 
-    it(`is valid if sortOrder === 'desc`, () => {
+    it(`is valid if sortDirection === 'desc`, () => {
       const testValue = 'desc'
-      expect(() => ValueValidators.validSortOrder().parse(testValue)).not.toThrow()
+      expect(() => ValueValidators.validSortDirection().parse(testValue)).not.toThrow()
     })
   })
 

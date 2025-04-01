@@ -4,7 +4,7 @@ import { IncomingListOrdersRequest, IncomingListOrdersRequestInput } from './Inc
 function buildMockIncomingListOrdersRequestInput(): IncomingListOrdersRequestInput {
   const mockValidRequestInput: IncomingListOrdersRequestInput = {
     orderId: 'mockOrderId',
-    sortOrder: 'asc',
+    sortDirection: 'asc',
     limit: 10,
   }
   return mockValidRequestInput
@@ -105,26 +105,26 @@ describe(`Orders Service ListOrdersApi IncomingListOrdersRequest tests`, () => {
   })
 
   //
-  // Test IncomingListOrdersRequestData.sortOrder edge cases
+  // Test IncomingListOrdersRequestData.sortDirection edge cases
   //
-  it(`returns a Success if the input IncomingListOrdersRequestInput.sortOrder is missing`, () => {
+  it(`returns a Success if the input IncomingListOrdersRequestInput.sortDirection is missing`, () => {
     const mockIncomingListOrdersRequestInput = buildMockIncomingListOrdersRequestInput()
-    delete mockIncomingListOrdersRequestInput.sortOrder
+    delete mockIncomingListOrdersRequestInput.sortDirection
     const result = IncomingListOrdersRequest.validateAndBuild(mockIncomingListOrdersRequestInput)
     expect(Result.isSuccess(result)).toBe(true)
   })
 
-  it(`returns a Success if the input IncomingListOrdersRequestInput.sortOrder is undefined`, () => {
+  it(`returns a Success if the input IncomingListOrdersRequestInput.sortDirection is undefined`, () => {
     const mockIncomingListOrdersRequestInput = buildMockIncomingListOrdersRequestInput()
-    mockIncomingListOrdersRequestInput.sortOrder = undefined
+    mockIncomingListOrdersRequestInput.sortDirection = undefined
     const result = IncomingListOrdersRequest.validateAndBuild(mockIncomingListOrdersRequestInput)
     expect(Result.isSuccess(result)).toBe(true)
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
-      IncomingListOrdersRequestInput.sortOrder is null`, () => {
+      IncomingListOrdersRequestInput.sortDirection is null`, () => {
     const mockIncomingListOrdersRequestInput = buildMockIncomingListOrdersRequestInput()
-    mockIncomingListOrdersRequestInput.sortOrder = null
+    mockIncomingListOrdersRequestInput.sortDirection = null
     const result = IncomingListOrdersRequest.validateAndBuild(mockIncomingListOrdersRequestInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -132,9 +132,9 @@ describe(`Orders Service ListOrdersApi IncomingListOrdersRequest tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
-      IncomingListOrdersRequestInput.sortOrder is empty`, () => {
+      IncomingListOrdersRequestInput.sortDirection is empty`, () => {
     const mockIncomingListOrdersRequestInput = buildMockIncomingListOrdersRequestInput()
-    mockIncomingListOrdersRequestInput.sortOrder = '' as never
+    mockIncomingListOrdersRequestInput.sortDirection = '' as never
     const result = IncomingListOrdersRequest.validateAndBuild(mockIncomingListOrdersRequestInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -142,9 +142,9 @@ describe(`Orders Service ListOrdersApi IncomingListOrdersRequest tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
-      IncomingListOrdersRequestInput.sortOrder is blank`, () => {
+      IncomingListOrdersRequestInput.sortDirection is blank`, () => {
     const mockIncomingListOrdersRequestInput = buildMockIncomingListOrdersRequestInput()
-    mockIncomingListOrdersRequestInput.sortOrder = '      ' as never
+    mockIncomingListOrdersRequestInput.sortDirection = '      ' as never
     const result = IncomingListOrdersRequest.validateAndBuild(mockIncomingListOrdersRequestInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -152,9 +152,9 @@ describe(`Orders Service ListOrdersApi IncomingListOrdersRequest tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
-      IncomingListOrdersRequestInput.sortOrder is a random string`, () => {
+      IncomingListOrdersRequestInput.sortDirection is a random string`, () => {
     const mockIncomingListOrdersRequestInput = buildMockIncomingListOrdersRequestInput()
-    mockIncomingListOrdersRequestInput.sortOrder = 'xyz' as never
+    mockIncomingListOrdersRequestInput.sortDirection = 'xyz' as never
     const result = IncomingListOrdersRequest.validateAndBuild(mockIncomingListOrdersRequestInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -236,7 +236,7 @@ describe(`Orders Service ListOrdersApi IncomingListOrdersRequest tests`, () => {
     const result = IncomingListOrdersRequest.validateAndBuild(mockIncomingListOrdersRequestInput)
     const expectedRequest: IncomingListOrdersRequest = {
       orderId: mockIncomingListOrdersRequestInput.orderId,
-      sortOrder: mockIncomingListOrdersRequestInput.sortOrder,
+      sortDirection: mockIncomingListOrdersRequestInput.sortDirection,
       limit: mockIncomingListOrdersRequestInput.limit,
     }
     const expectedResult = Result.makeSuccess(expectedRequest)

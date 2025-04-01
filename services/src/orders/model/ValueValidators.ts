@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { OrderEventName } from './OrderEventName'
 import { OrderStatus } from './OrderStatus'
-import { SortOrder } from './SortOrder'
+import { SortDirection } from './SortDirection'
 
 export class ValueValidators {
   public static validIncomingEventName = () => z.nativeEnum(OrderEventName)
@@ -24,7 +24,7 @@ export class ValueValidators {
 
   public static validUpdatedAt = () => z.string().trim().min(4)
 
-  public static validSortOrder = () => z.enum(Object.values(SortOrder) as [string, ...string[]])
+  public static validSortDirection = () => z.enum(Object.values(SortDirection) as [string, ...string[]])
 
   public static validLimit = () => z.number().int().min(1).max(1000)
 }

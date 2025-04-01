@@ -4,7 +4,7 @@ import { ListOrdersCommand, ListOrdersCommandInput } from './ListOrdersCommand'
 function buildMockListOrdersCommandInput() {
   const mockValidInput: ListOrdersCommandInput = {
     orderId: 'mockOrderId',
-    sortOrder: 'asc',
+    sortDirection: 'asc',
     limit: 10,
   }
   return mockValidInput
@@ -96,26 +96,26 @@ describe(`Orders Service ListOrdersApi ListOrdersCommand tests`, () => {
   })
 
   //
-  // Test ListOrdersCommandData.sortOrder edge cases
+  // Test ListOrdersCommandData.sortDirection edge cases
   //
-  it(`returns a Success if the input ListOrdersCommandInput.sortOrder is missing`, () => {
+  it(`returns a Success if the input ListOrdersCommandInput.sortDirection is missing`, () => {
     const mockListOrdersCommandInput = buildMockListOrdersCommandInput()
-    delete mockListOrdersCommandInput.sortOrder
+    delete mockListOrdersCommandInput.sortDirection
     const result = ListOrdersCommand.validateAndBuild(mockListOrdersCommandInput)
     expect(Result.isSuccess(result)).toBe(true)
   })
 
-  it(`returns a Success if the input ListOrdersCommandInput.sortOrder is undefined`, () => {
+  it(`returns a Success if the input ListOrdersCommandInput.sortDirection is undefined`, () => {
     const mockListOrdersCommandInput = buildMockListOrdersCommandInput()
-    mockListOrdersCommandInput.sortOrder = undefined
+    mockListOrdersCommandInput.sortDirection = undefined
     const result = ListOrdersCommand.validateAndBuild(mockListOrdersCommandInput)
     expect(Result.isSuccess(result)).toBe(true)
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
-      ListOrdersCommandInput.sortOrder is null`, () => {
+      ListOrdersCommandInput.sortDirection is null`, () => {
     const mockListOrdersCommandInput = buildMockListOrdersCommandInput()
-    mockListOrdersCommandInput.sortOrder = null
+    mockListOrdersCommandInput.sortDirection = null
     const result = ListOrdersCommand.validateAndBuild(mockListOrdersCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -123,9 +123,9 @@ describe(`Orders Service ListOrdersApi ListOrdersCommand tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
-      ListOrdersCommandInput.sortOrder is empty`, () => {
+      ListOrdersCommandInput.sortDirection is empty`, () => {
     const mockListOrdersCommandInput = buildMockListOrdersCommandInput()
-    mockListOrdersCommandInput.sortOrder = '' as never
+    mockListOrdersCommandInput.sortDirection = '' as never
     const result = ListOrdersCommand.validateAndBuild(mockListOrdersCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -133,9 +133,9 @@ describe(`Orders Service ListOrdersApi ListOrdersCommand tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
-      ListOrdersCommandInput.sortOrder is blank`, () => {
+      ListOrdersCommandInput.sortDirection is blank`, () => {
     const mockListOrdersCommandInput = buildMockListOrdersCommandInput()
-    mockListOrdersCommandInput.sortOrder = '      ' as never
+    mockListOrdersCommandInput.sortDirection = '      ' as never
     const result = ListOrdersCommand.validateAndBuild(mockListOrdersCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -143,9 +143,9 @@ describe(`Orders Service ListOrdersApi ListOrdersCommand tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
-      ListOrdersCommandInput.sortOrder is a random string`, () => {
+      ListOrdersCommandInput.sortDirection is a random string`, () => {
     const mockListOrdersCommandInput = buildMockListOrdersCommandInput()
-    mockListOrdersCommandInput.sortOrder = 'xyz' as never
+    mockListOrdersCommandInput.sortDirection = 'xyz' as never
     const result = ListOrdersCommand.validateAndBuild(mockListOrdersCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -229,7 +229,7 @@ describe(`Orders Service ListOrdersApi ListOrdersCommand tests`, () => {
       queryData: {
         orderId: mockListOrdersCommandInput.orderId,
         limit: mockListOrdersCommandInput.limit,
-        sortOrder: mockListOrdersCommandInput.sortOrder,
+        sortDirection: mockListOrdersCommandInput.sortDirection,
       },
       options: {},
     }
