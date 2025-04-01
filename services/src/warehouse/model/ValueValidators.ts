@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { z } from 'zod'
+import { SortDirection } from './SortDirection'
 import { WarehouseEventName } from './WarehouseEventName'
 
 export class ValueValidators {
@@ -22,4 +23,8 @@ export class ValueValidators {
   public static validUpdatedAt = () => z.string().trim().min(4)
 
   public static validLotId = () => z.string().trim().min(4)
+
+  public static validSortDirection = () => z.enum(Object.values(SortDirection) as [string, ...string[]])
+
+  public static validLimit = () => z.number().int().min(1).max(1000)
 }

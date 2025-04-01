@@ -11,6 +11,7 @@ import { SyncOrderWorkerConstruct } from './orders/SyncOrderWorkerConstruct'
 import { SimulateRawEventApiLambdaConstruct } from './testing/SimulateRawEventApiLambdaConstruct'
 import { TestingApiConstruct } from './testing/TestingApiConstruct'
 import { AllocateOrderStockWorkerConstruct } from './warehouse/AllocateOrderStockWorkerConstruct'
+import { ListSkusApiLambdaConstruct } from './warehouse/ListSkusApiLambdaConstruct'
 import { RestockSkuApiLambdaConstruct } from './warehouse/RestockSkuApiLambdaConstruct'
 import { RestockSkuWorkerConstruct } from './warehouse/RestockSkuWorkerConstruct'
 
@@ -77,16 +78,16 @@ export class MainStack extends Stack {
       dynamoDbTable,
     })
 
-    const listOrdersApiLambdaName = `${serviceId}-ListOrdersApi`
-    new ListOrdersApiLambdaConstruct(this, listOrdersApiLambdaName, {
-      httpApi,
-      dynamoDbTable,
-    })
-
     const syncOrderWorkerConstructName = `${serviceId}-SyncOrderWorker`
     new SyncOrderWorkerConstruct(this, syncOrderWorkerConstructName, {
       dynamoDbTable,
       eventBus,
+    })
+
+    const listOrdersApiLambdaName = `${serviceId}-ListOrdersApi`
+    new ListOrdersApiLambdaConstruct(this, listOrdersApiLambdaName, {
+      httpApi,
+      dynamoDbTable,
     })
   }
 
@@ -131,6 +132,12 @@ export class MainStack extends Stack {
     new AllocateOrderStockWorkerConstruct(this, allocateOrderStockWorkerConstructName, {
       dynamoDbTable,
       eventBus,
+    })
+
+    const listSkusApiConstructName = `${serviceId}-ListSkusApi`
+    new ListSkusApiLambdaConstruct(this, listSkusApiConstructName, {
+      httpApi,
+      dynamoDbTable,
     })
   }
 }

@@ -186,4 +186,60 @@ describe(`Warehouse Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validLotId().parse(testValue)).not.toThrow()
     })
   })
+
+  describe(`validSortDirection tests`, () => {
+    it(`throws if sortDirection is undefined`, () => {
+      const testValue = undefined as string
+      expect(() => ValueValidators.validSortDirection().parse(testValue)).toThrow()
+    })
+
+    it(`throws if sortDirection a random string`, () => {
+      const testValue = 'xyz'
+      expect(() => ValueValidators.validSortDirection().parse(testValue)).toThrow()
+    })
+
+    it(`is valid if sortDirection === 'asc`, () => {
+      const testValue = 'asc'
+      expect(() => ValueValidators.validSortDirection().parse(testValue)).not.toThrow()
+    })
+
+    it(`is valid if sortDirection === 'desc`, () => {
+      const testValue = 'desc'
+      expect(() => ValueValidators.validSortDirection().parse(testValue)).not.toThrow()
+    })
+  })
+
+  describe(`validLimit tests`, () => {
+    it(`throws if limit is undefined`, () => {
+      const testValue = undefined as string
+      expect(() => ValueValidators.validLimit().parse(testValue)).toThrow()
+    })
+
+    it(`throws if limit = 0`, () => {
+      const testValue = 0
+      expect(() => ValueValidators.validLimit().parse(testValue)).toThrow()
+    })
+
+    it(`throws if limit < 0`, () => {
+      const testValue = -1
+      expect(() => ValueValidators.validLimit().parse(testValue)).toThrow()
+    })
+
+    it(`throws if limit > 1000`, () => {
+      const testValue = 1001
+      expect(() => ValueValidators.validLimit().parse(testValue)).toThrow()
+    })
+
+    it(`throws if limit is not an integer`, () => {
+      const testValue = 3.45
+      expect(() => ValueValidators.validLimit().parse(testValue)).toThrow()
+    })
+
+    it(`is valid if limit >= 1 <= 1000`, () => {
+      const testValueFor1 = 1
+      const testValueFor1000 = 1000
+      expect(() => ValueValidators.validLimit().parse(testValueFor1)).not.toThrow()
+      expect(() => ValueValidators.validLimit().parse(testValueFor1000)).not.toThrow()
+    })
+  })
 })
