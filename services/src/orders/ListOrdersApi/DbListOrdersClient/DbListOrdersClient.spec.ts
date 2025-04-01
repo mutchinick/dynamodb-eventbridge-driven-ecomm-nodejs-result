@@ -30,14 +30,17 @@ function buildMockListOrdersCommand(
 //
 function buildMockDdbCommand_ByOrderId(orderId: string): QueryCommand {
   const orderListPk = `ORDERS#ORDER_ID#${orderId}`
+  const orderListSk = `ORDER_ID#${orderId}`
   const ddbCommand = new QueryCommand({
     TableName: mockOrdersTableName,
-    KeyConditionExpression: '#pk = :pk',
+    KeyConditionExpression: '#pk = :pk AND #sk = :sk',
     ExpressionAttributeNames: {
       '#pk': 'pk',
+      '#sk': 'sk',
     },
     ExpressionAttributeValues: {
       ':pk': orderListPk,
+      ':sk': orderListSk,
     },
   })
   return ddbCommand

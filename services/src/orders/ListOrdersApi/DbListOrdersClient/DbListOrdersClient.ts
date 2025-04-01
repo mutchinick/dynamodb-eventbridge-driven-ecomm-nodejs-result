@@ -83,14 +83,17 @@ export class DbListOrdersClient implements IDbListOrdersClient {
       let params: QueryCommandInput
       if (orderId) {
         const orderListPk = `ORDERS#ORDER_ID#${orderId}`
+        const orderListSk = `ORDER_ID#${orderId}`
         params = {
           TableName: tableName,
-          KeyConditionExpression: '#pk = :pk',
+          KeyConditionExpression: '#pk = :pk AND #sk = :sk',
           ExpressionAttributeNames: {
             '#pk': 'pk',
+            '#sk': 'sk',
           },
           ExpressionAttributeValues: {
             ':pk': orderListPk,
+            ':sk': orderListSk,
           },
         }
       } else {
