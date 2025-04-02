@@ -110,8 +110,8 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
               Item: {
                 pk: allocationPk,
                 sk: allocationSk,
-                sku,
                 orderId,
+                sku,
                 units,
                 price,
                 userId,
@@ -181,7 +181,7 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
       // When possible multiple transaction errors:
       // Prioritize tagging the "Duplication Errors", because if we get one, this means that the operation
       // has already executed successfully, thus we don't care about other possible transaction errors
-      if (this.DuplicateStockAllocationError(error)) {
+      if (this.isDuplicateStockAllocationError(error)) {
         const duplicationFailure = Result.makeFailure('DuplicateStockAllocationError', error, false)
         console.error(`${logContext} exit failure:`, { duplicationFailure, ddbCommand })
         return duplicationFailure
@@ -202,7 +202,7 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
   //
   //
   //
-  private DuplicateStockAllocationError(error: unknown): boolean {
+  private isDuplicateStockAllocationError(error: unknown): boolean {
     const errorCode = DynamoDbUtils.getTransactionCancellationCode(error, 0)
     return errorCode === DynamoDbUtils.CancellationReasons.ConditionalCheckFailed
   }

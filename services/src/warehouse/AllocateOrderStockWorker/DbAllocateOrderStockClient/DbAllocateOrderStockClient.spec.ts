@@ -7,9 +7,9 @@ import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { AllocateOrderStockCommand } from '../model/AllocateOrderStockCommand'
 import { DbAllocateOrderStockClient } from './DbAllocateOrderStockClient'
 
-const mockWarehouseName = 'mockWarehouseTableName'
+const mockWarehouseTableName = 'mockWarehouseTableName'
 
-process.env.WAREHOUSE_TABLE_NAME = mockWarehouseName
+process.env.WAREHOUSE_TABLE_NAME = mockWarehouseTableName
 
 jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
@@ -46,7 +46,7 @@ function buildMockDdbCommand(): TransactWriteCommand {
     TransactItems: [
       {
         Put: {
-          TableName: mockWarehouseName,
+          TableName: mockWarehouseTableName,
           Item: {
             pk: `WAREHOUSE#SKU#${mockSku}`,
             sk: `SKU#${mockSku}#ORDER_ID#${mockOrderId}#ALLOCATION`,
@@ -68,7 +68,7 @@ function buildMockDdbCommand(): TransactWriteCommand {
       },
       {
         Update: {
-          TableName: mockWarehouseName,
+          TableName: mockWarehouseTableName,
           Key: {
             pk: `WAREHOUSE#SKU#${mockSku}`,
             sk: `SKU#${mockSku}`,
