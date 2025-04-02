@@ -55,17 +55,17 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
       Result.isFailureOfKind(allocateOrderResult, 'DuplicateStockAllocationError')
     ) {
       const raiseAllocatedEventResult = await this.raiseAllocatedEvent(incomingOrderCreatedEvent)
-      Result.isSuccess(raiseAllocatedEventResult)
-        ? console.info(`${logContext} exit success:`, { raiseAllocatedEventResult })
-        : console.error(`${logContext} exit failure:`, { raiseAllocatedEventResult, incomingOrderCreatedEvent })
+      Result.isFailure(raiseAllocatedEventResult)
+        ? console.error(`${logContext} exit failure:`, { raiseAllocatedEventResult, incomingOrderCreatedEvent })
+        : console.info(`${logContext} exit success:`, { raiseAllocatedEventResult })
       return raiseAllocatedEventResult
     }
 
     if (Result.isFailureOfKind(allocateOrderResult, 'DepletedStockAllocationError')) {
       const raiseDepletedEventResult = await this.raiseDepletedEvent(incomingOrderCreatedEvent)
-      Result.isSuccess(raiseDepletedEventResult)
-        ? console.info(`${logContext} exit success:`, { raiseDepletedEventResult })
-        : console.error(`${logContext} exit failure:`, { raiseDepletedEventResult, incomingOrderCreatedEvent })
+      Result.isFailure(raiseDepletedEventResult)
+        ? console.error(`${logContext} exit failure:`, { raiseDepletedEventResult, incomingOrderCreatedEvent })
+        : console.info(`${logContext} exit success:`, { raiseDepletedEventResult })
       return raiseDepletedEventResult
     }
 
@@ -118,9 +118,9 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
     const allocateOrderStockCommand = allocateOrderStockCommandResult.value
     const allocateOrderStockResult = await this.dbAllocateOrderStockClient.allocateOrderStock(allocateOrderStockCommand)
 
-    Result.isSuccess(allocateOrderStockResult)
-      ? console.info(`${logContext} exit success:`, { allocateOrderStockResult })
-      : console.error(`${logContext} exit failure:`, { allocateOrderStockResult, allocateOrderStockCommand })
+    Result.isFailure(allocateOrderStockResult)
+      ? console.error(`${logContext} exit failure:`, { allocateOrderStockResult, allocateOrderStockCommand })
+      : console.info(`${logContext} exit success:`, { allocateOrderStockResult })
 
     return allocateOrderStockResult
   }
@@ -151,9 +151,9 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
     const raiseEventResult =
       await this.esRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent(orderStockAllocatedEvent)
 
-    Result.isSuccess(raiseEventResult)
-      ? console.info(`${logContext} exit success:`, { raiseEventResult })
-      : console.error(`${logContext} exit failure:`, { raiseEventResult, orderStockAllocatedEvent })
+    Result.isFailure(raiseEventResult)
+      ? console.error(`${logContext} exit failure:`, { raiseEventResult, orderStockAllocatedEvent })
+      : console.info(`${logContext} exit success:`, { raiseEventResult })
 
     return raiseEventResult
   }
@@ -184,9 +184,9 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
     const raiseEventResult =
       await this.esRaiseOrderStockDepletedEventClient.raiseOrderStockDepletedEvent(orderStockDepletedEvent)
 
-    Result.isSuccess(raiseEventResult)
-      ? console.info(`${logContext} exit success:`, { raiseEventResult })
-      : console.error(`${logContext} exit failure:`, { raiseEventResult, orderStockDepletedEvent })
+    Result.isFailure(raiseEventResult)
+      ? console.error(`${logContext} exit failure:`, { raiseEventResult, orderStockDepletedEvent })
+      : console.info(`${logContext} exit success:`, { raiseEventResult })
 
     return raiseEventResult
   }

@@ -75,9 +75,9 @@ export class AllocateOrderStockWorkerController implements IAllocateOrderStockWo
     const allocateOrderStockResult =
       await this.allocateOrderStockWorkerService.allocateOrderStock(incomingOrderCreatedEvent)
 
-    Result.isSuccess(allocateOrderStockResult)
-      ? console.info(`${logContext} exit success:`, { allocateOrderStockResult })
-      : console.error(`${logContext} exit failure:`, { allocateOrderStockResult, incomingOrderCreatedEvent })
+    Result.isFailure(allocateOrderStockResult)
+      ? console.error(`${logContext} exit failure:`, { allocateOrderStockResult, incomingOrderCreatedEvent })
+      : console.info(`${logContext} exit success:`, { allocateOrderStockResult })
 
     return allocateOrderStockResult
   }
