@@ -1,3 +1,5 @@
+import { AllocationStatus } from './AllocationStatus'
+
 export type AllocateOrderStockData = {
   orderId: string
   sku: string
@@ -6,4 +8,5 @@ export type AllocateOrderStockData = {
   userId: string
   createdAt: string
   updatedAt: string
+  allocationStatus: AllocationStatus
 }

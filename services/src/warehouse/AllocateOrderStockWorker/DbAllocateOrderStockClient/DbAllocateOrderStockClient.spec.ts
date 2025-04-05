@@ -6,6 +6,7 @@ import { WarehouseEventName } from '../../model/WarehouseEventName'
 import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { AllocateOrderStockCommand } from '../model/AllocateOrderStockCommand'
 import { DbAllocateOrderStockClient } from './DbAllocateOrderStockClient'
+import { AllocationStatus } from '../../model/AllocationStatus'
 
 const mockWarehouseTableName = 'mockWarehouseTableName'
 
@@ -20,6 +21,7 @@ const mockSku = 'mockSku'
 const mockUnits = 2
 const mockPrice = 10.32
 const mockUserId = 'mockUserId'
+const mockAllocationStatus: AllocationStatus = 'ALLOCATED'
 
 function buildMockAllocateOrderStockCommand(): TypeUtilsMutable<AllocateOrderStockCommand> {
   const mockClass = AllocateOrderStockCommand.validateAndBuild({
@@ -55,7 +57,7 @@ function buildMockDdbCommand(): TransactWriteCommand {
             units: mockUnits,
             price: mockPrice,
             userId: mockUserId,
-            allocationStatus: `ALLOCATED`,
+            allocationStatus: mockAllocationStatus,
             createdAt: mockDate,
             updatedAt: mockDate,
             _tn: `WAREHOUSE#ALLOCATION`,

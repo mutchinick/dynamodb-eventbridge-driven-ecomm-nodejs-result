@@ -1,3 +1,4 @@
+import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
 import { AllocateOrderStockCommand, AllocateOrderStockCommandInput } from './AllocateOrderStockCommand'
@@ -7,16 +8,8 @@ jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
 const mockDate = new Date().toISOString()
 
-type Mutable_IncomingOrderCreatedEvent = {
-  -readonly [K in keyof IncomingOrderCreatedEvent]: IncomingOrderCreatedEvent[K]
-}
-
-type Mutable_AllocateOrderStockCommandInput = {
-  incomingOrderCreatedEvent: Mutable_IncomingOrderCreatedEvent
-}
-
-function buildMockIncomingOrderCreatedEvent(): Mutable_IncomingOrderCreatedEvent {
-  const mockValidWarehouseEvent: Mutable_IncomingOrderCreatedEvent = {
+function buildMockIncomingOrderCreatedEvent(): TypeUtilsMutable<IncomingOrderCreatedEvent> {
+  const mockValidWarehouseEvent: TypeUtilsMutable<IncomingOrderCreatedEvent> = {
     eventName: WarehouseEventName.ORDER_CREATED_EVENT,
     eventData: {
       orderId: 'mockOrderId',
@@ -31,8 +24,8 @@ function buildMockIncomingOrderCreatedEvent(): Mutable_IncomingOrderCreatedEvent
   return mockValidWarehouseEvent
 }
 
-function buildMockAllocateOrderStockCommandInput(): Mutable_AllocateOrderStockCommandInput {
-  const mockValidInput: Mutable_AllocateOrderStockCommandInput = {
+function buildMockAllocateOrderStockCommandInput(): TypeUtilsMutable<AllocateOrderStockCommandInput> {
+  const mockValidInput: TypeUtilsMutable<AllocateOrderStockCommandInput> = {
     incomingOrderCreatedEvent: buildMockIncomingOrderCreatedEvent(),
   }
   return mockValidInput
@@ -469,6 +462,7 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockCommand t
         userId: mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.userId,
         createdAt: mockDate,
         updatedAt: mockDate,
+        allocationStatus: 'ALLOCATED',
       },
       options: {},
     }

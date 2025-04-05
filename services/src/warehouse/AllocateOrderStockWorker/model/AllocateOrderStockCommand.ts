@@ -3,12 +3,18 @@ import { Failure, Result, Success } from '../../errors/Result'
 import { AllocateOrderStockData } from '../../model/AllocateOrderStockData'
 import { ValueValidators } from '../../model/ValueValidators'
 import { IncomingOrderCreatedEvent } from './IncomingOrderCreatedEvent'
+import { TypeUtilsPretty } from '../../../shared/TypeUtils'
+import { AllocationStatus } from '../../model/AllocationStatus'
 
 export interface AllocateOrderStockCommandInput {
   incomingOrderCreatedEvent: IncomingOrderCreatedEvent
 }
 
-type AllocateOrderStockCommandData = AllocateOrderStockData
+type AllocateOrderStockCommandData = TypeUtilsPretty<
+  AllocateOrderStockData & {
+    allocationStatus: AllocationStatus<'ALLOCATED'>
+  }
+>
 
 type AllocateOrderStockCommandProps = {
   readonly allocateOrderStockData: AllocateOrderStockCommandData
@@ -68,6 +74,7 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
         userId,
         createdAt: date,
         updatedAt: date,
+        allocationStatus: 'ALLOCATED',
       },
       options: {},
     }

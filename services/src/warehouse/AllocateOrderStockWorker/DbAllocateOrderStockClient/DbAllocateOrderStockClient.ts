@@ -90,6 +90,7 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
 
       const { allocateOrderStockData } = allocateOrderStockCommand
       const { orderId, sku, units, price, userId, createdAt, updatedAt } = allocateOrderStockData
+      const { allocationStatus } = allocateOrderStockData
 
       const allocationPk = `WAREHOUSE#SKU#${sku}`
       const allocationSk = `SKU#${sku}#ORDER_ID#${orderId}#ALLOCATION`
@@ -97,7 +98,6 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
       const allocationSn = `WAREHOUSE`
       const allocationGsi1Pk = `WAREHOUSE#ALLOCATION`
       const allocationGsi1Sk = `CREATED_AT#${createdAt}`
-      const allocationStatus = `ALLOCATED`
 
       const skuItemPk = `WAREHOUSE#SKU#${sku}`
       const skuItemSk = `SKU#${sku}`
