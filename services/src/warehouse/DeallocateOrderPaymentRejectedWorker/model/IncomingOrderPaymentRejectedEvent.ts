@@ -3,7 +3,7 @@ import { unmarshall } from '@aws-sdk/util-dynamodb'
 import { EventBridgeEvent } from 'aws-lambda'
 import { z } from 'zod'
 import { Failure, Result, Success } from '../../errors/Result'
-import { AllocateOrderStockData } from '../../model/AllocateOrderStockData'
+import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { ValueValidators } from '../../model/ValueValidators'
 import { WarehouseEvent } from '../../model/WarehouseEvent'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
@@ -21,10 +21,7 @@ type EventDetail = {
 
 export type IncomingOrderPaymentRejectedEventInput = EventBridgeEvent<string, EventDetail>
 
-type IncomingOrderPaymentRejectedEventData = Pick<
-  AllocateOrderStockData,
-  'orderId' | 'sku' | 'units' | 'price' | 'userId'
->
+type IncomingOrderPaymentRejectedEventData = Pick<OrderAllocationData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
 
 type IncomingOrderPaymentRejectedEventProps = WarehouseEvent<
   WarehouseEventName.ORDER_PAYMENT_REJECTED_EVENT,

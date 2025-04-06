@@ -1,7 +1,7 @@
 import { DynamoDBDocumentClient, GetCommand, GetCommandOutput } from '@aws-sdk/lib-dynamodb'
 import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
-import { AllocateOrderStockData } from '../../model/AllocateOrderStockData'
+import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { GetOrderAllocationCommand } from '../model/GetOrderAllocationCommand'
 import { DbGetOrderAllocationClient } from './DbGetOrderAllocationClient'
 
@@ -41,7 +41,7 @@ const expectedDdbCommand = buildMockDdbCommand()
 //
 // Mock clients
 //
-const mockExistingOrderData: AllocateOrderStockData = {
+const mockExistingOrderData: OrderAllocationData = {
   orderId: mockGetOrderAllocationCommand.commandData.orderId,
   sku: mockGetOrderAllocationCommand.commandData.sku,
   units: 2,
@@ -168,11 +168,11 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DbGetOrderAlloc
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it(`returns the expected Success<AllocateOrderStockData> if DynamoDBDocumentClient.send returns a valid item`, async () => {
+  it(`returns the expected Success<OrderAllocationData> if DynamoDBDocumentClient.send returns a valid item`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderAllocationClient = new DbGetOrderAllocationClient(mockDdbDocClient)
     const result = await dbGetOrderAllocationClient.getOrderAllocation(mockGetOrderAllocationCommand)
-    const expectedData: AllocateOrderStockData = {
+    const expectedData: OrderAllocationData = {
       orderId: mockExistingOrderData.orderId,
       sku: mockExistingOrderData.sku,
       units: mockExistingOrderData.units,

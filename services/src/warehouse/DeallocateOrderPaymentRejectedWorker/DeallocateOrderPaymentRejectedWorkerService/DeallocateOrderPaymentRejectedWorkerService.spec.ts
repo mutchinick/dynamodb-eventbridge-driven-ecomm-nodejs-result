@@ -1,7 +1,7 @@
 import { marshall } from '@aws-sdk/util-dynamodb'
 import { FailureKind } from '../../errors/FailureKind'
 import { Result } from '../../errors/Result'
-import { AllocateOrderStockData } from '../../model/AllocateOrderStockData'
+import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
 import { IDbDeallocateOrderPaymentRejectedClient } from '../DbDeallocateOrderPaymentRejectedClient/DbDeallocateOrderPaymentRejectedClient'
 import { IDbGetOrderAllocationClient } from '../DbGetOrderAllocationClient/DbGetOrderAllocationClient'
@@ -19,8 +19,8 @@ const mockUnits = 2
 const mockPrice = 10.55
 const mockUserId = 'mockUserId'
 
-function buildMockExistingOrderAllocationData(): AllocateOrderStockData {
-  const mockClass: AllocateOrderStockData = {
+function buildMockExistingOrderAllocationData(): OrderAllocationData {
+  const mockClass: OrderAllocationData = {
     orderId: mockOrderId,
     sku: mockSku,
     units: mockUnits,

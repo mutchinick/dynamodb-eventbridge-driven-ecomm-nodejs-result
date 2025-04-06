@@ -1,5 +1,5 @@
 import { Failure, Result, Success } from '../../errors/Result'
-import { AllocateOrderStockData } from '../../model/AllocateOrderStockData'
+import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { IDbDeallocateOrderPaymentRejectedClient } from '../DbDeallocateOrderPaymentRejectedClient/DbDeallocateOrderPaymentRejectedClient'
 import { IDbGetOrderAllocationClient } from '../DbGetOrderAllocationClient/DbGetOrderAllocationClient'
 import {
@@ -99,7 +99,7 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
   //
   private async getOrderAllocation(
     incomingOrderPaymentRejectedEvent: IncomingOrderPaymentRejectedEvent,
-  ): Promise<Success<AllocateOrderStockData> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
+  ): Promise<Success<OrderAllocationData> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
     const logContext = 'DeallocateOrderPaymentRejectedWorkerService.getOrderAllocation'
     console.info(`${logContext} init:`, { incomingOrderPaymentRejectedEvent })
 
@@ -124,7 +124,7 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
   //
   //
   private async deallocateOrder(
-    existingOrderAllocationData: AllocateOrderStockData,
+    existingOrderAllocationData: OrderAllocationData,
     incomingOrderPaymentRejectedEvent: IncomingOrderPaymentRejectedEvent,
   ): Promise<
     | Success<void>

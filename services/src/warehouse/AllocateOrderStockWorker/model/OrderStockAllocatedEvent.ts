@@ -1,14 +1,11 @@
 import { z } from 'zod'
 import { Failure, Result, Success } from '../../errors/Result'
-import { AllocateOrderStockData } from '../../model/AllocateOrderStockData'
+import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { ValueValidators } from '../../model/ValueValidators'
 import { WarehouseEvent } from '../../model/WarehouseEvent'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
 
-export type OrderStockAllocatedEventData = Pick<
-  AllocateOrderStockData,
-  'orderId' | 'sku' | 'units' | 'price' | 'userId'
->
+export type OrderStockAllocatedEventData = Pick<OrderAllocationData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
 
 export type OrderStockAllocatedEventInput = OrderStockAllocatedEventData
 

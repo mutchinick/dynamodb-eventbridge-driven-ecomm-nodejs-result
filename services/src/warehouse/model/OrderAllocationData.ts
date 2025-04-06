@@ -1,6 +1,6 @@
 import { AllocationStatus } from './AllocationStatus'
 
-export type AllocateOrderStockData = {
+export type OrderAllocationData = {
   orderId: string
   sku: string
   units: number

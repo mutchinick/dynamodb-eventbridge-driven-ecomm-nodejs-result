@@ -1,6 +1,6 @@
 import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
-import { AllocateOrderStockData } from '../../model/AllocateOrderStockData'
+import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
 import {
   DeallocateOrderPaymentRejectedCommand,
@@ -28,8 +28,8 @@ function buildMockIncomingOrderPaymentRejectedEvent(): TypeUtilsMutable<Incoming
   return mockEvent
 }
 
-function buildMockExistingOrderAllocationData(): TypeUtilsMutable<AllocateOrderStockData> {
-  const mockData: TypeUtilsMutable<AllocateOrderStockData> = {
+function buildMockExistingOrderAllocationData(): TypeUtilsMutable<OrderAllocationData> {
+  const mockData: TypeUtilsMutable<OrderAllocationData> = {
     orderId: 'mockOrderId',
     sku: 'mockSku',
     units: 777, // Intentional mismatch with incomingOrderPaymentRejectedEvent

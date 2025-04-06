@@ -3,7 +3,7 @@ import { unmarshall } from '@aws-sdk/util-dynamodb'
 import { EventBridgeEvent } from 'aws-lambda'
 import { z } from 'zod'
 import { Failure, Result, Success } from '../../errors/Result'
-import { AllocateOrderStockData } from '../../model/AllocateOrderStockData'
+import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { ValueValidators } from '../../model/ValueValidators'
 import { WarehouseEvent } from '../../model/WarehouseEvent'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
@@ -21,7 +21,7 @@ type EventDetail = {
 
 export type IncomingOrderCreatedEventInput = EventBridgeEvent<string, EventDetail>
 
-type IncomingOrderCreatedEventData = Pick<AllocateOrderStockData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
+type IncomingOrderCreatedEventData = Pick<OrderAllocationData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
 
 type IncomingOrderCreatedEventProps = WarehouseEvent<
   WarehouseEventName.ORDER_CREATED_EVENT,

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { Failure, Result, Success } from '../../errors/Result'
-import { AllocateOrderStockData } from '../../model/AllocateOrderStockData'
+import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { ValueValidators } from '../../model/ValueValidators'
 import { IncomingOrderCreatedEvent } from './IncomingOrderCreatedEvent'
 import { TypeUtilsPretty } from '../../../shared/TypeUtils'
@@ -11,7 +11,7 @@ export interface AllocateOrderStockCommandInput {
 }
 
 type AllocateOrderStockCommandData = TypeUtilsPretty<
-  AllocateOrderStockData & {
+  OrderAllocationData & {
     allocationStatus: AllocationStatus<'ALLOCATED'>
   }
 >
