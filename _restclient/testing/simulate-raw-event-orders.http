@@ -9,16 +9,16 @@ Origin: https://localhost
 Content-Type: application/json
 
 {
- "pk": "EVENTS#ORDER_ID#{{orderId}}",
- "sk": "EVENT#ORDER_PLACED_EVENT",
- "eventName": "ORDER_PLACED_EVENT",
- "eventData": {
-  "orderId": "{{orderId}}",
-  "sku": "ORANGES",
-  "units": 2,
-  "price": 22.99,
-  "userId": "123456"
- }
+  "pk": "EVENTS#ORDER_ID#{{orderId}}",
+  "sk": "EVENT#ORDER_PLACED_EVENT",
+  "eventName": "ORDER_PLACED_EVENT",
+  "eventData": {
+    "orderId": "{{orderId}}",
+    "sku": "ORANGES",
+    "units": 2,
+    "price": 22.99,
+    "userId": "123456"
+  }
 }
 
 ### ORDER_STOCK_ALLOCATED_EVENT
@@ -28,16 +28,16 @@ Origin: https://localhost
 Content-Type: application/json
 
 {
- "pk": "EVENTS#ORDER_ID#{{orderId}}",
- "sk": "EVENT#ORDER_STOCK_ALLOCATED_EVENT",
- "eventName": "ORDER_STOCK_ALLOCATED_EVENT",
- "eventData": {
-  "orderId": "{{orderId}}",
-  "sku": "ORANGES",
-  "units": 2,
-  "price": 22.99,
-  "userId": "123456"
- }
+  "pk": "EVENTS#ORDER_ID#{{orderId}}",
+  "sk": "EVENT#ORDER_STOCK_ALLOCATED_EVENT",
+  "eventName": "ORDER_STOCK_ALLOCATED_EVENT",
+  "eventData": {
+    "orderId": "{{orderId}}",
+    "sku": "ORANGES",
+    "units": 2,
+    "price": 22.99,
+    "userId": "123456"
+  }
 }
 
 ### ORDER_PAYMENT_ACCEPTED_EVENT
@@ -47,16 +47,16 @@ Origin: https://localhost
 Content-Type: application/json
 
 {
- "pk": "EVENTS#ORDER_ID#{{orderId}}",
- "sk": "EVENT#ORDER_PAYMENT_ACCEPTED_EVENT",
- "eventName": "ORDER_PAYMENT_ACCEPTED_EVENT",
- "eventData": {
-  "orderId": "{{orderId}}",
-  "sku": "ORANGES",
-  "units": 2,
-  "price": 22.99,
-  "userId": "123456"
- }
+  "pk": "EVENTS#ORDER_ID#{{orderId}}",
+  "sk": "EVENT#ORDER_PAYMENT_ACCEPTED_EVENT",
+  "eventName": "ORDER_PAYMENT_ACCEPTED_EVENT",
+  "eventData": {
+    "orderId": "{{orderId}}",
+    "sku": "ORANGES",
+    "units": 2,
+    "price": 22.99,
+    "userId": "123456"
+  }
 }
 
 ### ORDER_FULFILLED_EVENT
@@ -66,16 +66,16 @@ Origin: https://localhost
 Content-Type: application/json
 
 {
- "pk": "EVENTS#ORDER_ID#{{orderId}}",
- "sk": "EVENT#ORDER_FULFILLED_EVENT",
- "eventName": "ORDER_FULFILLED_EVENT",
- "eventData": {
-  "orderId": "{{orderId}}",
-  "sku": "ORANGES",
-  "units": 2,
-  "price": 22.99,
-  "userId": "123456"
- }
+  "pk": "EVENTS#ORDER_ID#{{orderId}}",
+  "sk": "EVENT#ORDER_FULFILLED_EVENT",
+  "eventName": "ORDER_FULFILLED_EVENT",
+  "eventData": {
+    "orderId": "{{orderId}}",
+    "sku": "ORANGES",
+    "units": 2,
+    "price": 22.99,
+    "userId": "123456"
+  }
 }
 
 ### ORDER_PACKAGED_EVENT
@@ -85,16 +85,16 @@ Origin: https://localhost
 Content-Type: application/json
 
 {
- "pk": "EVENTS#ORDER_ID#{{orderId}}",
- "sk": "EVENT#ORDER_PACKAGED_EVENT",
- "eventName": "ORDER_PACKAGED_EVENT",
- "eventData": {
-  "orderId": "{{orderId}}",
-  "sku": "ORANGES",
-  "units": 2,
-  "price": 22.99,
-  "userId": "123456"
- }
+  "pk": "EVENTS#ORDER_ID#{{orderId}}",
+  "sk": "EVENT#ORDER_PACKAGED_EVENT",
+  "eventName": "ORDER_PACKAGED_EVENT",
+  "eventData": {
+    "orderId": "{{orderId}}",
+    "sku": "ORANGES",
+    "units": 2,
+    "price": 22.99,
+    "userId": "123456"
+  }
 }
 
 ### ORDER_SHIPPED_EVENT
@@ -104,16 +104,16 @@ Origin: https://localhost
 Content-Type: application/json
 
 {
- "pk": "EVENTS#ORDER_ID#{{orderId}}",
- "sk": "EVENT#ORDER_SHIPPED_EVENT",
- "eventName": "ORDER_SHIPPED_EVENT",
- "eventData": {
-  "orderId": "{{orderId}}",
-  "sku": "ORANGES",
-  "units": 2,
-  "price": 22.99,
-  "userId": "123456"
- }
+  "pk": "EVENTS#ORDER_ID#{{orderId}}",
+  "sk": "EVENT#ORDER_SHIPPED_EVENT",
+  "eventName": "ORDER_SHIPPED_EVENT",
+  "eventData": {
+    "orderId": "{{orderId}}",
+    "sku": "ORANGES",
+    "units": 2,
+    "price": 22.99,
+    "userId": "123456"
+  }
 }
 
 ### ORDER_DELIVERED_EVENT
@@ -123,16 +123,16 @@ Origin: https://localhost
 Content-Type: application/json
 
 {
- "pk": "EVENTS#ORDER_ID#{{orderId}}",
- "sk": "EVENT#ORDER_DELIVERED_EVENT",
- "eventName": "ORDER_DELIVERED_EVENT",
- "eventData": {
-  "orderId": "{{orderId}}",
-  "sku": "ORANGES",
-  "units": 2,
-  "price": 22.99,
-  "userId": "123456"
- }
+  "pk": "EVENTS#ORDER_ID#{{orderId}}",
+  "sk": "EVENT#ORDER_DELIVERED_EVENT",
+  "eventName": "ORDER_DELIVERED_EVENT",
+  "eventData": {
+    "orderId": "{{orderId}}",
+    "sku": "ORANGES",
+    "units": 2,
+    "price": 22.99,
+    "userId": "123456"
+  }
 }
 
 ### ORDER_CANCELLED_EVENT
@@ -142,16 +142,16 @@ Origin: https://localhost
 Content-Type: application/json
 
 {
- "pk": "EVENTS#ORDER_ID#{{orderId}}",
- "sk": "EVENT#ORDER_CANCELLED_EVENT",
- "eventName": "ORDER_CANCELLED_EVENT",
- "eventData": {
-  "orderId": "{{orderId}}",
-  "sku": "ORANGES",
-  "units": 2,
-  "price": 22.99,
-  "userId": "123456"
- }
+  "pk": "EVENTS#ORDER_ID#{{orderId}}",
+  "sk": "EVENT#ORDER_CANCELLED_EVENT",
+  "eventName": "ORDER_CANCELLED_EVENT",
+  "eventData": {
+    "orderId": "{{orderId}}",
+    "sku": "ORANGES",
+    "units": 2,
+    "price": 22.99,
+    "userId": "123456"
+  }
 }
 
 ### CORS QUERY
@@ -159,3 +159,46 @@ Content-Type: application/json
 OPTIONS {{simulateRawEventBaseUrl}}/api/v1/testing/simulateRawEvent
 Origin: https://localhost
 Access-Control-Request-Method: POST
+
+
+#############################
+#############################
+#############################
+
+### ORDER_STOCK_DEPLETED_EVENT
+### POST ###
+POST {{simulateRawEventBaseUrl}}/api/v1/testing/simulateRawEvent
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "pk": "EVENTS#ORDER_ID#{{orderId}}",
+  "sk": "EVENT#ORDER_STOCK_DEPLETED_EVENT",
+  "eventName": "ORDER_STOCK_DEPLETED_EVENT",
+  "eventData": {
+    "orderId": "{{orderId}}",
+    "sku": "ORANGES",
+    "units": 2,
+    "price": 22.99,
+    "userId": "123456"
+  }
+}
+
+### ORDER_PAYMENT_REJECTED_EVENT
+### POST ###
+POST {{simulateRawEventBaseUrl}}/api/v1/testing/simulateRawEvent
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "pk": "EVENTS#ORDER_ID#{{orderId}}",
+  "sk": "EVENT#ORDER_PAYMENT_REJECTED_EVENT",
+  "eventName": "ORDER_PAYMENT_REJECTED_EVENT",
+  "eventData": {
+    "orderId": "{{orderId}}",
+    "sku": "ORANGES",
+    "units": 24,
+    "price": 15.59,
+    "userId": "123456"
+  }
+}

@@ -11,6 +11,7 @@ import { SyncOrderWorkerConstruct } from './orders/SyncOrderWorkerConstruct'
 import { SimulateRawEventApiLambdaConstruct } from './testing/SimulateRawEventApiLambdaConstruct'
 import { TestingApiConstruct } from './testing/TestingApiConstruct'
 import { AllocateOrderStockWorkerConstruct } from './warehouse/AllocateOrderStockWorkerConstruct'
+import { DeallocateOrderPaymentRejectedWorkerConstruct } from './warehouse/DeallocateOrderPaymentRejectedWorkerConstruct'
 import { ListSkusApiLambdaConstruct } from './warehouse/ListSkusApiLambdaConstruct'
 import { RestockSkuApiLambdaConstruct } from './warehouse/RestockSkuApiLambdaConstruct'
 import { RestockSkuWorkerConstruct } from './warehouse/RestockSkuWorkerConstruct'
@@ -130,6 +131,12 @@ export class MainStack extends Stack {
 
     const allocateOrderStockWorkerConstructName = `${serviceId}-AllocateOrderStockWorker`
     new AllocateOrderStockWorkerConstruct(this, allocateOrderStockWorkerConstructName, {
+      dynamoDbTable,
+      eventBus,
+    })
+
+    const deallocateOrderPaymentRejectedWorkerConstructName = `${serviceId}-DeallocateOrderPaymentRejectedWorker`
+    new DeallocateOrderPaymentRejectedWorkerConstruct(this, deallocateOrderPaymentRejectedWorkerConstructName, {
       dynamoDbTable,
       eventBus,
     })

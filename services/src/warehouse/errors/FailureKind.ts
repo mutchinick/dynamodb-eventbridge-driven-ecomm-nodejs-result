@@ -6,3 +6,4 @@ export type FailureKind =
   | 'DuplicateRestockOperationError'
   | 'DuplicateStockAllocationError'
   | 'DepletedStockAllocationError'
+  | 'InvalidStockDeallocationError'

@@ -2,11 +2,15 @@
 import { z } from 'zod'
 import { SortDirection } from './SortDirection'
 import { WarehouseEventName } from './WarehouseEventName'
+import { AllocationStatus, AllocationStatusMembers } from './AllocationStatus'
 
 export class ValueValidators {
   public static validSkuRestockedEventName = () => z.literal(WarehouseEventName.SKU_RESTOCKED_EVENT)
 
   public static validOrderCreatedEventName = () => z.literal(WarehouseEventName.ORDER_CREATED_EVENT)
+
+  public static validOrderEventNameGroup = (events: WarehouseEventName[]) =>
+    z.enum(events as unknown as [WarehouseEventName, ...WarehouseEventName[]])
 
   public static validOrderId = () => z.string().trim().min(4)
 
@@ -27,4 +31,9 @@ export class ValueValidators {
   public static validSortDirection = () => z.enum(Object.values(SortDirection) as [string, ...string[]])
 
   public static validLimit = () => z.number().int().min(1).max(1000)
+
+  public static validAllocationStatus = (expectedAllocationStatus?: AllocationStatus) =>
+    expectedAllocationStatus !== undefined
+      ? z.enum(AllocationStatusMembers).and(z.literal(expectedAllocationStatus))
+      : z.enum(AllocationStatusMembers)
 }

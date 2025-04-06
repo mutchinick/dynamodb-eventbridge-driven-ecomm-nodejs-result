@@ -1,0 +1,320 @@
+import { marshall } from '@aws-sdk/util-dynamodb'
+import { FailureKind } from '../../errors/FailureKind'
+import { Result } from '../../errors/Result'
+import { AllocateOrderStockData } from '../../model/AllocateOrderStockData'
+import { WarehouseEventName } from '../../model/WarehouseEventName'
+import { IDbDeallocateOrderPaymentRejectedClient } from '../DbDeallocateOrderPaymentRejectedClient/DbDeallocateOrderPaymentRejectedClient'
+import { IDbGetOrderAllocationClient } from '../DbGetOrderAllocationClient/DbGetOrderAllocationClient'
+import { DeallocateOrderPaymentRejectedCommand } from '../model/DeallocateOrderPaymentRejectedCommand'
+import { GetOrderAllocationCommand } from '../model/GetOrderAllocationCommand'
+import { IncomingOrderPaymentRejectedEvent } from '../model/IncomingOrderPaymentRejectedEvent'
+import { DeallocateOrderPaymentRejectedWorkerService } from './DeallocateOrderPaymentRejectedWorkerService'
+
+jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
+
+const mockDate = new Date().toISOString()
+const mockOrderId = 'mockOrderId'
+const mockSku = 'mockSku'
+const mockUnits = 2
+const mockPrice = 10.55
+const mockUserId = 'mockUserId'
+
+function buildMockExistingOrderAllocationData(): AllocateOrderStockData {
+  const mockClass: AllocateOrderStockData = {
+    orderId: mockOrderId,
+    sku: mockSku,
+    units: mockUnits,
+    price: mockPrice,
+    userId: mockUserId,
+    createdAt: mockDate,
+    updatedAt: mockDate,
+    allocationStatus: 'ALLOCATED',
+  }
+  return mockClass
+}
+
+const mockExistingOrderAllocationData = buildMockExistingOrderAllocationData()
+
+function buildMockGetOrderAllocationCommand(): GetOrderAllocationCommand {
+  const mockClass = GetOrderAllocationCommand.validateAndBuild({
+    orderId: mockOrderId,
+    sku: mockSku,
+  })
+  return Result.getSuccessValueOrThrow(mockClass)
+}
+
+const expectedGetOrderAllocationCommand = buildMockGetOrderAllocationCommand()
+
+function buildMockIncomingOrderPaymentRejectedEvent(): IncomingOrderPaymentRejectedEvent {
+  const incomingOrderEventProps: IncomingOrderPaymentRejectedEvent = {
+    eventName: WarehouseEventName.ORDER_PAYMENT_REJECTED_EVENT,
+    eventData: {
+      orderId: mockOrderId,
+      sku: mockSku,
+      units: mockUnits,
+      price: mockPrice,
+      userId: mockUserId,
+    },
+    createdAt: mockDate,
+    updatedAt: mockDate,
+  }
+
+  // COMBAK: Figure a simpler way to build/wrap/unwrap these EventBrideEvents (maybe some abstraction util?)
+  const mockClass = IncomingOrderPaymentRejectedEvent.validateAndBuild({
+    'detail-type': 'mockDetailType',
+    id: 'mockId',
+    account: 'mockAccount',
+    region: 'mockRegion',
+    resources: [],
+    source: 'mockSource',
+    time: 'mockTime',
+    version: 'mockVersion',
+    detail: {
+      awsRegion: 'mockAwsRegion',
+      eventID: 'mockEventId',
+      eventName: 'INSERT',
+      eventSource: 'aws:dynamodb',
+      eventVersion: 'mockEventVersion',
+      dynamodb: {
+        NewImage: marshall(incomingOrderEventProps),
+      },
+    },
+  })
+  return Result.getSuccessValueOrThrow(mockClass)
+}
+
+const mockIncomingOrderPaymentRejectedEvent = buildMockIncomingOrderPaymentRejectedEvent()
+
+function buildExpectedDeallocateOrderPaymentRejectedCommand(): DeallocateOrderPaymentRejectedCommand {
+  const mockClass = DeallocateOrderPaymentRejectedCommand.validateAndBuild({
+    existingOrderAllocationData: mockExistingOrderAllocationData,
+    incomingOrderPaymentRejectedEvent: mockIncomingOrderPaymentRejectedEvent,
+  })
+  return Result.getSuccessValueOrThrow(mockClass)
+}
+
+const expectedDeallocateOrderPaymentRejectedCommand = buildExpectedDeallocateOrderPaymentRejectedCommand()
+
+//
+// Mock Clients
+//
+function buildMockDbGetOrderAllocationClient_succeeds(): IDbGetOrderAllocationClient {
+  return {
+    getOrderAllocation: jest.fn().mockResolvedValue(Result.makeSuccess(mockExistingOrderAllocationData)),
+  }
+}
+
+function buildMockDbGetOrderAllocationClient_fails(
+  failureKind?: FailureKind,
+  message?: string,
+  transient?: boolean,
+): IDbGetOrderAllocationClient {
+  return {
+    getOrderAllocation: jest
+      .fn()
+      .mockResolvedValue(
+        Result.makeFailure(failureKind ?? 'UnrecognizedError', message ?? 'UnrecognizedError', transient ?? false),
+      ),
+  }
+}
+
+function buildMockDbDeallocateOrderPaymentRejectedClient_succeeds(): IDbDeallocateOrderPaymentRejectedClient {
+  return { deallocateOrderStock: jest.fn().mockResolvedValue(Result.makeSuccess(undefined)) }
+}
+
+function buildMockDbDeallocateOrderPaymentRejectedClient_fails(
+  failureKind?: FailureKind,
+  message?: string,
+  transient?: boolean,
+): IDbDeallocateOrderPaymentRejectedClient {
+  return {
+    deallocateOrderStock: jest
+      .fn()
+      .mockResolvedValue(
+        Result.makeFailure(failureKind ?? 'UnrecognizedError', message ?? 'UnrecognizedError', transient ?? false),
+      ),
+  }
+}
+
+describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrderPaymentRejectedWorkerService tests`, () => {
+  //
+  // Test IncomingOrderPaymentRejectedEvent edge cases
+  //
+  it(`returns a Success if the input IncomingOrderPaymentRejectedEvent is valid`, async () => {
+    const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
+    const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
+    const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
+      mockDbGetOrderAllocationClient,
+      mockDbDeallocateOrderPaymentRejectedClient,
+    )
+    const result = await deallocateOrderPaymentRejectedWorkerService.deallocateOrderStock(
+      mockIncomingOrderPaymentRejectedEvent,
+    )
+    expect(Result.isSuccess(result)).toBe(true)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if IncomingOrderPaymentRejectedEvent is undefined`, async () => {
+    const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
+    const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
+    const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
+      mockDbGetOrderAllocationClient,
+      mockDbDeallocateOrderPaymentRejectedClient,
+    )
+    const result = await deallocateOrderPaymentRejectedWorkerService.deallocateOrderStock(undefined)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  //
+  // Test internal logic DbGetOrderAllocationClient
+  //
+  it(`returns the same Failure if GetOrderAllocationCommand.validateAndBuild returns a Failure`, async () => {
+    const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
+    const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
+    const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
+      mockDbGetOrderAllocationClient,
+      mockDbDeallocateOrderPaymentRejectedClient,
+    )
+    const mockFailureKind = 'mockFailureKind' as never
+    const mockError = 'mockError'
+    const mockTransient = 'mockTransient' as never
+    const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
+    jest.spyOn(GetOrderAllocationCommand, 'validateAndBuild').mockReturnValueOnce(expectedResult)
+    const result = await deallocateOrderPaymentRejectedWorkerService.deallocateOrderStock(
+      mockIncomingOrderPaymentRejectedEvent,
+    )
+    expect(Result.isFailure(result)).toBe(true)
+    expect(result).toStrictEqual(expectedResult)
+  })
+
+  it(`calls DbGetOrderAllocationClient.getOrderAllocation a single time`, async () => {
+    const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
+    const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
+    const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
+      mockDbGetOrderAllocationClient,
+      mockDbDeallocateOrderPaymentRejectedClient,
+    )
+    await deallocateOrderPaymentRejectedWorkerService.deallocateOrderStock(mockIncomingOrderPaymentRejectedEvent)
+    expect(mockDbGetOrderAllocationClient.getOrderAllocation).toHaveBeenCalledTimes(1)
+  })
+
+  it(`calls DbGetOrderAllocationClient.getOrderAllocation with the expected GetOrderAllocationCommand`, async () => {
+    const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
+    const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
+    const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
+      mockDbGetOrderAllocationClient,
+      mockDbDeallocateOrderPaymentRejectedClient,
+    )
+    await deallocateOrderPaymentRejectedWorkerService.deallocateOrderStock(mockIncomingOrderPaymentRejectedEvent)
+    expect(mockDbGetOrderAllocationClient.getOrderAllocation).toHaveBeenCalledWith(expectedGetOrderAllocationCommand)
+  })
+
+  it(`returns the same Failure if DbGetOrderAllocationClient.getOrderAllocation returns a Failure`, async () => {
+    const mockFailureKind = 'mockFailureKind' as never
+    const mockError = 'mockError'
+    const mockTransient = 'mockTransient' as never
+    const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_fails(
+      mockFailureKind,
+      mockError,
+      mockTransient,
+    )
+    const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
+    const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
+      mockDbGetOrderAllocationClient,
+      mockDbDeallocateOrderPaymentRejectedClient,
+    )
+    const result = await deallocateOrderPaymentRejectedWorkerService.deallocateOrderStock(
+      mockIncomingOrderPaymentRejectedEvent,
+    )
+    const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(result).toStrictEqual(expectedResult)
+  })
+
+  //
+  // Test internal logic DbDeallocateOrderPaymentRejectedClient
+  //
+  it(`returns the same Failure if DeallocateOrderPaymentRejectedCommand.validateAndBuild returns a Failure`, async () => {
+    const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
+    const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
+    const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
+      mockDbGetOrderAllocationClient,
+      mockDbDeallocateOrderPaymentRejectedClient,
+    )
+    const mockFailureKind = 'mockFailureKind' as never
+    const mockError = 'mockError'
+    const mockTransient = 'mockTransient' as never
+    const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
+    jest.spyOn(DeallocateOrderPaymentRejectedCommand, 'validateAndBuild').mockReturnValueOnce(expectedResult)
+    const result = await deallocateOrderPaymentRejectedWorkerService.deallocateOrderStock(
+      mockIncomingOrderPaymentRejectedEvent,
+    )
+    expect(Result.isFailure(result)).toBe(true)
+    expect(result).toStrictEqual(expectedResult)
+  })
+
+  it(`calls DbDeallocateOrderPaymentRejectedClient.deallocateOrderStock a single time`, async () => {
+    const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
+    const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
+    const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
+      mockDbGetOrderAllocationClient,
+      mockDbDeallocateOrderPaymentRejectedClient,
+    )
+    await deallocateOrderPaymentRejectedWorkerService.deallocateOrderStock(mockIncomingOrderPaymentRejectedEvent)
+    expect(mockDbDeallocateOrderPaymentRejectedClient.deallocateOrderStock).toHaveBeenCalledTimes(1)
+  })
+
+  it(`calls DbDeallocateOrderPaymentRejectedClient.deallocateOrderStock with the expected DeallocateOrderPaymentRejectedCommand`, async () => {
+    const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
+    const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
+    const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
+      mockDbGetOrderAllocationClient,
+      mockDbDeallocateOrderPaymentRejectedClient,
+    )
+    await deallocateOrderPaymentRejectedWorkerService.deallocateOrderStock(mockIncomingOrderPaymentRejectedEvent)
+    expect(mockDbDeallocateOrderPaymentRejectedClient.deallocateOrderStock).toHaveBeenCalledWith(
+      expectedDeallocateOrderPaymentRejectedCommand,
+    )
+  })
+
+  it(`returns the same Failure if DbDeallocateOrderPaymentRejectedClient.deallocateOrderStock returns a Failure`, async () => {
+    const mockFailureKind = 'mockFailureKind' as never
+    const mockError = 'mockError'
+    const mockTransient = 'mockTransient' as never
+    const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
+    const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_fails(
+      mockFailureKind,
+      mockError,
+      mockTransient,
+    )
+    const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
+      mockDbGetOrderAllocationClient,
+      mockDbDeallocateOrderPaymentRejectedClient,
+    )
+    const result = await deallocateOrderPaymentRejectedWorkerService.deallocateOrderStock(
+      mockIncomingOrderPaymentRejectedEvent,
+    )
+    const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(result).toStrictEqual(expectedResult)
+  })
+
+  //
+  // Test expected results
+  //
+  it(`returns the expected Success<void> with the expected data`, async () => {
+    const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
+    const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
+    const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
+      mockDbGetOrderAllocationClient,
+      mockDbDeallocateOrderPaymentRejectedClient,
+    )
+    const result = await deallocateOrderPaymentRejectedWorkerService.deallocateOrderStock(
+      mockIncomingOrderPaymentRejectedEvent,
+    )
+    const expectedResult = Result.makeSuccess()
+    expect(Result.isSuccess(result)).toBe(true)
+    expect(result).toStrictEqual(expectedResult)
+  })
+})
