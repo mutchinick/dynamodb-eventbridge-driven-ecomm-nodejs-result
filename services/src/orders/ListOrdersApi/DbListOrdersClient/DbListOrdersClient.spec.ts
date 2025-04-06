@@ -117,7 +117,7 @@ const mockExistingOrderData: OrderData[] = [
 ]
 
 function buildMockDdbDocClient_resolves(listOrdersCommand?: ListOrdersCommand): DynamoDBDocumentClient {
-  const orderId = listOrdersCommand?.queryData?.orderId
+  const orderId = listOrdersCommand?.commandData?.orderId
   const mockGetCommandResult: QueryCommandOutput = {
     Items: orderId ? [mockExistingOrderData[0]] : mockExistingOrderData,
     $metadata: {},
@@ -172,11 +172,11 @@ describe(`Orders Service ListOrdersApi DbListOrdersClient tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    ListOrdersCommand.queryData is undefined`, async () => {
+    ListOrdersCommand.commandData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
     const mockTestCommand = buildMockListOrdersCommand({})
-    mockTestCommand.queryData = undefined
+    mockTestCommand.commandData = undefined
     const result = await dbListOrdersClient.listOrders(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -184,11 +184,11 @@ describe(`Orders Service ListOrdersApi DbListOrdersClient tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    ListOrdersCommand.queryData is null`, async () => {
+    ListOrdersCommand.commandData is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
     const mockTestCommand = buildMockListOrdersCommand({})
-    mockTestCommand.queryData = null
+    mockTestCommand.commandData = null
     const result = await dbListOrdersClient.listOrders(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)

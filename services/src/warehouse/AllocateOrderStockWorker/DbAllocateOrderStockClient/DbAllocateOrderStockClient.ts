@@ -88,9 +88,9 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
     try {
       const tableName = process.env.WAREHOUSE_TABLE_NAME
 
-      const { allocateOrderStockData } = allocateOrderStockCommand
-      const { orderId, sku, units, price, userId, createdAt, updatedAt } = allocateOrderStockData
-      const { allocationStatus } = allocateOrderStockData
+      const { commandData } = allocateOrderStockCommand
+      const { orderId, sku, units, price, userId, createdAt, updatedAt } = commandData
+      const { allocationStatus } = commandData
 
       const allocationPk = `WAREHOUSE#SKU#${sku}`
       const allocationSk = `SKU#${sku}#ORDER_ID#${orderId}#ALLOCATION`

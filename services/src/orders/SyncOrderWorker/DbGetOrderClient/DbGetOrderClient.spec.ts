@@ -41,7 +41,7 @@ const expectedDdbCommand = buildMockDdbCommand()
 // Mock clients
 //
 const mockExistingOrderData: OrderData = {
-  orderId: mockGetOrderCommand.orderData.orderId,
+  orderId: mockGetOrderCommand.commandData.orderId,
   orderStatus: OrderStatus.ORDER_CREATED_STATUS,
   sku: 'mockSku',
   units: 2,
@@ -105,11 +105,11 @@ describe(`Orders Service SyncOrderWorker DbGetOrderClient tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      GetOrderCommand.orderData is undefined`, async () => {
+      GetOrderCommand.commandData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
     const mockTestCommand = buildMockGetOrderCommand()
-    mockTestCommand.orderData = undefined
+    mockTestCommand.commandData = undefined
     const result = await dbGetOrderClient.getOrder(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -117,11 +117,11 @@ describe(`Orders Service SyncOrderWorker DbGetOrderClient tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      GetOrderCommand.orderData is null`, async () => {
+      GetOrderCommand.commandData is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderClient = new DbGetOrderClient(mockDdbDocClient)
     const mockTestCommand = buildMockGetOrderCommand()
-    mockTestCommand.orderData = null
+    mockTestCommand.commandData = null
     const result = await dbGetOrderClient.getOrder(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)

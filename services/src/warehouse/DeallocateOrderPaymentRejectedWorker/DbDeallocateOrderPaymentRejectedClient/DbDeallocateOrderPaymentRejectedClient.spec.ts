@@ -161,7 +161,7 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DbDeallocateOrd
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError
-      if the input DeallocateOrderPaymentRejectedCommand.allocateOrderStockData 
+      if the input DeallocateOrderPaymentRejectedCommand.commandData 
       is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbDeallocateOrderPaymentRejectedClient = new DbDeallocateOrderPaymentRejectedClient(mockDdbDocClient)
@@ -174,7 +174,7 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DbDeallocateOrd
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError
-      if the input DeallocateOrderPaymentRejectedCommand.allocateOrderStockData 
+      if the input DeallocateOrderPaymentRejectedCommand.commandData 
       is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbDeallocateOrderPaymentRejectedClient = new DbDeallocateOrderPaymentRejectedClient(mockDdbDocClient)

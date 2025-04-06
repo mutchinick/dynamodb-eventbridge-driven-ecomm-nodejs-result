@@ -226,7 +226,7 @@ describe(`Warehouse Service ListSkusApi ListSkusCommand tests`, () => {
     const mockListSkusCommandInput = buildMockListSkusCommandInput()
     const result = ListSkusCommand.validateAndBuild(mockListSkusCommandInput)
     const expectedCommand: ListSkusCommand = {
-      queryData: {
+      commandData: {
         sku: mockListSkusCommandInput.sku,
         limit: mockListSkusCommandInput.limit,
         sortDirection: mockListSkusCommandInput.sortDirection,

@@ -86,14 +86,14 @@ const expectedDdbCommand = buildMockDdbCommand()
 // Mock clients
 //
 const expectedUpdatedOrderData: OrderData = {
-  orderId: mockUpdateOrderCommand.orderData.orderId,
-  orderStatus: mockUpdateOrderCommand.orderData.orderStatus,
+  orderId: mockUpdateOrderCommand.commandData.orderId,
+  orderStatus: mockUpdateOrderCommand.commandData.orderStatus,
   sku: 'mockSku',
   units: 2,
   price: 3.98,
   userId: 'mockUserId',
   createdAt: 'mockCreatedAt',
-  updatedAt: mockUpdateOrderCommand.orderData.updatedAt,
+  updatedAt: mockUpdateOrderCommand.commandData.updatedAt,
 }
 
 function buildMockDdbDocClient_resolves(): DynamoDBDocumentClient {
@@ -176,11 +176,11 @@ describe(`Orders Service SyncOrderWorker DbUpdateOrderClient tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      UpdateOrderCommand.orderData is undefined`, async () => {
+      UpdateOrderCommand.commandData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbUpdateOrderClient = new DbUpdateOrderClient(mockDdbDocClient)
     const mockTestCommand = buildMockUpdateOrderCommand()
-    mockTestCommand.orderData = undefined
+    mockTestCommand.commandData = undefined
     const result = await dbUpdateOrderClient.updateOrder(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -188,11 +188,11 @@ describe(`Orders Service SyncOrderWorker DbUpdateOrderClient tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      UpdateOrderCommand.orderData is null`, async () => {
+      UpdateOrderCommand.commandData is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbUpdateOrderClient = new DbUpdateOrderClient(mockDdbDocClient)
     const mockTestCommand = buildMockUpdateOrderCommand()
-    mockTestCommand.orderData = undefined
+    mockTestCommand.commandData = undefined
     const result = await dbUpdateOrderClient.updateOrder(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)

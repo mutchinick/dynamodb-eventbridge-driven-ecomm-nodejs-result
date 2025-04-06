@@ -108,7 +108,7 @@ const mockExistingSkuData: RestockSkuData[] = [
 ]
 
 function buildMockDdbDocClient_resolves(listSkusCommand?: ListSkusCommand): DynamoDBDocumentClient {
-  const sku = listSkusCommand?.queryData?.sku
+  const sku = listSkusCommand?.commandData?.sku
   const mockGetCommandResult: QueryCommandOutput = {
     Items: sku ? [mockExistingSkuData[0]] : mockExistingSkuData,
     $metadata: {},
@@ -163,11 +163,11 @@ describe(`Warehouse Service ListSkusApi DbListSkusClient tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    ListSkusCommand.queryData is undefined`, async () => {
+    ListSkusCommand.commandData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     const mockTestCommand = buildMockListSkusCommand({})
-    mockTestCommand.queryData = undefined
+    mockTestCommand.commandData = undefined
     const result = await dbListSkusClient.listSkus(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -175,11 +175,11 @@ describe(`Warehouse Service ListSkusApi DbListSkusClient tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    ListSkusCommand.queryData is null`, async () => {
+    ListSkusCommand.commandData is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     const mockTestCommand = buildMockListSkusCommand({})
-    mockTestCommand.queryData = null
+    mockTestCommand.commandData = null
     const result = await dbListSkusClient.listSkus(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)

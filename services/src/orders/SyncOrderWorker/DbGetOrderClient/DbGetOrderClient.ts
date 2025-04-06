@@ -70,8 +70,8 @@ export class DbGetOrderClient implements IDbGetOrderClient {
     try {
       const tableName = process.env.ORDERS_TABLE_NAME
 
-      const orderItemPk = `ORDERS#ORDER_ID#${getOrderCommand.orderData.orderId}`
-      const orderItemSk = `ORDER_ID#${getOrderCommand.orderData.orderId}`
+      const orderItemPk = `ORDERS#ORDER_ID#${getOrderCommand.commandData.orderId}`
+      const orderItemSk = `ORDER_ID#${getOrderCommand.commandData.orderId}`
 
       const ddbCommand = new GetCommand({
         TableName: tableName,

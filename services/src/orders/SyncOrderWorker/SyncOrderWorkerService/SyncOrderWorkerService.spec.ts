@@ -174,7 +174,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
-    IncomingOrderEvent.eventName is undefined`, async () => {
+      IncomingOrderEvent.eventName is undefined`, async () => {
     const mockDbGetOrderClient = buildMockDbGetOrderClient_succeeds_OrderData()
     const mockDbCreateOrderClient = buildMockDbCreateOrderClient_succeeds()
     const mockDbUpdateOrderClient = buildMockDbUpdateOrderClient_fails()
@@ -194,7 +194,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
-    IncomingOrderEvent.orderData is undefined`, async () => {
+      IncomingOrderEvent.eventData is undefined`, async () => {
     const mockDbGetOrderClient = buildMockDbGetOrderClient_succeeds_OrderData()
     const mockDbCreateOrderClient = buildMockDbCreateOrderClient_succeeds()
     const mockDbUpdateOrderClient = buildMockDbUpdateOrderClient_fails()
@@ -214,7 +214,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
-      IncomingOrderEvent.orderData.orderId is undefined`, async () => {
+      IncomingOrderEvent.eventData.orderId is undefined`, async () => {
     const mockDbGetOrderClient = buildMockDbGetOrderClient_succeeds_OrderData()
     const mockDbCreateOrderClient = buildMockDbCreateOrderClient_succeeds()
     const mockDbUpdateOrderClient = buildMockDbUpdateOrderClient_fails()

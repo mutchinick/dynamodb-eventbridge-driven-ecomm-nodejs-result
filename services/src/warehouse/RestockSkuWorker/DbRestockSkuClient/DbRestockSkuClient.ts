@@ -84,7 +84,7 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
     try {
       const tableName = process.env.WAREHOUSE_TABLE_NAME
 
-      const { sku, units, lotId, createdAt, updatedAt } = restockSkuCommand.restockSkuData
+      const { sku, units, lotId, createdAt, updatedAt } = restockSkuCommand.commandData
 
       const restockPk = `WAREHOUSE#SKU#${sku}`
       const restockSk = `LOT_ID#${lotId}`

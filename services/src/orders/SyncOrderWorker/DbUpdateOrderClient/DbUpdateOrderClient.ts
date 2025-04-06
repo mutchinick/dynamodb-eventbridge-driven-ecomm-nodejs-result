@@ -72,7 +72,7 @@ export class DbUpdateOrderClient implements IDbUpdateOrderClient {
     try {
       const tableName = process.env.ORDERS_TABLE_NAME
 
-      const { orderId, orderStatus, updatedAt } = updateOrderCommand.orderData
+      const { orderId, orderStatus, updatedAt } = updateOrderCommand.commandData
 
       const orderItemPk = `ORDERS#ORDER_ID#${orderId}`
       const orderItemSk = `ORDER_ID#${orderId}`

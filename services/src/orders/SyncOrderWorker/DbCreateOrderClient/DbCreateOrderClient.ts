@@ -72,8 +72,8 @@ export class DbCreateOrderClient implements IDbCreateOrderClient {
     try {
       const tableName = process.env.ORDERS_TABLE_NAME
 
-      const { orderData } = createOrderCommand
-      const { orderId, orderStatus, sku, units, price, userId, createdAt, updatedAt } = orderData
+      const { commandData } = createOrderCommand
+      const { orderId, orderStatus, sku, units, price, userId, createdAt, updatedAt } = commandData
 
       const orderItemPk = `ORDERS#ORDER_ID#${orderId}`
       const orderItemSk = `ORDER_ID#${orderId}`

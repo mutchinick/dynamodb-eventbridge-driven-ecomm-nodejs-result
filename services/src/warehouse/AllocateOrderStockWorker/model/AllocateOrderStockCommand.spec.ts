@@ -454,7 +454,7 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockCommand t
     const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
     const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
     const expectedCommand: AllocateOrderStockCommand = {
-      allocateOrderStockData: {
+      commandData: {
         orderId: mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId,
         sku: mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.sku,
         units: mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.units,

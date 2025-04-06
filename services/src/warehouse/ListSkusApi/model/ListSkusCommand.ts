@@ -4,14 +4,14 @@ import { RestockSkuData } from '../../model/RestockSkuData'
 import { SortDirection } from '../../model/SortDirection'
 import { ValueValidators } from '../../model/ValueValidators'
 
-type ListSkusCommandQueryData = Partial<
+export type ListSkusCommandInput = Partial<
   Pick<RestockSkuData, 'sku'> & { sortDirection: SortDirection } & { limit: number }
 >
 
-export type ListSkusCommandInput = ListSkusCommandQueryData
+type ListSkusCommandData = Partial<Pick<RestockSkuData, 'sku'> & { sortDirection: SortDirection } & { limit: number }>
 
 type ListSkusCommandProps = {
-  readonly queryData: ListSkusCommandQueryData
+  readonly commandData: ListSkusCommandData
   readonly options?: Record<string, unknown>
 }
 
@@ -20,7 +20,7 @@ export class ListSkusCommand implements ListSkusCommandProps {
   //
   //
   private constructor(
-    public readonly queryData: ListSkusCommandQueryData,
+    public readonly commandData: ListSkusCommandData,
     public readonly options?: Record<string, unknown>,
   ) {}
 
@@ -39,8 +39,8 @@ export class ListSkusCommand implements ListSkusCommandProps {
       return propsResult
     }
 
-    const { queryData, options } = propsResult.value
-    const listSkusCommand = new ListSkusCommand(queryData, options)
+    const { commandData, options } = propsResult.value
+    const listSkusCommand = new ListSkusCommand(commandData, options)
     const listSkusCommandResult = Result.makeSuccess(listSkusCommand)
     console.info(`${logContext} exit success:`, { listSkusCommandResult, listSkusCommandInput })
     return listSkusCommandResult
@@ -59,7 +59,7 @@ export class ListSkusCommand implements ListSkusCommandProps {
 
     const { sku, sortDirection, limit } = listSkusCommandInput
     const listSkusCommandProps: ListSkusCommandProps = {
-      queryData: { sku, sortDirection, limit },
+      commandData: { sku, sortDirection, limit },
       options: {},
     }
     return Result.makeSuccess(listSkusCommandProps)
@@ -69,7 +69,7 @@ export class ListSkusCommand implements ListSkusCommandProps {
   //
   //
   private static validateInput(
-    listSkusCommandInput: ListSkusCommandQueryData,
+    listSkusCommandInput: ListSkusCommandData,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'ListSkusCommand.validateInput'
 

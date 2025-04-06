@@ -8,7 +8,7 @@ export type GetOrderCommandInput = Pick<OrderData, 'orderId'>
 export type GetOrderCommandData = Pick<OrderData, 'orderId'>
 
 type GetOrderCommandProps = {
-  readonly orderData: GetOrderCommandData
+  readonly commandData: GetOrderCommandData
   readonly options?: Record<string, unknown>
 }
 
@@ -17,7 +17,7 @@ export class GetOrderCommand implements GetOrderCommandProps {
   //
   //
   private constructor(
-    readonly orderData: GetOrderCommandData,
+    public readonly commandData: GetOrderCommandData,
     public readonly options?: Record<string, unknown>,
   ) {}
 
@@ -36,8 +36,8 @@ export class GetOrderCommand implements GetOrderCommandProps {
       return propsResult
     }
 
-    const { orderData, options } = propsResult.value
-    const getOrderCommand = new GetOrderCommand(orderData, options)
+    const { commandData, options } = propsResult.value
+    const getOrderCommand = new GetOrderCommand(commandData, options)
     const getOrderCommandResult = Result.makeSuccess(getOrderCommand)
     console.info(`${logContext} exit success:`, { getOrderCommandResult, getOrderCommandInput })
     return getOrderCommandResult
@@ -55,7 +55,7 @@ export class GetOrderCommand implements GetOrderCommandProps {
     }
 
     const { orderId } = getOrderCommandInput
-    const getOrderCommandProps: GetOrderCommandProps = { orderData: { orderId }, options: {} }
+    const getOrderCommandProps: GetOrderCommandProps = { commandData: { orderId }, options: {} }
     return Result.makeSuccess(getOrderCommandProps)
   }
 

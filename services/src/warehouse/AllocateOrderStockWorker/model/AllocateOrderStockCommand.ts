@@ -17,7 +17,7 @@ type AllocateOrderStockCommandData = TypeUtilsPretty<
 >
 
 type AllocateOrderStockCommandProps = {
-  readonly allocateOrderStockData: AllocateOrderStockCommandData
+  readonly commandData: AllocateOrderStockCommandData
   readonly options?: Record<string, unknown>
 }
 
@@ -26,7 +26,7 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
   //
   //
   private constructor(
-    public readonly allocateOrderStockData: AllocateOrderStockCommandData,
+    public readonly commandData: AllocateOrderStockCommandData,
     public readonly options?: Record<string, unknown>,
   ) {}
 
@@ -45,8 +45,8 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
       return propsResult
     }
 
-    const { allocateOrderStockData, options } = propsResult.value
-    const allocateOrderStockCommand = new AllocateOrderStockCommand(allocateOrderStockData, options)
+    const { commandData, options } = propsResult.value
+    const allocateOrderStockCommand = new AllocateOrderStockCommand(commandData, options)
     const allocateOrderStockCommandResult = Result.makeSuccess(allocateOrderStockCommand)
     console.info(`${logContext} exit success:`, { allocateOrderStockCommandResult })
     return allocateOrderStockCommandResult
@@ -66,7 +66,7 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
     const { orderId, sku, units, price, userId } = incomingOrderCreatedEvent.eventData
     const date = new Date().toISOString()
     const allocateOrderStockCommandProps: AllocateOrderStockCommandProps = {
-      allocateOrderStockData: {
+      commandData: {
         orderId,
         sku,
         units,

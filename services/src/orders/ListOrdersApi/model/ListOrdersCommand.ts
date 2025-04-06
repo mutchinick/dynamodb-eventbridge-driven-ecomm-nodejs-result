@@ -4,14 +4,14 @@ import { OrderData } from '../../model/OrderData'
 import { SortDirection } from '../../model/SortDirection'
 import { ValueValidators } from '../../model/ValueValidators'
 
-type ListOrdersCommandQueryData = Partial<
+export type ListOrdersCommandInput = Partial<
   Pick<OrderData, 'orderId'> & { sortDirection: SortDirection } & { limit: number }
 >
 
-export type ListOrdersCommandInput = ListOrdersCommandQueryData
+type ListOrdersCommandData = Partial<Pick<OrderData, 'orderId'> & { sortDirection: SortDirection } & { limit: number }>
 
 type ListOrdersCommandProps = {
-  readonly queryData: ListOrdersCommandQueryData
+  readonly commandData: ListOrdersCommandData
   readonly options?: Record<string, unknown>
 }
 
@@ -20,7 +20,7 @@ export class ListOrdersCommand implements ListOrdersCommandProps {
   //
   //
   private constructor(
-    public readonly queryData: ListOrdersCommandQueryData,
+    public readonly commandData: ListOrdersCommandData,
     public readonly options?: Record<string, unknown>,
   ) {}
 
@@ -39,8 +39,8 @@ export class ListOrdersCommand implements ListOrdersCommandProps {
       return propsResult
     }
 
-    const { queryData, options } = propsResult.value
-    const listOrdersCommand = new ListOrdersCommand(queryData, options)
+    const { commandData, options } = propsResult.value
+    const listOrdersCommand = new ListOrdersCommand(commandData, options)
     const listOrdersCommandResult = Result.makeSuccess(listOrdersCommand)
     console.info(`${logContext} exit success:`, { listOrdersCommandResult, listOrdersCommandInput })
     return listOrdersCommandResult
@@ -59,7 +59,7 @@ export class ListOrdersCommand implements ListOrdersCommandProps {
 
     const { orderId, sortDirection, limit } = listOrdersCommandInput
     const listOrdersCommandProps: ListOrdersCommandProps = {
-      queryData: { orderId, sortDirection, limit },
+      commandData: { orderId, sortDirection, limit },
       options: {},
     }
     return Result.makeSuccess(listOrdersCommandProps)
@@ -69,7 +69,7 @@ export class ListOrdersCommand implements ListOrdersCommandProps {
   //
   //
   private static validateInput(
-    listOrdersCommandInput: ListOrdersCommandQueryData,
+    listOrdersCommandInput: ListOrdersCommandData,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'ListOrdersCommand.validateInput'
 

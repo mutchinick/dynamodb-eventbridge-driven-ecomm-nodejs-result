@@ -17,7 +17,7 @@ export class GetOrderAllocationCommand implements GetOrderAllocationCommandProps
   //
   //
   private constructor(
-    readonly commandData: GetOrderAllocationCommandData,
+    public readonly commandData: GetOrderAllocationCommandData,
     public readonly options?: Record<string, unknown>,
   ) {}
 

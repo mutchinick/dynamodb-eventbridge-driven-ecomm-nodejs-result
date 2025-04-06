@@ -9,8 +9,10 @@ export interface CreateOrderCommandInput {
   incomingOrderEvent: IncomingOrderEvent
 }
 
+type CreateOrderCommandData = OrderData
+
 type CreateOrderCommandProps = {
-  readonly orderData: OrderData
+  readonly commandData: CreateOrderCommandData
   readonly options?: Record<string, unknown>
 }
 
@@ -22,7 +24,7 @@ export class CreateOrderCommand implements CreateOrderCommandProps {
   //
   //
   private constructor(
-    public readonly orderData: OrderData,
+    public readonly commandData: CreateOrderCommandData,
     public readonly options?: Record<string, unknown>,
   ) {}
 
@@ -41,8 +43,8 @@ export class CreateOrderCommand implements CreateOrderCommandProps {
       return propsResult
     }
 
-    const { orderData, options } = propsResult.value
-    const createOrderCommand = new CreateOrderCommand(orderData, options)
+    const { commandData, options } = propsResult.value
+    const createOrderCommand = new CreateOrderCommand(commandData, options)
     const createOrderCommandResult = Result.makeSuccess(createOrderCommand)
     console.info(`${logContext} exit success:`, { createOrderCommandResult, createOrderCommandInput })
     return createOrderCommandResult
@@ -63,7 +65,7 @@ export class CreateOrderCommand implements CreateOrderCommandProps {
     const { orderId, sku, units, price, userId } = incomingOrderEvent.eventData
     const date = new Date().toISOString()
     const createOrderCommandProps: CreateOrderCommandProps = {
-      orderData: {
+      commandData: {
         orderId,
         orderStatus: OrderStatus.ORDER_CREATED_STATUS,
         sku,

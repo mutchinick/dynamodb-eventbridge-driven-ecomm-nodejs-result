@@ -175,12 +175,12 @@ describe(`Warehouse Service AllocateOrderStockWorker DbAllocateOrderStockClient 
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError
-      if the input AllocateOrderStockCommand.allocateOrderStockData 
+      if the input AllocateOrderStockCommand.commandData 
       is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
     const mockValidCommand = buildMockAllocateOrderStockCommand()
-    mockValidCommand.allocateOrderStockData = undefined
+    mockValidCommand.commandData = undefined
     const result = await dbAllocateOrderStockClient.allocateOrderStock(mockValidCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -188,12 +188,12 @@ describe(`Warehouse Service AllocateOrderStockWorker DbAllocateOrderStockClient 
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError
-      if the input AllocateOrderStockCommand.allocateOrderStockData 
+      if the input AllocateOrderStockCommand.commandData 
       is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
     const mockValidCommand = buildMockAllocateOrderStockCommand()
-    mockValidCommand.allocateOrderStockData = null
+    mockValidCommand.commandData = null
     const result = await dbAllocateOrderStockClient.allocateOrderStock(mockValidCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)

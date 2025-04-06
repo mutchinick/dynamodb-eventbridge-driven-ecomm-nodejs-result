@@ -15,7 +15,7 @@ export interface UpdateOrderCommandInput {
 type UpdateOrderCommandData = Pick<OrderData, 'orderId' | 'orderStatus' | 'updatedAt'>
 
 type UpdateOrderCommandProps = {
-  readonly orderData: UpdateOrderCommandData
+  readonly commandData: UpdateOrderCommandData
   readonly options?: Record<string, unknown>
 }
 
@@ -24,7 +24,7 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
   //
   //
   private constructor(
-    public readonly orderData: UpdateOrderCommandData,
+    public readonly commandData: UpdateOrderCommandData,
     public readonly options?: Record<string, unknown>,
   ) {}
 
@@ -50,8 +50,8 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
       return propsResult
     }
 
-    const { orderData, options } = propsResult.value
-    const updateOrderCommand = new UpdateOrderCommand(orderData, options)
+    const { commandData, options } = propsResult.value
+    const updateOrderCommand = new UpdateOrderCommand(commandData, options)
     const updateOrderCommandResult = Result.makeSuccess(updateOrderCommand)
     console.info(`${logContext} exit success:`, { updateOrderCommandResult, updateOrderCommandInput })
     return updateOrderCommandResult
@@ -85,7 +85,7 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
     }
 
     const updateOrderCommandProps: UpdateOrderCommandProps = {
-      orderData: {
+      commandData: {
         orderId: existingOrderData.orderId,
         orderStatus: orderStatusResult.value,
         updatedAt: new Date().toISOString(),

@@ -584,7 +584,7 @@ describe(`Orders Service SyncOrderWorker CreateOrderCommand tests`, () => {
     const mockCreateOrderCommandInput = buildMockCreateOrderCommandInput()
     const result = CreateOrderCommand.validateAndBuild(mockCreateOrderCommandInput)
     const expectedCommand: CreateOrderCommand = {
-      orderData: {
+      commandData: {
         orderId: mockCreateOrderCommandInput.incomingOrderEvent.eventData.orderId,
         orderStatus: OrderStatus.ORDER_CREATED_STATUS,
         sku: mockCreateOrderCommandInput.incomingOrderEvent.eventData.sku,

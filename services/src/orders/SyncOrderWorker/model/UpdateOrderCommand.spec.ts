@@ -1276,11 +1276,13 @@ describe(`Orders Service SyncOrderWorker UpdateOrderCommand tests`, () => {
   // Test expected results
   // COMBAK: Somehow test all possible valid transitions using a loop?
   //
-  it(`returns the expected Success<UpdateOrderCommand> with orderStatus === ORDER_STOCK_ALLOCATED_STATUS`, () => {
+  it(`returns the expected Success<UpdateOrderCommand> with the expected data (case ORDER_STOCK_ALLOCATED_STATUS)`, () => {
     const mockUpdateOrderCommandInput = buildMockUpdateOrderCommandInput()
+    mockUpdateOrderCommandInput.existingOrderData.orderStatus = OrderStatus.ORDER_CREATED_STATUS
+    mockUpdateOrderCommandInput.incomingOrderEvent.eventName = OrderEventName.ORDER_STOCK_ALLOCATED_EVENT
     const result = UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)
     const expectedCommand: UpdateOrderCommand = {
-      orderData: {
+      commandData: {
         orderId: mockUpdateOrderCommandInput.existingOrderData.orderId,
         orderStatus: OrderStatus.ORDER_STOCK_ALLOCATED_STATUS,
         updatedAt: mockDate,
@@ -1292,14 +1294,15 @@ describe(`Orders Service SyncOrderWorker UpdateOrderCommand tests`, () => {
     expect(result).toStrictEqual(expect.objectContaining(expectedResult))
   })
 
-  it(`returns the expected Success<UpdateOrderCommand> with orderStatus === ORDER_STOCK_DEPLETED_STATUS`, () => {
+  it(`returns the expected Success<UpdateOrderCommand> with the expected data (case ORDER_FULFILLED_STATUS)`, () => {
     const mockUpdateOrderCommandInput = buildMockUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.incomingOrderEvent.eventName = OrderEventName.ORDER_STOCK_DEPLETED_EVENT
+    mockUpdateOrderCommandInput.existingOrderData.orderStatus = OrderStatus.ORDER_PAYMENT_ACCEPTED_STATUS
+    mockUpdateOrderCommandInput.incomingOrderEvent.eventName = OrderEventName.ORDER_FULFILLED_EVENT
     const result = UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)
     const expectedCommand: UpdateOrderCommand = {
-      orderData: {
+      commandData: {
         orderId: mockUpdateOrderCommandInput.existingOrderData.orderId,
-        orderStatus: OrderStatus.ORDER_STOCK_DEPLETED_STATUS,
+        orderStatus: OrderStatus.ORDER_FULFILLED_STATUS,
         updatedAt: mockDate,
       },
       options: {},

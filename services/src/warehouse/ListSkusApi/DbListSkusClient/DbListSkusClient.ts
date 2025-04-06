@@ -76,7 +76,7 @@ export class DbListSkusClient implements IDbListSkusClient {
     try {
       const tableName = process.env.WAREHOUSE_TABLE_NAME
 
-      const { sku, sortDirection, limit } = listSkusCommand.queryData
+      const { sku, sortDirection, limit } = listSkusCommand.commandData
 
       let params: QueryCommandInput
       if (sku) {

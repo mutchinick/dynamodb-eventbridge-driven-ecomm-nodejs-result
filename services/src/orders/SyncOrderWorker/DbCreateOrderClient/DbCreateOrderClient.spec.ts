@@ -108,14 +108,14 @@ const expectedDdbCommand = buildMockDdbCommand()
 // Mock clients
 //
 const expectedCreatedOrderData: OrderData = {
-  orderId: mockCreateOrderCommand.orderData.orderId,
-  orderStatus: mockCreateOrderCommand.orderData.orderStatus,
-  sku: mockCreateOrderCommand.orderData.sku,
-  units: mockCreateOrderCommand.orderData.units,
-  price: mockCreateOrderCommand.orderData.price,
-  userId: mockCreateOrderCommand.orderData.userId,
-  createdAt: mockCreateOrderCommand.orderData.createdAt,
-  updatedAt: mockCreateOrderCommand.orderData.updatedAt,
+  orderId: mockCreateOrderCommand.commandData.orderId,
+  orderStatus: mockCreateOrderCommand.commandData.orderStatus,
+  sku: mockCreateOrderCommand.commandData.sku,
+  units: mockCreateOrderCommand.commandData.units,
+  price: mockCreateOrderCommand.commandData.price,
+  userId: mockCreateOrderCommand.commandData.userId,
+  createdAt: mockCreateOrderCommand.commandData.createdAt,
+  updatedAt: mockCreateOrderCommand.commandData.updatedAt,
 }
 
 function buildMockDdbDocClient_resolves(): DynamoDBDocumentClient {
@@ -198,11 +198,11 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      CreateOrderCommand.orderData is undefined`, async () => {
+      CreateOrderCommand.commandData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
     const mockTestCommand = buildMockCreateOrderCommand()
-    mockTestCommand.orderData = undefined
+    mockTestCommand.commandData = undefined
     const result = await dbCreateOrderClient.createOrder(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -210,11 +210,11 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      CreateOrderCommand.orderData is null`, async () => {
+      CreateOrderCommand.commandData is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
     const mockTestCommand = buildMockCreateOrderCommand()
-    mockTestCommand.orderData = null
+    mockTestCommand.commandData = null
     const result = await dbCreateOrderClient.createOrder(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)

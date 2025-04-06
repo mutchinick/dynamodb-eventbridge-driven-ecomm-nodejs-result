@@ -161,11 +161,11 @@ describe(`Warehouse Service RestockSkuWorker DbRestockSkuClient tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      RestockSkuCommand.restockSkuData is undefined`, async () => {
+      RestockSkuCommand.commandData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
     const mockRestockSkuCommand = buildMockRestockSkuCommand()
-    mockRestockSkuCommand.restockSkuData = undefined
+    mockRestockSkuCommand.commandData = undefined
     const result = await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -173,11 +173,11 @@ describe(`Warehouse Service RestockSkuWorker DbRestockSkuClient tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      RestockSkuCommand.restockSkuData is null`, async () => {
+      RestockSkuCommand.commandData is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbRestockSkuClient = new DbRestockSkuClient(mockDdbDocClient)
     const mockRestockSkuCommand = buildMockRestockSkuCommand()
-    mockRestockSkuCommand.restockSkuData = null
+    mockRestockSkuCommand.commandData = null
     const result = await dbRestockSkuClient.restockSku(mockRestockSkuCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)

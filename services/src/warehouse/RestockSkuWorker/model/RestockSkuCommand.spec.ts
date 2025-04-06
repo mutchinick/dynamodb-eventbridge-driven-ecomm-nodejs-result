@@ -459,7 +459,7 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuCommand tests`, () => {
     const mockRestockSkuCommandInput = buildMockRestockSkuCommandInput()
     const result = RestockSkuCommand.validateAndBuild(mockRestockSkuCommandInput)
     const expectedCommand: RestockSkuCommand = {
-      restockSkuData: {
+      commandData: {
         sku: mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.sku,
         units: mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.units,
         lotId: mockRestockSkuCommandInput.incomingSkuRestockedEvent.eventData.lotId,

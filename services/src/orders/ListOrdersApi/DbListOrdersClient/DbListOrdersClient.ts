@@ -78,7 +78,7 @@ export class DbListOrdersClient implements IDbListOrdersClient {
     try {
       const tableName = process.env.ORDERS_TABLE_NAME
 
-      const { orderId, sortDirection, limit } = listOrdersCommand.queryData
+      const { orderId, sortDirection, limit } = listOrdersCommand.commandData
 
       let params: QueryCommandInput
       if (orderId) {
