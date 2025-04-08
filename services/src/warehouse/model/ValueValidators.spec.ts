@@ -294,12 +294,6 @@ describe(`Warehouse Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validAllocationStatus(expectedAllocationStatus).parse(testInput)).toThrow()
     })
 
-    it(`is valid if the input allocationStatus is the literal expectedAllocationStatus`, () => {
-      const expectedAllocationStatus: AllocationStatus = 'ALLOCATED'
-      const testInput: AllocationStatus = 'PAYMENT_REJECTED'
-      expect(() => ValueValidators.validAllocationStatus(expectedAllocationStatus).parse(testInput)).toThrow()
-    })
-
     it(`is valid if the input allocationStatus === 'ALLOCATED`, () => {
       const testInput: AllocationStatus = 'ALLOCATED'
       expect(() => ValueValidators.validAllocationStatus().parse(testInput)).not.toThrow()
@@ -313,6 +307,12 @@ describe(`Warehouse Service ValueValidators tests`, () => {
     it(`is valid if the input allocationStatus === 'PAYMENT_REJECTED`, () => {
       const testInput: AllocationStatus = 'PAYMENT_REJECTED'
       expect(() => ValueValidators.validAllocationStatus().parse(testInput)).not.toThrow()
+    })
+
+    it(`is valid if the input allocationStatus is the literal expectedAllocationStatus`, () => {
+      const expectedAllocationStatus: AllocationStatus = 'ALLOCATED'
+      const testInput: AllocationStatus = 'ALLOCATED'
+      expect(() => ValueValidators.validAllocationStatus(expectedAllocationStatus).parse(testInput)).not.toThrow()
     })
   })
 })
