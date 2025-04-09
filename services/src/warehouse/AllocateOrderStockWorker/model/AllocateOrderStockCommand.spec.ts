@@ -60,6 +60,112 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockCommand t
   })
 
   //
+  // Test AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData edge cases
+  //
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData is missing`, () => {
+    const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
+    delete mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData
+    const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData is undefined`, () => {
+    const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData = undefined
+    const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData is null`, () => {
+    const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData = null
+    const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData is empty`, () => {
+    const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData = {} as never
+    const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  //
+  // Test AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId edge cases
+  //
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId is missing`, () => {
+    const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
+    delete mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId
+    const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId is undefined`, () => {
+    const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId = undefined
+    const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId is null`, () => {
+    const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId = null
+    const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId is empty`, () => {
+    const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId = ''
+    const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId is blank`, () => {
+    const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId = '      '
+    const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId length < 4`, () => {
+    const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId = '123'
+    const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  //
   // Test AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventName edge cases
   //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
@@ -259,62 +365,105 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockCommand t
   })
 
   //
-  // Test AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId edge cases
+  // Test AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.price edge cases
   //
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId is missing`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
+    AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.price is missing`, () => {
     const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
-    delete mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId
+    delete mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.price
     const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
+    AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.price is undefined`, () => {
     const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
-    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId = undefined
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.price = undefined
     const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
+    AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.price is null`, () => {
     const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
-    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId = null
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.price = null
     const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
+    AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.price < 0`, () => {
     const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
-    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId = ''
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.price = -1
     const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
+    AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.price is not a number`, () => {
     const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
-    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId = '      '
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.price = '1' as unknown as number
     const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId length < 4`, () => {
+  //
+  // Test AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.userId edge cases
+  //
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
+    AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.userId is missing`, () => {
     const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
-    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.orderId = '123'
+    delete mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.userId
+    const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
+    AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.userId is undefined`, () => {
+    const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.userId = undefined
+    const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
+    AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.userId is null`, () => {
+    const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.userId = null
+    const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
+    AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.userId is empty`, () => {
+    const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.userId = ''
+    const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input 
+    AllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.userId is blank`, () => {
+    const mockAllocateOrderStockCommandInput = buildMockAllocateOrderStockCommandInput()
+    mockAllocateOrderStockCommandInput.incomingOrderCreatedEvent.eventData.userId = '      '
     const result = AllocateOrderStockCommand.validateAndBuild(mockAllocateOrderStockCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
