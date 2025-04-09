@@ -652,7 +652,7 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
   // Test DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus edge cases
   //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus is missing`, () => {
+      DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus is missing`, () => {
     const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
     delete mockDeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus
     const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
@@ -664,7 +664,7 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus is undefined`, () => {
+      DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus is undefined`, () => {
     const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
     mockDeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus = undefined
     const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
@@ -676,7 +676,7 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus is null`, () => {
+      DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus is null`, () => {
     const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
     mockDeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus = null
     const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
@@ -688,7 +688,7 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus is empty`, () => {
+      DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus is empty`, () => {
     const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
     mockDeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus = '' as never
     const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
@@ -700,7 +700,20 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus is 'CANCELED'`, () => {
+      DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus is not an AllocationStatus`, () => {
+    const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
+    mockDeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus =
+      'mockInvalidValue' as never
+    const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
+      mockDeallocateOrderPaymentRejectedCommandInput,
+    )
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus is 'CANCELED'`, () => {
     const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
     mockDeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus = 'CANCELED'
     const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
@@ -712,7 +725,7 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-  DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus is 'PAYMENT_REJECTED'`, () => {
+      DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus is 'PAYMENT_REJECTED'`, () => {
     const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
     mockDeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus = 'PAYMENT_REJECTED'
     const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
@@ -851,6 +864,57 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
   })
 
   //
+  // Test DeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData edge cases
+  //
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      DeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData is missing`, () => {
+    const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
+    delete mockDeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData
+    const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
+      mockDeallocateOrderPaymentRejectedCommandInput,
+    )
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      DeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData is undefined`, () => {
+    const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
+    mockDeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData = undefined
+    const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
+      mockDeallocateOrderPaymentRejectedCommandInput,
+    )
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      DeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData is null`, () => {
+    const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
+    mockDeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData = null
+    const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
+      mockDeallocateOrderPaymentRejectedCommandInput,
+    )
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      DeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData is empty`, () => {
+    const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
+    mockDeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData = {} as never
+    const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
+      mockDeallocateOrderPaymentRejectedCommandInput,
+    )
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  //
   // Test DeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData.orderId edge cases
   //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
@@ -917,57 +981,6 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
       DeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData.orderId length < 4`, () => {
     const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
     mockDeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData.orderId = '123'
-    const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
-      mockDeallocateOrderPaymentRejectedCommandInput,
-    )
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  //
-  // Test DeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData edge cases
-  //
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      DeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData is missing`, () => {
-    const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
-    delete mockDeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData
-    const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
-      mockDeallocateOrderPaymentRejectedCommandInput,
-    )
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      DeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData is undefined`, () => {
-    const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
-    mockDeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData = undefined
-    const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
-      mockDeallocateOrderPaymentRejectedCommandInput,
-    )
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      DeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData is null`, () => {
-    const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
-    mockDeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData = null
-    const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
-      mockDeallocateOrderPaymentRejectedCommandInput,
-    )
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      DeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData is empty`, () => {
-    const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
-    mockDeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData = {} as never
     const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
       mockDeallocateOrderPaymentRejectedCommandInput,
     )
