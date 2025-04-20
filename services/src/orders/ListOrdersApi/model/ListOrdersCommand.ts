@@ -1,14 +1,13 @@
 import { z } from 'zod'
+import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
-import { SortDirection } from '../../model/SortDirection'
+import { SortParams } from '../../model/SortParams'
 import { ValueValidators } from '../../model/ValueValidators'
 
-export type ListOrdersCommandInput = Partial<
-  Pick<OrderData, 'orderId'> & { sortDirection: SortDirection } & { limit: number }
->
+export type ListOrdersCommandInput = TypeUtilsPretty<Partial<Pick<OrderData, 'orderId'> & SortParams>>
 
-type ListOrdersCommandData = Partial<Pick<OrderData, 'orderId'> & { sortDirection: SortDirection } & { limit: number }>
+type ListOrdersCommandData = TypeUtilsPretty<Partial<Pick<OrderData, 'orderId'> & SortParams>>
 
 type ListOrdersCommandProps = {
   readonly commandData: ListOrdersCommandData

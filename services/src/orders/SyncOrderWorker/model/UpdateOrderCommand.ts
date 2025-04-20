@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { TypeUtilsWrapper } from '../../../shared/TypeUtils'
+import { TypeUtilsPretty, TypeUtilsWrapper } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
 import { OrderEventName } from '../../model/OrderEventName'
@@ -7,12 +7,12 @@ import { OrderStatus } from '../../model/OrderStatus'
 import { ValueValidators } from '../../model/ValueValidators'
 import { IncomingOrderEvent } from './IncomingOrderEvent'
 
-export interface UpdateOrderCommandInput {
+export type UpdateOrderCommandInput = {
   existingOrderData: OrderData
   incomingOrderEvent: IncomingOrderEvent
 }
 
-type UpdateOrderCommandData = Pick<OrderData, 'orderId' | 'orderStatus' | 'updatedAt'>
+type UpdateOrderCommandData = TypeUtilsPretty<Pick<OrderData, 'orderId' | 'orderStatus' | 'updatedAt'>>
 
 type UpdateOrderCommandProps = {
   readonly commandData: UpdateOrderCommandData
@@ -79,16 +79,18 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
     const existingOrderStatus = existingOrderData.orderStatus
     const incomingEventName = incomingOrderEvent.eventName
 
-    const orderStatusResult = this.computeNewOrderStatus({ existingOrderStatus, incomingEventName })
-    if (Result.isFailure(orderStatusResult)) {
-      return orderStatusResult
+    const newOrderStatusResult = this.computeNewOrderStatus({ existingOrderStatus, incomingEventName })
+    if (Result.isFailure(newOrderStatusResult)) {
+      return newOrderStatusResult
     }
 
+    const newOrderStatus = newOrderStatusResult.value
+    const currentDate = new Date().toISOString()
     const updateOrderCommandProps: UpdateOrderCommandProps = {
       commandData: {
         orderId: existingOrderData.orderId,
-        orderStatus: orderStatusResult.value,
-        updatedAt: new Date().toISOString(),
+        orderStatus: newOrderStatus,
+        updatedAt: currentDate,
       },
       options: {},
     }

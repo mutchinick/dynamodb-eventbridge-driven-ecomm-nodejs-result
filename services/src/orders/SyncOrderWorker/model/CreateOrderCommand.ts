@@ -5,7 +5,7 @@ import { OrderStatus } from '../../model/OrderStatus'
 import { ValueValidators } from '../../model/ValueValidators'
 import { IncomingOrderEvent } from './IncomingOrderEvent'
 
-export interface CreateOrderCommandInput {
+export type CreateOrderCommandInput = {
   incomingOrderEvent: IncomingOrderEvent
 }
 
@@ -63,7 +63,7 @@ export class CreateOrderCommand implements CreateOrderCommandProps {
 
     const { incomingOrderEvent } = createOrderCommandInput
     const { orderId, sku, units, price, userId } = incomingOrderEvent.eventData
-    const date = new Date().toISOString()
+    const currentDate = new Date().toISOString()
     const createOrderCommandProps: CreateOrderCommandProps = {
       commandData: {
         orderId,
@@ -72,8 +72,8 @@ export class CreateOrderCommand implements CreateOrderCommandProps {
         units,
         price,
         userId,
-        createdAt: date,
-        updatedAt: date,
+        createdAt: currentDate,
+        updatedAt: currentDate,
       },
       options: {},
     }

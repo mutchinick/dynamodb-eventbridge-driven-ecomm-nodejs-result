@@ -2,10 +2,11 @@ import { z } from 'zod'
 import { Failure, Result, Success } from '../../errors/Result'
 import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { ValueValidators } from '../../model/ValueValidators'
+import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 
-export type GetOrderAllocationCommandInput = Pick<OrderAllocationData, 'orderId' | 'sku'>
+export type GetOrderAllocationCommandInput = TypeUtilsPretty<Pick<OrderAllocationData, 'orderId' | 'sku'>>
 
-export type GetOrderAllocationCommandData = Pick<OrderAllocationData, 'orderId' | 'sku'>
+type GetOrderAllocationCommandData = TypeUtilsPretty<Pick<OrderAllocationData, 'orderId' | 'sku'>>
 
 type GetOrderAllocationCommandProps = {
   readonly commandData: GetOrderAllocationCommandData

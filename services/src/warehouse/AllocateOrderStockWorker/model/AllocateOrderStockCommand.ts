@@ -1,12 +1,12 @@
 import { z } from 'zod'
+import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
+import { AllocationStatus } from '../../model/AllocationStatus'
 import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { ValueValidators } from '../../model/ValueValidators'
 import { IncomingOrderCreatedEvent } from './IncomingOrderCreatedEvent'
-import { TypeUtilsPretty } from '../../../shared/TypeUtils'
-import { AllocationStatus } from '../../model/AllocationStatus'
 
-export interface AllocateOrderStockCommandInput {
+export type AllocateOrderStockCommandInput = {
   incomingOrderCreatedEvent: IncomingOrderCreatedEvent
 }
 
@@ -62,9 +62,10 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
     if (Result.isFailure(inputValidationResult)) {
       return inputValidationResult
     }
+
     const { incomingOrderCreatedEvent } = allocateOrderStockCommandInput
     const { orderId, sku, units, price, userId } = incomingOrderCreatedEvent.eventData
-    const date = new Date().toISOString()
+    const currentDate = new Date().toISOString()
     const allocateOrderStockCommandProps: AllocateOrderStockCommandProps = {
       commandData: {
         orderId,
@@ -72,8 +73,8 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
         units,
         price,
         userId,
-        createdAt: date,
-        updatedAt: date,
+        createdAt: currentDate,
+        updatedAt: currentDate,
         allocationStatus: 'ALLOCATED',
       },
       options: {},

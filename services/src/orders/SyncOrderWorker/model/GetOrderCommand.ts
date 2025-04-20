@@ -1,11 +1,12 @@
 import { z } from 'zod'
+import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
 import { ValueValidators } from '../../model/ValueValidators'
 
-export type GetOrderCommandInput = Pick<OrderData, 'orderId'>
+export type GetOrderCommandInput = TypeUtilsPretty<Pick<OrderData, 'orderId'>>
 
-export type GetOrderCommandData = Pick<OrderData, 'orderId'>
+type GetOrderCommandData = TypeUtilsPretty<Pick<OrderData, 'orderId'>>
 
 type GetOrderCommandProps = {
   readonly commandData: GetOrderCommandData
@@ -55,7 +56,10 @@ export class GetOrderCommand implements GetOrderCommandProps {
     }
 
     const { orderId } = getOrderCommandInput
-    const getOrderCommandProps: GetOrderCommandProps = { commandData: { orderId }, options: {} }
+    const getOrderCommandProps: GetOrderCommandProps = {
+      commandData: { orderId },
+      options: {},
+    }
     return Result.makeSuccess(getOrderCommandProps)
   }
 

@@ -4,7 +4,7 @@ import { RestockSkuData } from '../../model/RestockSkuData'
 import { ValueValidators } from '../../model/ValueValidators'
 import { IncomingSkuRestockedEvent } from './IncomingSkuRestockedEvent'
 
-export interface RestockSkuCommandInput {
+export type RestockSkuCommandInput = {
   incomingSkuRestockedEvent: IncomingSkuRestockedEvent
 }
 
@@ -59,9 +59,15 @@ export class RestockSkuCommand implements RestockSkuCommandProps {
 
     const { incomingSkuRestockedEvent } = restockSkuCommandInput
     const { sku, units, lotId } = incomingSkuRestockedEvent.eventData
-    const date = new Date().toISOString()
+    const currentDate = new Date().toISOString()
     const restockSkuCommandProps: RestockSkuCommandProps = {
-      commandData: { sku, units, lotId, createdAt: date, updatedAt: date },
+      commandData: {
+        sku,
+        units,
+        lotId,
+        createdAt: currentDate,
+        updatedAt: currentDate,
+      },
       options: {},
     }
     return Result.makeSuccess(restockSkuCommandProps)

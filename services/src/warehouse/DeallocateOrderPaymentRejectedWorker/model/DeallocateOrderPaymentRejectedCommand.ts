@@ -7,7 +7,7 @@ import { ValueValidators } from '../../model/ValueValidators'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
 import { IncomingOrderPaymentRejectedEvent } from './IncomingOrderPaymentRejectedEvent'
 
-export interface DeallocateOrderPaymentRejectedCommandInput {
+export type DeallocateOrderPaymentRejectedCommandInput = {
   existingOrderAllocationData: OrderAllocationData
   incomingOrderPaymentRejectedEvent: IncomingOrderPaymentRejectedEvent
 }
