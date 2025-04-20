@@ -1,11 +1,12 @@
 import { z } from 'zod'
+import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
 import { RestockSkuData } from '../../model/RestockSkuData'
 import { ValueValidators } from '../../model/ValueValidators'
 
-export type IncomingRestockSkuRequestInput = Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>
+export type IncomingRestockSkuRequestInput = TypeUtilsPretty<Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>>
 
-type IncomingRestockSkuRequestProps = Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>
+type IncomingRestockSkuRequestProps = TypeUtilsPretty<Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>>
 
 //
 //
@@ -54,7 +55,11 @@ export class IncomingRestockSkuRequest implements IncomingRestockSkuRequestProps
     }
 
     const { sku, units, lotId } = incomingRestockSkuRequestInput
-    const incomingRestockSkuRequestProps: IncomingRestockSkuRequestProps = { sku, units, lotId }
+    const incomingRestockSkuRequestProps: IncomingRestockSkuRequestProps = {
+      sku,
+      units,
+      lotId,
+    }
     return Result.makeSuccess(incomingRestockSkuRequestProps)
   }
 

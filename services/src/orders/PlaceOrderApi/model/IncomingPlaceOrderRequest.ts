@@ -1,11 +1,14 @@
 import { z } from 'zod'
+import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
 import { ValueValidators } from '../../model/ValueValidators'
 
-export type IncomingPlaceOrderRequestInput = Pick<OrderData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
+export type IncomingPlaceOrderRequestInput = TypeUtilsPretty<
+  Pick<OrderData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
+>
 
-type IncomingPlaceOrderRequestProps = Pick<OrderData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
+type IncomingPlaceOrderRequestProps = TypeUtilsPretty<Pick<OrderData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>>
 
 export class IncomingPlaceOrderRequest implements IncomingPlaceOrderRequestProps {
   //
