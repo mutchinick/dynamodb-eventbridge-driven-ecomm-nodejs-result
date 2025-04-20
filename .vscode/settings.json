@@ -17,6 +17,7 @@
   },
   "explorerExclude.backup": {},
   "eslint.workingDirectories": ["services", "infra"],
+  "markdown.preview.fontSize": 12,
   "workbench.colorCustomizations": {
     "titleBar.activeBackground": "#000000",
     "titleBar.inactiveBackground": "#00000099",
