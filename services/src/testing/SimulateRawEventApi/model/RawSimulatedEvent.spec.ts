@@ -36,7 +36,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEventInput is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEventInput is undefined`, () => {
     const mockRawSimulatedEventInput = undefined as unknown as RawSimulatedEventInput
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -44,7 +45,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEventInput is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEventInput is null`, () => {
     const mockRawSimulatedEventInput = null as unknown as RawSimulatedEventInput
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -58,7 +60,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
    ************************************************************
    * Test RawSimulatedEventInput.pk edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEventInput.pk is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEventInput.pk is undefined`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.pk = undefined
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
@@ -67,7 +70,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEventInput.pk is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEventInput.pk is null`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.pk = null
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
@@ -76,7 +80,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEventInput.pk is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEventInput.pk is empty`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.pk = ''
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
@@ -85,7 +90,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEventInput.pk is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEventInput.pk is blank`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.pk = '      '
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
@@ -100,7 +106,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
    ************************************************************
    * Test RawSimulatedEventInput.sk edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEventInput.sk is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEventInput.sk is undefined`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.sk = undefined
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
@@ -109,7 +116,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEventInput.sk is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEventInput.sk is null`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.sk = null
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
@@ -118,7 +126,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEventInput.sk is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEventInput.sk is empty`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.sk = ''
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
@@ -127,7 +136,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEventInput.sk is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEventInput.sk is blank`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.sk = '      '
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
@@ -142,7 +152,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
    ************************************************************
    * Test RawSimulatedEventInput.eventName edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEventInput.eventName is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEventInput.eventName is undefined`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.eventName = undefined
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
@@ -151,7 +162,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEventInput.eventName is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEventInput.eventName is null`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.eventName = null
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
@@ -160,7 +172,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEventInput.eventName is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEventInput.eventName is empty`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.eventName = ''
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
@@ -169,7 +182,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEventInput.eventName is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEventInput.eventName is blank`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.eventName = '      '
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
@@ -184,21 +198,24 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
    ************************************************************
    * Test RawSimulatedEventInput.createdAt edge cases
    ************************************************************/
-  it(`sets the current RawSimulatedEventInput.createdAt to the current date if it is undefined`, () => {
+  it(`sets the current RawSimulatedEventInput.createdAt to the current date if it is
+      undefined`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.createdAt = undefined
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
     expect(Result.isSuccess(result) && result.value.createdAt).toEqual(mockDate)
   })
 
-  it(`sets the current RawSimulatedEventInput.createdAt to the current date if it is empty`, () => {
+  it(`sets the current RawSimulatedEventInput.createdAt to the current date if it is
+      empty`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.createdAt = ''
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
     expect(Result.isSuccess(result) && result.value.createdAt).toEqual(mockDate)
   })
 
-  it(`sets the current RawSimulatedEventInput.createdAt to the current date if it is blank`, () => {
+  it(`sets the current RawSimulatedEventInput.createdAt to the current date if it is
+      blank`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.createdAt = '      '
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
@@ -211,21 +228,24 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
    ************************************************************
    * Test RawSimulatedEventInput.updatedAt edge cases
    ************************************************************/
-  it(`sets the current RawSimulatedEventInput.updatedAt to the current date if it is undefined`, () => {
+  it(`sets the current RawSimulatedEventInput.updatedAt to the current date if it is
+      undefined`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.updatedAt = undefined
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
     expect(Result.isSuccess(result) && result.value.updatedAt).toEqual(mockDate)
   })
 
-  it(`sets the current RawSimulatedEventInput.updatedAt to the current date if it is empty`, () => {
+  it(`sets the current RawSimulatedEventInput.updatedAt to the current date if it is
+      empty`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.updatedAt = ''
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
     expect(Result.isSuccess(result) && result.value.updatedAt).toEqual(mockDate)
   })
 
-  it(`sets the current RawSimulatedEventInput.updatedAt to the current date if it is blank`, () => {
+  it(`sets the current RawSimulatedEventInput.updatedAt to the current date if it is
+      blank`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     mockRawSimulatedEventInput.updatedAt = '      '
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
@@ -238,7 +258,8 @@ describe(`Testing Service SimulateRawEventApi RawSimulatedEvent tests`, () => {
    ************************************************************
    * Test expected results
    ************************************************************/
-  it(`returns the expected Success<RawSimulatedEvent> if the execution path is successful`, () => {
+  it(`returns the expected Success<RawSimulatedEvent> if the execution path is
+      successful`, () => {
     const mockRawSimulatedEventInput = buildMockRawSimulatedEventInput()
     const result = RawSimulatedEvent.validateAndBuild(mockRawSimulatedEventInput)
     const expectedEvent: RawSimulatedEvent = {

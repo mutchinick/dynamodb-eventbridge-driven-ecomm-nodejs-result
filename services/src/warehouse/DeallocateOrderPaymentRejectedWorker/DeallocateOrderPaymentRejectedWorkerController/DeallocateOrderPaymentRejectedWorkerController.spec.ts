@@ -149,7 +149,8 @@ function buildMockDeallocateOrderPaymentRejectedWorkerService_failsOnData({
   }
 }
 
-describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrderPaymentRejectedWorkerController tests`, () => {
+describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker
+          DeallocateOrderPaymentRejectedWorkerController tests`, () => {
   /*
    *
    *
@@ -166,7 +167,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     await expect(deallocateOrderStockWorkerController.deallocateOrdersStock(mockSqsEvent)).resolves.not.toThrow()
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input SQSEvent is undefined`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input SQSEvent is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -177,7 +179,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).toHaveBeenCalledTimes(0)
   })
 
-  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSEvent is undefined`, async () => {
+  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSEvent is
+      undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -189,7 +192,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(result).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input SQSEvent is null`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input SQSEvent is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -200,7 +204,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).toHaveBeenCalledTimes(0)
   })
 
-  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSEvent is null`, async () => {
+  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSEvent is
+      null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -218,7 +223,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test SQSEvent.Records edge cases
    ************************************************************/
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input SQSEvent records are missing`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input SQSEvent records are missing`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -229,7 +235,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).toHaveBeenCalledTimes(0)
   })
 
-  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSEvent records are missing`, async () => {
+  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSEvent
+      records are missing`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -241,7 +248,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(result).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input SQSEvent records are undefined`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input SQSEvent records are undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -252,7 +260,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).toHaveBeenCalledTimes(0)
   })
 
-  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSEvent records are undefined`, async () => {
+  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSEvent
+      records are undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -264,7 +273,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(result).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input SQSEvent records are null`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input SQSEvent records are null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -275,7 +285,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).toHaveBeenCalledTimes(0)
   })
 
-  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSEvent records are null`, async () => {
+  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSEvent
+      records are null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -287,7 +298,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(result).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input SQSEvent records are empty`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input SQSEvent records are empty`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -298,7 +310,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).toHaveBeenCalledTimes(0)
   })
 
-  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSEvent records are empty`, async () => {
+  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSEvent
+      records are empty`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -316,7 +329,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test SQSRecord.body edge cases
    ************************************************************/
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input SQSRecord.body is undefined`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input SQSRecord.body is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -328,7 +342,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).toHaveBeenCalledTimes(0)
   })
 
-  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSRecord.body is undefined`, async () => {
+  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSRecord.body
+      is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -341,7 +356,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(result).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input SQSRecord.body is null`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input SQSRecord.body is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -353,7 +369,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).toHaveBeenCalledTimes(0)
   })
 
-  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSRecord.body is null`, async () => {
+  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSRecord.body
+      is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -366,7 +383,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(result).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input SQSRecord.body is not a valid JSON`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input SQSRecord.body is not a valid JSON`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -379,7 +397,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).toHaveBeenCalledTimes(0)
   })
 
-  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSRecord.body is not a valid JSON`, async () => {
+  it(`returns an empty SQSBatchResponse.batchItemFailures if the input SQSRecord.body
+      is not a valid JSON`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -399,7 +418,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test IncomingOrderPaymentRejectedEvent edge cases
    ************************************************************/
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent is invalid`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent is invalid`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -414,7 +434,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent is invalid`, async () => {
+  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent
+      is invalid`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -436,7 +457,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test IncomingOrderPaymentRejectedEvent.eventName edge cases
    ************************************************************/
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.eventName is undefined`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.eventName is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -452,7 +474,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.eventName is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.eventName is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -469,7 +492,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.eventName is null`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.eventName is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -485,7 +509,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.eventName is null`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.eventName is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -508,7 +533,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test IncomingOrderPaymentRejectedEvent.createdAt edge cases
    ************************************************************/
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.createdAt is undefined`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.createdAt is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -524,7 +550,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.createdAt is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.createdAt is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -541,7 +568,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.createdAt is null`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.createdAt is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -557,7 +585,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.createdAt is null`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.createdAt is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -580,7 +609,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test IncomingOrderPaymentRejectedEvent.updatedAt edge cases
    ************************************************************/
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.updatedAt is undefined`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.updatedAt is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -596,7 +626,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.updatedAt is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.updatedAt is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -613,7 +644,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.updatedAt is null`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.updatedAt is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -629,7 +661,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.updatedAt is null`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.updatedAt is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -652,7 +685,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test IncomingOrderPaymentRejectedEvent.eventData edge cases
    ************************************************************/
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.eventData is undefined`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.eventData is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -668,7 +702,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.eventData is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.eventData is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -685,7 +720,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.eventData is null`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.eventData is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -701,7 +737,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.eventData is null`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.eventData is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -724,7 +761,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test IncomingOrderPaymentRejectedEvent.eventData.orderId edge cases
    ************************************************************/
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.eventData.orderId is undefined`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.eventData.orderId is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -740,7 +778,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.eventData.orderId is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.eventData.orderId is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -757,7 +796,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.eventData.orderId is null`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.eventData.orderId is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -773,7 +813,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.eventData.orderId is null`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.eventData.orderId is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -796,7 +837,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test IncomingOrderPaymentRejectedEvent.eventData.sku edge cases
    ************************************************************/
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.eventData.sku is undefined`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.eventData.sku is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -812,7 +854,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.eventData.sku is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.eventData.sku is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -829,7 +872,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.eventData.sku is null`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.eventData.sku is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -845,7 +889,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.eventData.sku is null`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.eventData.sku is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -868,7 +913,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test IncomingOrderPaymentRejectedEvent.eventData.units edge cases
    ************************************************************/
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.eventData.units is undefined`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.eventData.units is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -884,7 +930,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.eventData.units is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.eventData.units is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -901,7 +948,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.eventData.units is null`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.eventData.units is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -917,7 +965,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.eventData.units is null`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.eventData.units is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -940,7 +989,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test IncomingOrderPaymentRejectedEvent.eventData.price edge cases
    ************************************************************/
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.eventData.price is undefined`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.eventData.price is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -956,7 +1006,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.eventData.price is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.eventData.price is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -973,7 +1024,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.eventData.price is null`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.eventData.price is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -989,7 +1041,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.eventData.price is null`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.eventData.price is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -1012,7 +1065,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test IncomingOrderPaymentRejectedEvent.eventData.userId edge cases
    ************************************************************/
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.eventData.userId is undefined`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.eventData.userId is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -1028,7 +1082,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.eventData.userId is undefined`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.eventData.userId is undefined`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -1045,7 +1100,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock if the input IncomingOrderPaymentRejectedEvent.eventData.userId is null`, async () => {
+  it(`fails to call DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock
+      if the input IncomingOrderPaymentRejectedEvent.eventData.userId is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -1061,7 +1117,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).not.toHaveBeenCalled()
   })
 
-  it(`returns no SQSBatchItemFailures if the input IncomingOrderPaymentRejectedEvent.eventData.userId is null`, async () => {
+  it(`returns no SQSBatchItemFailures if the input
+      IncomingOrderPaymentRejectedEvent.eventData.userId is null`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -1084,7 +1141,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test internal logic
    ************************************************************/
-  it(`calls DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock a single time for an SQSEvent with a single record`, async () => {
+  it(`calls DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock a single
+      time for an SQSEvent with a single record`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -1096,7 +1154,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock).toHaveBeenCalledTimes(1)
   })
 
-  it(`calls DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock a multiple times for an SQSEvent with a multiple records`, async () => {
+  it(`calls DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock a
+      multiple times for an SQSEvent with a multiple records`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -1110,7 +1169,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     )
   })
 
-  it(`calls DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock with the expected input`, async () => {
+  it(`calls DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock with the
+      expected input`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -1139,7 +1199,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test transient/non-transient edge cases
    ************************************************************/
-  it(`returns no SQSBatchItemFailures if the DeallocateOrderPaymentRejectedWorkerService returns no Failure`, async () => {
+  it(`returns no SQSBatchItemFailures if the
+      DeallocateOrderPaymentRejectedWorkerService returns no Failure`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_succeeds()
     const deallocateOrderStockWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
@@ -1152,7 +1213,9 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`returns no SQSBatchItemFailures if the DeallocateOrderPaymentRejectedWorkerService returns a non-transient Failure (test 1)`, async () => {
+  it(`returns no SQSBatchItemFailures if the
+      DeallocateOrderPaymentRejectedWorkerService returns a non-transient Failure
+      (test 1)`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_failsOnData({
         transient: false,
@@ -1167,7 +1230,9 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`returns no SQSBatchItemFailures if the DeallocateOrderPaymentRejectedWorkerService returns a non-transient Failure (test 2)`, async () => {
+  it(`returns no SQSBatchItemFailures if the
+      DeallocateOrderPaymentRejectedWorkerService returns a non-transient Failure
+      (test 2)`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_failsOnData({
         transient: false,
@@ -1182,7 +1247,9 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`returns no SQSBatchItemFailures if the DeallocateOrderPaymentRejectedWorkerService returns a non-transient Failure (test 3)`, async () => {
+  it(`returns no SQSBatchItemFailures if the
+      DeallocateOrderPaymentRejectedWorkerService returns a non-transient Failure
+      (test 3)`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_failsOnData({
         transient: false,
@@ -1197,7 +1264,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`returns expected SQSBatchItemFailures if the DeallocateOrderPaymentRejectedWorkerService returns a transient Failure (test 1)`, async () => {
+  it(`returns expected SQSBatchItemFailures if the
+      DeallocateOrderPaymentRejectedWorkerService returns a transient Failure (test 1)`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_failsOnData({
         transient: true,
@@ -1217,7 +1285,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`returns expected SQSBatchItemFailures if the DeallocateOrderPaymentRejectedWorkerService returns a transient Failure (test 2)`, async () => {
+  it(`returns expected SQSBatchItemFailures if the
+      DeallocateOrderPaymentRejectedWorkerService returns a transient Failure (test 2)`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_failsOnData({
         transient: true,
@@ -1237,7 +1306,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`returns expected SQSBatchItemFailures if the DeallocateOrderPaymentRejectedWorkerService returns a transient Failure (test 3)`, async () => {
+  it(`returns expected SQSBatchItemFailures if the
+      DeallocateOrderPaymentRejectedWorkerService returns a transient Failure (test 3)`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_failsOnData({
         transient: true,
@@ -1259,7 +1329,9 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`returns all SQSBatchItemFailures if the DeallocateOrderPaymentRejectedWorkerService throws all and only transient Failure`, async () => {
+  it(`returns all SQSBatchItemFailures if the
+      DeallocateOrderPaymentRejectedWorkerService throws all and only transient
+      Failure`, async () => {
     const mockDeallocateOrderPaymentRejectedWorkerService =
       buildMockDeallocateOrderPaymentRejectedWorkerService_failsOnData({
         transient: true,

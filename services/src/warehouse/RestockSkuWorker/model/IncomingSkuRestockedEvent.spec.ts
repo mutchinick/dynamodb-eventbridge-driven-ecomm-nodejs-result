@@ -83,7 +83,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent is undefined`, () => {
     const mockEventBridgeEvent = undefined as never
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
@@ -91,7 +92,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent is null`, () => {
     const mockEventBridgeEvent = null as never
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
@@ -105,7 +107,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
    ************************************************************
    * Test EventBridgeEvent.detail edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent.detail is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent.detail is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
     mockEventBridgeEvent.detail = undefined as never
@@ -115,7 +118,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent.detail is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent.detail is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
     mockEventBridgeEvent.detail = null as never
@@ -131,7 +135,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
    ************************************************************
    * Test EventBridgeEvent.detail.dynamodb edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent.detail.dynamodb is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent.detail.dynamodb is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
     mockEventBridgeEvent.detail.dynamodb = undefined as never
@@ -141,7 +146,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent.detail.dynamodb is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent.detail.dynamodb is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
     mockEventBridgeEvent.detail.dynamodb = null as never
@@ -157,7 +163,9 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
    ************************************************************
    * Test EventBridgeEvent.detail.dynamodb.newImage edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent.detail.dynamodb.newImage (IncomingSkuRestockedEvent) is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent.detail.dynamodb.newImage (IncomingSkuRestockedEvent) is
+      undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
     mockEventBridgeEvent.detail.dynamodb.NewImage = undefined as never
@@ -167,7 +175,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent.detail.dynamodb.newImage (IncomingSkuRestockedEvent) is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent.detail.dynamodb.newImage (IncomingSkuRestockedEvent) is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
     mockEventBridgeEvent.detail.dynamodb.NewImage = null as never
@@ -183,7 +192,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
    ************************************************************
    * Test IncomingSkuRestockedEvent.eventName edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventName is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventName is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventName = undefined
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -193,7 +203,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventName is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventName is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventName = null
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -203,7 +214,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventName is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventName is empty`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventName = '' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -213,7 +225,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventName is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventName is blank`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventName = '      ' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -223,7 +236,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventName is not an WarehouseEventName`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventName is not an WarehouseEventName`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventName = 'mockEventName' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -239,7 +253,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
    ************************************************************
    * Test IncomingSkuRestockedEvent.createdAt edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.createdAt is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.createdAt is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.createdAt = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -249,7 +264,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.createdAt is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.createdAt is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.createdAt = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -259,7 +275,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.createdAt is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.createdAt is empty`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.createdAt = '' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -269,7 +286,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.createdAt is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.createdAt is blank`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.createdAt = '      ' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -279,7 +297,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.createdAt length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.createdAt length < 4`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.createdAt = '123' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -295,7 +314,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
    ************************************************************
    * Test IncomingSkuRestockedEvent.updatedAt edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.updatedAt is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.updatedAt is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.updatedAt = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -305,7 +325,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.updatedAt is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.updatedAt is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.updatedAt = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -315,7 +336,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.updatedAt is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.updatedAt is empty`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.updatedAt = '' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -325,7 +347,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.updatedAt is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.updatedAt is blank`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.updatedAt = '      ' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -335,7 +358,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.updatedAt length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.updatedAt length < 4`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.updatedAt = '123' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -351,7 +375,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
    ************************************************************
    * Test IncomingSkuRestockedEvent.eventData edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -361,7 +386,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -371,7 +397,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData is empty`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData = {} as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -381,7 +408,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData invalid`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData invalid`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData = 'mockInvalidValue' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -397,7 +425,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
    ************************************************************
    * Test IncomingSkuRestockedEvent.eventData.sku edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.sku is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.sku is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.sku = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -407,7 +436,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.sku is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.sku is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.sku = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -417,7 +447,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.sku is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.sku is empty`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.sku = '' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -427,7 +458,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.sku is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.sku is blank`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.sku = '      ' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -437,7 +469,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.sku length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.sku length < 4`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.sku = '123' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -453,7 +486,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
    ************************************************************
    * Test IncomingSkuRestockedEvent.eventData.units edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.units is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.units is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.units = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -463,7 +497,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.units is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.units is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.units = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -473,7 +508,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.units < 1`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.units < 1`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.units = 0
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -483,7 +519,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.units is not an integer`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.units is not an integer`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.units = 3.45
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -493,7 +530,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.units is not a number`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.units is not a number`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.units = '1' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -509,7 +547,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
    ************************************************************
    * Test IncomingSkuRestockedEvent.eventData.lotId edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.lotId is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.lotId is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.lotId = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -519,7 +558,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.lotId is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.lotId is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.lotId = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -529,7 +569,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.lotId is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.lotId is empty`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.lotId = '' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -539,7 +580,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.lotId is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.lotId is blank`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.lotId = '      ' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -549,7 +591,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent.eventData.lotId length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent.eventData.lotId length < 4`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.lotId = '123' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
@@ -565,7 +608,8 @@ describe(`Warehouse Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
    ************************************************************
    * Test expected results
    ************************************************************/
-  it(`returns the expected Success<IncomingSkuRestockedEvent> if the execution path is successful`, () => {
+  it(`returns the expected Success<IncomingSkuRestockedEvent> if the execution path is
+      successful`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)

@@ -27,7 +27,8 @@ describe(`Orders Service Result tests`, () => {
       expect(result).toStrictEqual(expectedResult)
     })
 
-    it(`returns a transient Failure with the expected FailureKind and Error when an error is provided`, () => {
+    it(`returns a transient Failure with the expected FailureKind and Error when an
+        error is provided`, () => {
       const error = new Error('mockError')
       const failureKind: FailureKind = 'InvalidArgumentsError'
       const transient = true
@@ -36,7 +37,8 @@ describe(`Orders Service Result tests`, () => {
       expect(result).toStrictEqual(expectedResult)
     })
 
-    it(`returns a Failure with an Error with the expected error message when an error message is provided`, () => {
+    it(`returns a Failure with an Error with the expected error message when an error
+        message is provided`, () => {
       const expectedErrorMessage = 'mockErrorMessage'
       const error = new Error(expectedErrorMessage)
       const failureKind: FailureKind = 'InvalidArgumentsError'
@@ -45,7 +47,8 @@ describe(`Orders Service Result tests`, () => {
       expect(result.error.message).toStrictEqual(expectedErrorMessage)
     })
 
-    it(`returns a Failure with an Error with an "Unrecognized Error" message when the error parameter is not a string`, () => {
+    it(`returns a Failure with an Error with an "Unrecognized Error" message when the
+        error parameter is not a string`, () => {
       const errorParameter = null as unknown
       const expectedErrorMessage = '[UnrecognizedError]: Unrecognized error'
       const failureKind: FailureKind = 'UnrecognizedError'

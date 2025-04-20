@@ -77,7 +77,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     await expect(listOrdersApiController.simulateRawEvent(mockApiEvent)).resolves.not.toThrow()
   })
 
-  it(`fails to call SimulateRawEventApiService if the input APIGatewayProxyEventV2 is undefined`, async () => {
+  it(`fails to call SimulateRawEventApiService if the input APIGatewayProxyEventV2 is
+      undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEvent = undefined as unknown as APIGatewayProxyEventV2
@@ -94,7 +95,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call SimulateRawEventApiService if the input APIGatewayProxyEventV2 is invalid`, async () => {
+  it(`fails to call SimulateRawEventApiService if the input APIGatewayProxyEventV2 is
+      invalid`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEvent = 'mockInvalidValue' as unknown as APIGatewayProxyEventV2
@@ -117,7 +119,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
    ************************************************************
    * Test APIGatewayProxyEventV2.body edge cases
    ************************************************************/
-  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body is undefined`, async () => {
+  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body is undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEvent = { body: undefined } as unknown as APIGatewayProxyEventV2
@@ -125,7 +128,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body is undefined`, async () => {
+  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body is
+      undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEvent = { body: undefined } as unknown as APIGatewayProxyEventV2
@@ -134,7 +138,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body is null`, async () => {
+  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body is null`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEvent = { body: null } as unknown as APIGatewayProxyEventV2
@@ -151,7 +156,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body is not a valid JSON`, async () => {
+  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body is not a valid JSON`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEvent = { body: 'mockInvalidValue' } as unknown as APIGatewayProxyEventV2
@@ -159,7 +165,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body is not a valid JSON`, async () => {
+  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body is not a
+      valid JSON`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEvent = { body: 'mockInvalidValue' } as unknown as APIGatewayProxyEventV2
@@ -174,7 +181,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
    ************************************************************
    * Test APIGatewayProxyEventV2.body.pk edge cases
    ************************************************************/
-  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body.pk is undefined`, async () => {
+  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body.pk is undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -184,7 +192,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.pk is undefined`, async () => {
+  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.pk is
+      undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -195,7 +204,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body.pk is null`, async () => {
+  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body.pk is null`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -205,7 +215,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.pk is null`, async () => {
+  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.pk is
+      null`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -222,7 +233,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
    ************************************************************
    * Test APIGatewayProxyEventV2.body.sk edge cases
    ************************************************************/
-  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body.sk is undefined`, async () => {
+  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body.sk is undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -232,7 +244,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.sk is undefined`, async () => {
+  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.sk is
+      undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -243,7 +256,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body.sk is null`, async () => {
+  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body.sk is null`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -253,7 +267,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.sk is null`, async () => {
+  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.sk is
+      null`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -270,7 +285,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
    ************************************************************
    * Test APIGatewayProxyEventV2.body.eventName edge cases
    ************************************************************/
-  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body.eventName is undefined`, async () => {
+  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body.eventName is undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -280,7 +296,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.eventName is undefined`, async () => {
+  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.eventName
+      is undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -291,7 +308,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body.eventName is null`, async () => {
+  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body.eventName is null`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -301,7 +319,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.eventName is null`, async () => {
+  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.eventName
+      is null`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -318,7 +337,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
    ************************************************************
    * Test APIGatewayProxyEventV2.body.createdAt edge cases
    ************************************************************/
-  it(`calls SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body.createdAt is undefined`, async () => {
+  it(`calls SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body.createdAt is undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -328,7 +348,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).toHaveBeenCalled()
   })
 
-  it(`responds with 202 Accepted if the input APIGatewayProxyEventV2.body.createdAt is undefined`, async () => {
+  it(`responds with 202 Accepted if the input APIGatewayProxyEventV2.body.createdAt is
+      undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -338,7 +359,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(response.statusCode).toBe(202)
   })
 
-  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body.createdAt is null`, async () => {
+  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body.createdAt is null`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -348,7 +370,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.createdAt is null`, async () => {
+  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.createdAt
+      is null`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -365,7 +388,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
    ************************************************************
    * Test APIGatewayProxyEventV2.body.updatedAt edge cases
    ************************************************************/
-  it(`calls SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body.updatedAt is undefined`, async () => {
+  it(`calls SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body.updatedAt is undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -375,7 +399,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).toHaveBeenCalled()
   })
 
-  it(`responds with 202 Accepted if the input APIGatewayProxyEventV2.body.updatedAt is undefined`, async () => {
+  it(`responds with 202 Accepted if the input APIGatewayProxyEventV2.body.updatedAt is
+      undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -385,7 +410,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(response.statusCode).toBe(202)
   })
 
-  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body.updatedAt is null`, async () => {
+  it(`fails to call SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body.updatedAt is null`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -395,7 +421,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.updatedAt is null`, async () => {
+  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.updatedAt
+      is null`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -412,7 +439,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
    ************************************************************
    * Test APIGatewayProxyEventV2.body.eventData edge cases
    ************************************************************/
-  it(`calls SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body.eventData is undefined`, async () => {
+  it(`calls SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body.eventData is undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -422,7 +450,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).toHaveBeenCalled()
   })
 
-  it(`responds with 202 Accepted if the input APIGatewayProxyEventV2.body.eventData is undefined`, async () => {
+  it(`responds with 202 Accepted if the input APIGatewayProxyEventV2.body.eventData is
+      undefined`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -432,7 +461,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(response.statusCode).toBe(202)
   })
 
-  it(`calls SimulateRawEventApiService.simulateRawEvent if the input APIGatewayProxyEventV2.body.eventData is null`, async () => {
+  it(`calls SimulateRawEventApiService.simulateRawEvent if the input
+      APIGatewayProxyEventV2.body.eventData is null`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -442,7 +472,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).toHaveBeenCalled()
   })
 
-  it(`responds with 202 Accepted if the input APIGatewayProxyEventV2.body.eventData is null`, async () => {
+  it(`responds with 202 Accepted if the input APIGatewayProxyEventV2.body.eventData is
+      null`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_succeeds()
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -477,7 +508,9 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(mockSimulateRawEventApiService.simulateRawEvent).toHaveBeenCalledWith(expectedServiceInput)
   })
 
-  it(`responds with 500 Internal Server Error if SimulateRawEventApiService.simulateRawEvent returns a Failure of kind not accounted for`, async () => {
+  it(`responds with 500 Internal Server Error if
+      SimulateRawEventApiService.simulateRawEvent returns a Failure of kind not
+      accounted for`, async () => {
     const mockFailureKind = 'mockFailureKind' as FailureKind
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_fails(mockFailureKind)
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
@@ -489,7 +522,9 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`responds with 500 Internal Server Error if SimulateRawEventApiService.simulateRawEvent returns a Failure of kind UnrecognizedError`, async () => {
+  it(`responds with 500 Internal Server Error if
+      SimulateRawEventApiService.simulateRawEvent returns a Failure of kind
+      UnrecognizedError`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_fails('UnrecognizedError')
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -500,7 +535,8 @@ describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`responds with 400 Bad Request if SimulateRawEventApiService.simulateRawEvent returns a Failure of kind InvalidArgumentsError`, async () => {
+  it(`responds with 400 Bad Request if SimulateRawEventApiService.simulateRawEvent
+      returns a Failure of kind InvalidArgumentsError`, async () => {
     const mockSimulateRawEventApiService = buildMockSimulateRawEventApiService_fails('InvalidArgumentsError')
     const simulateRawEventApiController = new SimulateRawEventApiController(mockSimulateRawEventApiService)
     const mockApiEventBody = buildMockApiEventBody()

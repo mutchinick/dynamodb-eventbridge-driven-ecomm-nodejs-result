@@ -173,7 +173,8 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input CreateOrderCommand is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      CreateOrderCommand is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
     const mockTestCommand = undefined as CreateOrderCommand
@@ -183,7 +184,8 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input CreateOrderCommand is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      CreateOrderCommand is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
     const mockTestCommand = null as CreateOrderCommand
@@ -193,7 +195,8 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input CreateOrderCommand is not an instance of the class`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      CreateOrderCommand is not an instance of the class`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
     const mockTestCommand = { ...mockCreateOrderCommand }
@@ -209,7 +212,8 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
    ************************************************************
    * Test CreateOrderCommand.commandData edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input CreateOrderCommand.commandData is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      CreateOrderCommand.commandData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
     const mockTestCommand = buildMockCreateOrderCommand()
@@ -220,7 +224,8 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input CreateOrderCommand.commandData is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      CreateOrderCommand.commandData is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
     const mockTestCommand = buildMockCreateOrderCommand()
@@ -251,7 +256,8 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
-  it(`returns a transient Failure of kind UnrecognizedError if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
+  it(`returns a transient Failure of kind UnrecognizedError if
+      DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
     const result = await dbCreateOrderClient.createOrder(mockCreateOrderCommand)
@@ -266,7 +272,8 @@ describe(`Orders Service SyncOrderWorker DbCreateOrderClient tests`, () => {
    ************************************************************
    * Test expected results
    ************************************************************/
-  it(`returns the expected Success<OrderData> existing in the database if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException`, async () => {
+  it(`returns the expected Success<OrderData> existing in the database if
+      DynamoDBDocumentClient.send throws a ConditionalCheckFailedException`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws_ConditionalCheckFailedException()
     const dbCreateOrderClient = new DbCreateOrderClient(mockDdbDocClient)
     const result = await dbCreateOrderClient.createOrder(mockCreateOrderCommand)

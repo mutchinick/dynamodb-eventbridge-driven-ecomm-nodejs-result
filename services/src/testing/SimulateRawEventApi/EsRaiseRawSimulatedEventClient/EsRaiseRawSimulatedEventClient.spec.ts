@@ -81,7 +81,8 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEvent is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEvent is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_succeeds()
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
     const mockTestEvent = undefined as never
@@ -91,7 +92,8 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEvent is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEvent is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_succeeds()
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
     const mockTestEvent = null as never
@@ -101,7 +103,8 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEvent is not an instance of the class`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      RawSimulatedEvent is not an instance of the class`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_succeeds()
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
     const mockTestEvent = { ...mockRawSimulatedEvent }
@@ -131,7 +134,8 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
-  it(`returns a transient Failure of kind UnrecognizedError if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
+  it(`returns a transient Failure of kind UnrecognizedError if
+      DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockError = new Error('mockError')
     const mockDdbDocClient = buildMockDdbDocClient_throws(mockError)
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
@@ -141,7 +145,8 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
     expect(Result.isFailureTransient(result)).toBe(true)
   })
 
-  it(`returns a non-transient Failure of kind DuplicateEventRaisedError if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException`, async () => {
+  it(`returns a non-transient Failure of kind DuplicateEventRaisedError if
+      DynamoDBDocumentClient.send throws a ConditionalCheckFailedException`, async () => {
     const mockError = new ConditionalCheckFailedException({ $metadata: {}, message: '' })
     const mockDdbDocClient = buildMockDdbDocClient_throws(mockError)
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)

@@ -86,7 +86,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     await expect(listSkusApiController.listSkus(mockApiEvent)).resolves.not.toThrow()
   })
 
-  it(`fails to call ListSkusApiService if the input APIGatewayProxyEventV2 is undefined`, async () => {
+  it(`fails to call ListSkusApiService if the input APIGatewayProxyEventV2 is
+      undefined`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEvent = undefined as unknown as APIGatewayProxyEventV2
@@ -126,7 +127,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
    ************************************************************
    * Test APIGatewayProxyEventV2.body edge cases
    ************************************************************/
-  it(`fails to call ListSkusApiService.listSkus if the input APIGatewayProxyEventV2.body is undefined`, async () => {
+  it(`fails to call ListSkusApiService.listSkus if the input
+      APIGatewayProxyEventV2.body is undefined`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEvent = { body: undefined } as unknown as APIGatewayProxyEventV2
@@ -134,7 +136,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     expect(mockListSkusApiService.listSkus).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body is undefined`, async () => {
+  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body is
+      undefined`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEvent = { body: undefined } as unknown as APIGatewayProxyEventV2
@@ -143,7 +146,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call ListSkusApiService.listSkus if the input APIGatewayProxyEventV2.body is null`, async () => {
+  it(`fails to call ListSkusApiService.listSkus if the input
+      APIGatewayProxyEventV2.body is null`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEvent = { body: null } as unknown as APIGatewayProxyEventV2
@@ -160,7 +164,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call ListSkusApiService.listSkus if the input APIGatewayProxyEventV2.body is not a valid JSON`, async () => {
+  it(`fails to call ListSkusApiService.listSkus if the input
+      APIGatewayProxyEventV2.body is not a valid JSON`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEvent = { body: 'mockInvalidValue' } as unknown as APIGatewayProxyEventV2
@@ -168,7 +173,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     expect(mockListSkusApiService.listSkus).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body is not a valid JSON`, async () => {
+  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body is not a
+      valid JSON`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEvent = { body: 'mockInvalidValue' } as unknown as APIGatewayProxyEventV2
@@ -183,7 +189,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
    ************************************************************
    * Test APIGatewayProxyEventV2.body.sku edge cases
    ************************************************************/
-  it(`calls ListSkusApiService.listSkus if the input APIGatewayProxyEventV2.body.sku is undefined`, async () => {
+  it(`calls ListSkusApiService.listSkus if the input APIGatewayProxyEventV2.body.sku
+      is undefined`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -203,7 +210,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     expect(response.statusCode).toBe(200)
   })
 
-  it(`fails to call ListSkusApiService.listSkus if the input APIGatewayProxyEventV2.body.sku is null`, async () => {
+  it(`fails to call ListSkusApiService.listSkus if the input
+      APIGatewayProxyEventV2.body.sku is null`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -213,7 +221,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     expect(mockListSkusApiService.listSkus).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.sku is null`, async () => {
+  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.sku is
+      null`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -230,7 +239,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
    ************************************************************
    * Test APIGatewayProxyEventV2.body.limit edge cases
    ************************************************************/
-  it(`calls ListSkusApiService.listSkus if the input APIGatewayProxyEventV2.body.limit is undefined`, async () => {
+  it(`calls ListSkusApiService.listSkus if the input APIGatewayProxyEventV2.body.limit
+      is undefined`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -250,7 +260,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     expect(response.statusCode).toBe(200)
   })
 
-  it(`fails to call ListSkusApiService.listSkus if the input APIGatewayProxyEventV2.body.limit is null`, async () => {
+  it(`fails to call ListSkusApiService.listSkus if the input
+      APIGatewayProxyEventV2.body.limit is null`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -260,7 +271,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     expect(mockListSkusApiService.listSkus).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.limit is null`, async () => {
+  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.limit is
+      null`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -277,7 +289,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
    ************************************************************
    * Test APIGatewayProxyEventV2.body.sortDirection edge cases
    ************************************************************/
-  it(`calls ListSkusApiService.listSkus if the input APIGatewayProxyEventV2.body.sortDirection is undefined`, async () => {
+  it(`calls ListSkusApiService.listSkus if the input
+      APIGatewayProxyEventV2.body.sortDirection is undefined`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -287,7 +300,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     expect(mockListSkusApiService.listSkus).toHaveBeenCalled()
   })
 
-  it(`responds with 200 OK if the input APIGatewayProxyEventV2.body.sortDirection is undefined`, async () => {
+  it(`responds with 200 OK if the input APIGatewayProxyEventV2.body.sortDirection is
+      undefined`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -297,7 +311,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     expect(response.statusCode).toBe(200)
   })
 
-  it(`fails to call ListSkusApiService.listSkus if the input APIGatewayProxyEventV2.body.sortDirection is null`, async () => {
+  it(`fails to call ListSkusApiService.listSkus if the input
+      APIGatewayProxyEventV2.body.sortDirection is null`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -307,7 +322,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     expect(mockListSkusApiService.listSkus).not.toHaveBeenCalled()
   })
 
-  it(`responds with 400 Bad Request if the input APIGatewayProxyEventV2.body.sortDirection is null`, async () => {
+  it(`responds with 400 Bad Request if the input
+      APIGatewayProxyEventV2.body.sortDirection is null`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_succeeds()
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -343,7 +359,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     expect(mockListSkusApiService.listSkus).toHaveBeenCalledWith(expectedServiceInput)
   })
 
-  it(`responds with 500 Internal Server Error if ListSkusApiService.listSkus returns a Failure of kind not accounted for`, async () => {
+  it(`responds with 500 Internal Server Error if ListSkusApiService.listSkus returns a
+      Failure of kind not accounted for`, async () => {
     const mockFailureKind = 'mockFailureKind' as FailureKind
     const mockListSkusApiService = buildMockListSkusApiService_fails(mockFailureKind)
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
@@ -355,7 +372,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`responds with 500 Internal Server Error if ListSkusApiService.listSkus returns a Failure of kind UnrecognizedError`, async () => {
+  it(`responds with 500 Internal Server Error if ListSkusApiService.listSkus returns a
+      Failure of kind UnrecognizedError`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_fails('UnrecognizedError')
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEventBody = buildMockApiEventBody()
@@ -366,7 +384,8 @@ describe(`Warehouse Service ListSkusApi ListSkusApiController tests`, () => {
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`responds with 400 Bad Request if ListSkusApiService.listSkus returns a Failure of kind InvalidArgumentsError`, async () => {
+  it(`responds with 400 Bad Request if ListSkusApiService.listSkus returns a Failure
+      of kind InvalidArgumentsError`, async () => {
     const mockListSkusApiService = buildMockListSkusApiService_fails('InvalidArgumentsError')
     const listSkusApiController = new ListSkusApiController(mockListSkusApiService)
     const mockApiEventBody = buildMockApiEventBody()

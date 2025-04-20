@@ -12,7 +12,8 @@ function buildMockGetOrderAllocationCommandInput(): GetOrderAllocationCommandInp
   return mockValidInput
 }
 
-describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocationCommand tests`, () => {
+describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocationCommand
+          tests`, () => {
   /*
    *
    *
@@ -25,7 +26,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocat
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommandInput is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderAllocationCommandInput is undefined`, () => {
     const mockGetOrderAllocationCommandInput: GetOrderAllocationCommandInput = undefined
     const result = GetOrderAllocationCommand.validateAndBuild(mockGetOrderAllocationCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -33,7 +35,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocat
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommandInput is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderAllocationCommandInput is null`, () => {
     const mockGetOrderAllocationCommandInput: GetOrderAllocationCommandInput = null
     const result = GetOrderAllocationCommand.validateAndBuild(mockGetOrderAllocationCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -47,7 +50,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocat
    ************************************************************
    * Test GetOrderAllocationCommandInput.orderId edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommandInput.orderId is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderAllocationCommandInput.orderId is undefined`, () => {
     const mockGetOrderAllocationCommandInput = buildMockGetOrderAllocationCommandInput()
     mockGetOrderAllocationCommandInput.orderId = undefined
     const result = GetOrderAllocationCommand.validateAndBuild(mockGetOrderAllocationCommandInput)
@@ -56,7 +60,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocat
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommandInput.orderId is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderAllocationCommandInput.orderId is null`, () => {
     const mockGetOrderAllocationCommandInput = buildMockGetOrderAllocationCommandInput()
     mockGetOrderAllocationCommandInput.orderId = null
     const result = GetOrderAllocationCommand.validateAndBuild(mockGetOrderAllocationCommandInput)
@@ -65,7 +70,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocat
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommandInput.orderId is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderAllocationCommandInput.orderId is empty`, () => {
     const mockGetOrderAllocationCommandInput = buildMockGetOrderAllocationCommandInput()
     mockGetOrderAllocationCommandInput.orderId = ''
     const result = GetOrderAllocationCommand.validateAndBuild(mockGetOrderAllocationCommandInput)
@@ -74,7 +80,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocat
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommandInput.orderId is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderAllocationCommandInput.orderId is blank`, () => {
     const mockGetOrderAllocationCommandInput = buildMockGetOrderAllocationCommandInput()
     mockGetOrderAllocationCommandInput.orderId = '      '
     const result = GetOrderAllocationCommand.validateAndBuild(mockGetOrderAllocationCommandInput)
@@ -83,7 +90,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocat
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommandInput.orderId length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderAllocationCommandInput.orderId length < 4`, () => {
     const mockGetOrderAllocationCommandInput = buildMockGetOrderAllocationCommandInput()
     mockGetOrderAllocationCommandInput.orderId = '123'
     const result = GetOrderAllocationCommand.validateAndBuild(mockGetOrderAllocationCommandInput)
@@ -98,7 +106,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocat
    ************************************************************
    * Test GetOrderAllocationCommandInput.sku edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommandInput.sku is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderAllocationCommandInput.sku is undefined`, () => {
     const mockGetOrderAllocationCommandInput = buildMockGetOrderAllocationCommandInput()
     mockGetOrderAllocationCommandInput.sku = undefined
     const result = GetOrderAllocationCommand.validateAndBuild(mockGetOrderAllocationCommandInput)
@@ -107,7 +116,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocat
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommandInput.sku is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderAllocationCommandInput.sku is null`, () => {
     const mockGetOrderAllocationCommandInput = buildMockGetOrderAllocationCommandInput()
     mockGetOrderAllocationCommandInput.sku = null
     const result = GetOrderAllocationCommand.validateAndBuild(mockGetOrderAllocationCommandInput)
@@ -116,7 +126,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocat
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommandInput.sku is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderAllocationCommandInput.sku is empty`, () => {
     const mockGetOrderAllocationCommandInput = buildMockGetOrderAllocationCommandInput()
     mockGetOrderAllocationCommandInput.sku = ''
     const result = GetOrderAllocationCommand.validateAndBuild(mockGetOrderAllocationCommandInput)
@@ -125,7 +136,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocat
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommandInput.sku is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderAllocationCommandInput.sku is blank`, () => {
     const mockGetOrderAllocationCommandInput = buildMockGetOrderAllocationCommandInput()
     mockGetOrderAllocationCommandInput.sku = '      '
     const result = GetOrderAllocationCommand.validateAndBuild(mockGetOrderAllocationCommandInput)
@@ -134,7 +146,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocat
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommandInput.sku length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderAllocationCommandInput.sku length < 4`, () => {
     const mockGetOrderAllocationCommandInput = buildMockGetOrderAllocationCommandInput()
     mockGetOrderAllocationCommandInput.sku = '123'
     const result = GetOrderAllocationCommand.validateAndBuild(mockGetOrderAllocationCommandInput)
@@ -149,7 +162,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker GetOrderAllocat
    ************************************************************
    * Test expected results
    ************************************************************/
-  it(`returns the expected Success<GetOrderAllocationCommand> if the execution path is successful`, () => {
+  it(`returns the expected Success<GetOrderAllocationCommand> if the execution path is
+      successful`, () => {
     const mockGetOrderAllocationCommandInput = buildMockGetOrderAllocationCommandInput()
     const result = GetOrderAllocationCommand.validateAndBuild(mockGetOrderAllocationCommandInput)
     const expectedCommand: GetOrderAllocationCommand = {

@@ -27,7 +27,8 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput is undefined`, () => {
     const mockIncomingListSkusRequestInput = undefined as never
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -35,7 +36,8 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput is null`, () => {
     const mockIncomingListSkusRequestInput = null as never
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -49,14 +51,16 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
    ************************************************************
    * Test IncomingListSkusRequestData.sku edge cases
    ************************************************************/
-  it(`does not return a Failure if the input IncomingListSkusRequestInput.sku is undefined`, () => {
+  it(`does not return a Failure if the input IncomingListSkusRequestInput.sku is
+      undefined`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.sku = undefined
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput.sku is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput.sku is null`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.sku = null
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
@@ -65,7 +69,8 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput.sku is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput.sku is empty`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.sku = ''
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
@@ -74,7 +79,8 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput.sku is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput.sku is blank`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.sku = '      '
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
@@ -83,7 +89,8 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput.sku length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput.sku length < 4`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.sku = '123'
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
@@ -98,14 +105,16 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
    ************************************************************
    * Test IncomingListSkusRequestData.sortDirection edge cases
    ************************************************************/
-  it(`does not return a Failure if the input IncomingListSkusRequestInput.sortDirection is undefined`, () => {
+  it(`does not return a Failure if the input
+      IncomingListSkusRequestInput.sortDirection is undefined`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.sortDirection = undefined
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput.sortDirection is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput.sortDirection is null`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.sortDirection = null
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
@@ -114,7 +123,8 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput.sortDirection is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput.sortDirection is empty`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.sortDirection = '' as never
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
@@ -123,7 +133,8 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput.sortDirection is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput.sortDirection is blank`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.sortDirection = '      ' as never
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
@@ -132,7 +143,8 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput.sortDirection is a random string`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput.sortDirection is a random string`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.sortDirection = 'xyz' as never
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
@@ -147,14 +159,16 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
    ************************************************************
    * Test IncomingListSkusRequestData.limit edge cases
    ************************************************************/
-  it(`does not return a Failure if the input IncomingListSkusRequestInput.limit is undefined`, () => {
+  it(`does not return a Failure if the input IncomingListSkusRequestInput.limit is
+      undefined`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.limit = undefined
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput.limit is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput.limit is null`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.limit = null
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
@@ -163,7 +177,8 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput.limit < 1`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput.limit < 1`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.limit = 0
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
@@ -172,7 +187,8 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput.limit > 1000`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput.limit > 1000`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.limit = 1001
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
@@ -181,7 +197,8 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput.limit is not an integer`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput.limit is not an integer`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.limit = 3.45
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
@@ -190,7 +207,8 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequestInput.limit is not a number`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListSkusRequestInput.limit is not a number`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     mockIncomingListSkusRequestInput.limit = '1' as never
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
@@ -205,7 +223,8 @@ describe(`Warehouse Service ListSkusApi IncomingListSkusRequest tests`, () => {
    ************************************************************
    * Test expected results
    ************************************************************/
-  it(`returns the expected Success<IncomingListSkusRequest> if the execution path is successful`, () => {
+  it(`returns the expected Success<IncomingListSkusRequest> if the execution path is
+      successful`, () => {
     const mockIncomingListSkusRequestInput = buildMockIncomingListSkusRequestInput()
     const result = IncomingListSkusRequest.validateAndBuild(mockIncomingListSkusRequestInput)
     const expectedRequest: IncomingListSkusRequest = {

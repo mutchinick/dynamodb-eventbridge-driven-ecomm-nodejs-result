@@ -139,14 +139,16 @@ function buildMockDbDeallocateOrderPaymentRejectedClient_fails(
   }
 }
 
-describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrderPaymentRejectedWorkerService tests`, () => {
+describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker
+          DeallocateOrderPaymentRejectedWorkerService tests`, () => {
   /*
    *
    *
    ************************************************************
    * Test IncomingOrderPaymentRejectedEvent edge cases
    ************************************************************/
-  it(`does not return a Failure if the input IncomingOrderPaymentRejectedEvent is valid`, async () => {
+  it(`does not return a Failure if the input IncomingOrderPaymentRejectedEvent is
+      valid`, async () => {
     const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
     const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
     const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
@@ -159,7 +161,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderPaymentRejectedEvent is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderPaymentRejectedEvent is undefined`, async () => {
     const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
     const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
     const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
@@ -173,7 +176,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderPaymentRejectedEvent is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderPaymentRejectedEvent is null`, async () => {
     const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
     const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
     const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
@@ -187,7 +191,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderPaymentRejectedEvent is not an instance of the class`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderPaymentRejectedEvent is not an instance of the class`, async () => {
     const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
     const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
     const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
@@ -207,7 +212,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test when it reads the Allocation from the database
    ************************************************************/
-  it(`returns the same Failure if GetOrderAllocationCommand.validateAndBuild returns a Failure`, async () => {
+  it(`returns the same Failure if GetOrderAllocationCommand.validateAndBuild returns a
+      Failure`, async () => {
     const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
     const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
     const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
@@ -237,7 +243,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDbGetOrderAllocationClient.getOrderAllocation).toHaveBeenCalledTimes(1)
   })
 
-  it(`calls DbGetOrderAllocationClient.getOrderAllocation with the expected GetOrderAllocationCommand`, async () => {
+  it(`calls DbGetOrderAllocationClient.getOrderAllocation with the expected
+      GetOrderAllocationCommand`, async () => {
     const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
     const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
     const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
@@ -248,7 +255,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDbGetOrderAllocationClient.getOrderAllocation).toHaveBeenCalledWith(expectedGetOrderAllocationCommand)
   })
 
-  it(`returns the same Failure if DbGetOrderAllocationClient.getOrderAllocation returns a Failure`, async () => {
+  it(`returns the same Failure if DbGetOrderAllocationClient.getOrderAllocation
+      returns a Failure`, async () => {
     const mockFailureKind = 'mockFailureKind' as never
     const mockError = 'mockError'
     const mockTransient = 'mockTransient' as never
@@ -276,7 +284,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
    ************************************************************
    * Test when it deallocates the Allocation from the database
    ************************************************************/
-  it(`returns the same Failure if DeallocateOrderPaymentRejectedCommand.validateAndBuild returns a Failure`, async () => {
+  it(`returns the same Failure if
+      DeallocateOrderPaymentRejectedCommand.validateAndBuild returns a Failure`, async () => {
     const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
     const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
     const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
@@ -306,7 +315,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     expect(mockDbDeallocateOrderPaymentRejectedClient.deallocateOrderStock).toHaveBeenCalledTimes(1)
   })
 
-  it(`calls DbDeallocateOrderPaymentRejectedClient.deallocateOrderStock with the expected DeallocateOrderPaymentRejectedCommand`, async () => {
+  it(`calls DbDeallocateOrderPaymentRejectedClient.deallocateOrderStock with the
+      expected DeallocateOrderPaymentRejectedCommand`, async () => {
     const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds()
     const mockDbDeallocateOrderPaymentRejectedClient = buildMockDbDeallocateOrderPaymentRejectedClient_succeeds()
     const deallocateOrderPaymentRejectedWorkerService = new DeallocateOrderPaymentRejectedWorkerService(
@@ -319,7 +329,8 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DeallocateOrder
     )
   })
 
-  it(`returns the same Failure if DbDeallocateOrderPaymentRejectedClient.deallocateOrderStock returns a Failure`, async () => {
+  it(`returns the same Failure if
+      DbDeallocateOrderPaymentRejectedClient.deallocateOrderStock returns a Failure`, async () => {
     const mockFailureKind = 'mockFailureKind' as never
     const mockError = 'mockError'
     const mockTransient = 'mockTransient' as never

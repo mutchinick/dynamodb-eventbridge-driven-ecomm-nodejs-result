@@ -83,7 +83,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent is undefined`, () => {
     const mockEventBridgeEvent = undefined as never
     const result = IncomingOrderEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
@@ -91,7 +92,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent is null`, () => {
     const mockEventBridgeEvent = null as never
     const result = IncomingOrderEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
@@ -105,7 +107,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
    ************************************************************
    * Test EventBridgeEvent.detail edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent.detail is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent.detail is undefined`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     mockEventBridgeEvent.detail = undefined as never
@@ -115,7 +118,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent.detail is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent.detail is null`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     mockEventBridgeEvent.detail = null as never
@@ -131,7 +135,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
    ************************************************************
    * Test EventBridgeEvent.detail.dynamodb edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent.detail.dynamodb is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent.detail.dynamodb is undefined`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     mockEventBridgeEvent.detail.dynamodb = undefined as never
@@ -141,7 +146,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent.detail.dynamodb is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent.detail.dynamodb is null`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     mockEventBridgeEvent.detail.dynamodb = null as never
@@ -157,7 +163,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
    ************************************************************
    * Test EventBridgeEvent.detail.dynamodb.newImage edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent.detail.dynamodb.newImage (IncomingOrderEvent) is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent.detail.dynamodb.newImage (IncomingOrderEvent) is undefined`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     mockEventBridgeEvent.detail.dynamodb.NewImage = undefined as never
@@ -167,7 +174,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input EventBridgeEvent.detail.dynamodb.newImage (IncomingOrderEvent) is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      EventBridgeEvent.detail.dynamodb.newImage (IncomingOrderEvent) is null`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     mockEventBridgeEvent.detail.dynamodb.NewImage = null as never
@@ -183,7 +191,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
    ************************************************************
    * Test IncomingOrderEvent.eventName edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventName is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventName is undefined`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventName = undefined
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -193,7 +202,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventName is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventName is null`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventName = null
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -203,7 +213,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventName is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventName is empty`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventName = '' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -213,7 +224,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventName is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventName is blank`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventName = '      ' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -223,7 +235,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventName is not an OrderEventName`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventName is not an OrderEventName`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventName = 'mockEventName' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -239,7 +252,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
    ************************************************************
    * Test IncomingOrderEvent.createdAt edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.createdAt is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.createdAt is undefined`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.createdAt = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -249,7 +263,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.createdAt is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.createdAt is null`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.createdAt = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -259,7 +274,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.createdAt is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.createdAt is empty`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.createdAt = '' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -269,7 +285,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.createdAt is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.createdAt is blank`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.createdAt = '      ' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -279,7 +296,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.createdAt length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.createdAt length < 4`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.createdAt = '123' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -295,7 +313,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
    ************************************************************
    * Test IncomingOrderEvent.updatedAt edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.updatedAt is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.updatedAt is undefined`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.updatedAt = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -305,7 +324,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.updatedAt is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.updatedAt is null`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.updatedAt = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -315,7 +335,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.updatedAt is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.updatedAt is empty`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.updatedAt = '' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -325,7 +346,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.updatedAt is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.updatedAt is blank`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.updatedAt = '      ' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -335,7 +357,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.updatedAt length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.updatedAt length < 4`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.updatedAt = '123' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -351,7 +374,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
    ************************************************************
    * Test IncomingOrderEvent.eventData edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData is undefined`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -361,7 +385,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData is null`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -371,7 +396,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData is empty`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData = {} as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -381,7 +407,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData invalid`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData invalid`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData = 'mockInvalidValue' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -397,7 +424,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
    ************************************************************
    * Test IncomingOrderEvent.eventData.orderId edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.orderId is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.orderId is undefined`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.orderId = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -407,7 +435,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.orderId is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.orderId is null`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.orderId = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -417,7 +446,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.orderId is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.orderId is empty`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.orderId = '' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -427,7 +457,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.orderId is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.orderId is blank`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.orderId = '      ' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -437,7 +468,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.orderId length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.orderId length < 4`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.orderId = '123' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -453,7 +485,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
    ************************************************************
    * Test IncomingOrderEvent.eventData.sku edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.sku is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.sku is undefined`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.sku = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -463,7 +496,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.sku is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.sku is null`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.sku = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -473,7 +507,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.sku is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.sku is empty`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.sku = '' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -483,7 +518,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.sku is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.sku is blank`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.sku = '      ' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -493,7 +529,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.sku length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.sku length < 4`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.sku = '123' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -509,7 +546,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
    ************************************************************
    * Test IncomingOrderEvent.eventData.units edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.units is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.units is undefined`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.units = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -519,7 +557,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.units is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.units is null`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.units = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -529,7 +568,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.units < 1`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.units < 1`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.units = 0
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -539,7 +579,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.units is not an integer`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.units is not an integer`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.units = 3.45
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -549,7 +590,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.units is not a number`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.units is not a number`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.units = '1' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -565,7 +607,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
    ************************************************************
    * Test IncomingOrderEvent.eventData.price edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.price is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.price is undefined`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.price = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -575,7 +618,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.price is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.price is null`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.price = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -585,7 +629,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.price < 0`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.price < 0`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.price = -1
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -595,7 +640,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.price is not a number`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.price is not a number`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.price = '0' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -611,7 +657,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
    ************************************************************
    * Test IncomingOrderEvent.eventData.userId edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.userId is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.userId is undefined`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.userId = undefined as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -621,7 +668,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.userId is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.userId is null`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.userId = null as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -631,7 +679,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.userId is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.userId is empty`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.userId = '' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -641,7 +690,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.userId is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.userId is blank`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.userId = '      ' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -651,7 +701,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderEvent.eventData.userId length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingOrderEvent.eventData.userId length < 4`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     mockIncomingOrderEvent.eventData.userId = '123' as never
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
@@ -667,7 +718,8 @@ describe(`Orders Service SyncOrderWorker IncomingOrderEvent tests`, () => {
    ************************************************************
    * Test expected results
    ************************************************************/
-  it(`returns the expected Success<IncomingOrderEvent> if the execution path is successful`, () => {
+  it(`returns the expected Success<IncomingOrderEvent> if the execution path is
+      successful`, () => {
     const mockIncomingOrderEvent = buildMockIncomingOrderEvent()
     const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingOrderEvent)
     const result = IncomingOrderEvent.validateAndBuild(mockEventBridgeEvent)

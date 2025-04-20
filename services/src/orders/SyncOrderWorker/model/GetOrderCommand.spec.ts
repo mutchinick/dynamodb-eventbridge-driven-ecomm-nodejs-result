@@ -23,7 +23,8 @@ describe(`Orders Service SyncOrderWorker GetOrderCommand tests`, () => {
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderCommandInput is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderCommandInput is undefined`, () => {
     const mockGetOrderCommandInput: GetOrderCommandInput = undefined
     const result = GetOrderCommand.validateAndBuild(mockGetOrderCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -31,7 +32,8 @@ describe(`Orders Service SyncOrderWorker GetOrderCommand tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderCommandInput is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderCommandInput is null`, () => {
     const mockGetOrderCommandInput: GetOrderCommandInput = null
     const result = GetOrderCommand.validateAndBuild(mockGetOrderCommandInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -45,7 +47,8 @@ describe(`Orders Service SyncOrderWorker GetOrderCommand tests`, () => {
    ************************************************************
    * Test GetOrderCommandInput.orderId edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderCommandInput.orderId is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderCommandInput.orderId is undefined`, () => {
     const mockGetOrderCommandInput = buildMockGetOrderCommandInput()
     mockGetOrderCommandInput.orderId = undefined
     const result = GetOrderCommand.validateAndBuild(mockGetOrderCommandInput)
@@ -54,7 +57,8 @@ describe(`Orders Service SyncOrderWorker GetOrderCommand tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderCommandInput.orderId is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderCommandInput.orderId is null`, () => {
     const mockGetOrderCommandInput = buildMockGetOrderCommandInput()
     mockGetOrderCommandInput.orderId = null
     const result = GetOrderCommand.validateAndBuild(mockGetOrderCommandInput)
@@ -63,7 +67,8 @@ describe(`Orders Service SyncOrderWorker GetOrderCommand tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderCommandInput.orderId is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderCommandInput.orderId is empty`, () => {
     const mockGetOrderCommandInput = buildMockGetOrderCommandInput()
     mockGetOrderCommandInput.orderId = ''
     const result = GetOrderCommand.validateAndBuild(mockGetOrderCommandInput)
@@ -72,7 +77,8 @@ describe(`Orders Service SyncOrderWorker GetOrderCommand tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderCommandInput.orderId is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderCommandInput.orderId is blank`, () => {
     const mockGetOrderCommandInput = buildMockGetOrderCommandInput()
     mockGetOrderCommandInput.orderId = '      '
     const result = GetOrderCommand.validateAndBuild(mockGetOrderCommandInput)
@@ -81,7 +87,8 @@ describe(`Orders Service SyncOrderWorker GetOrderCommand tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderCommandInput.orderId length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      GetOrderCommandInput.orderId length < 4`, () => {
     const mockGetOrderCommandInput = buildMockGetOrderCommandInput()
     mockGetOrderCommandInput.orderId = '123'
     const result = GetOrderCommand.validateAndBuild(mockGetOrderCommandInput)
@@ -96,7 +103,8 @@ describe(`Orders Service SyncOrderWorker GetOrderCommand tests`, () => {
    ************************************************************
    * Test expected results
    ************************************************************/
-  it(`returns the expected Success<GetOrderCommand> if the execution path is successful`, () => {
+  it(`returns the expected Success<GetOrderCommand> if the execution path is
+      successful`, () => {
     const mockGetOrderCommandInput = buildMockGetOrderCommandInput()
     const result = GetOrderCommand.validateAndBuild(mockGetOrderCommandInput)
     const expectedCommand: GetOrderCommand = {

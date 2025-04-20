@@ -1,7 +1,8 @@
 import { HttpResponse } from './HttpResponse'
 
-describe('Shared HttpResponse tests', () => {
-  test('HttpResponse.OK returns the expected 200 OK APIGatewayProxyStructuredResultV2 response', () => {
+describe(`Shared HttpResponse tests`, () => {
+  test(`HttpResponse.OK returns the expected 200 OK APIGatewayProxyStructuredResultV2
+        response`, () => {
     const mockResponseBody = { mockItem1: 1, mockItem2: 'mockItem2' }
     const expectedResponse = {
       statusCode: 200,
@@ -11,7 +12,8 @@ describe('Shared HttpResponse tests', () => {
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  test('HttpResponse.Created returns the expected 201 Created APIGatewayProxyStructuredResultV2 response', () => {
+  test(`HttpResponse.Created returns the expected 201 Created
+        APIGatewayProxyStructuredResultV2 response`, () => {
     const mockResponseBody = { mockItem1: 1, mockItem2: 'mockItem2' }
     const expectedResponse = {
       statusCode: 201,
@@ -21,7 +23,8 @@ describe('Shared HttpResponse tests', () => {
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  test('HttpResponse.Accepted returns the expected 202 Accepted APIGatewayProxyStructuredResultV2 response', () => {
+  test(`HttpResponse.Accepted returns the expected 202 Accepted
+        APIGatewayProxyStructuredResultV2 response`, () => {
     const mockResponseBody = { mockItem1: 1, mockItem2: 'mockItem2' }
     const expectedResponse = {
       statusCode: 202,
@@ -31,7 +34,8 @@ describe('Shared HttpResponse tests', () => {
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  test('HttpResponse.InternalServerError returns the expected 500 Internal Server Error APIGatewayProxyStructuredResultV2 response', () => {
+  test(`HttpResponse.InternalServerError returns the expected 500 Internal Server Error
+        APIGatewayProxyStructuredResultV2 response`, () => {
     const mockResponseBody = { message: 'Internal Server Error' }
     const expectedResponse = {
       statusCode: 500,
@@ -41,7 +45,8 @@ describe('Shared HttpResponse tests', () => {
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  test('HttpResponse.BadRequestError returns the expected 400 Bad Request APIGatewayProxyStructuredResultV2 response', () => {
+  test(`HttpResponse.BadRequestError returns the expected 400 Bad Request
+        APIGatewayProxyStructuredResultV2 response`, () => {
     const mockResponseBody = { message: 'Bad Request' }
     const expectedResponse = {
       statusCode: 400,

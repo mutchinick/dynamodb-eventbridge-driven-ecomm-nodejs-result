@@ -16,7 +16,8 @@ describe(`Orders Service DynamoDbUtils tests`, () => {
       expect(DynamoDbUtils.getTransactionCancellationCode(error, 0)).toBeNull()
     })
 
-    it(`returns null if the input Error does not contain the requested CancellationReasons[0].Code`, () => {
+    it(`returns null if the input Error does not contain the requested
+        CancellationReasons[0].Code`, () => {
       const error: Error = new TransactionCanceledException({
         $metadata: {},
         message: '',
@@ -25,7 +26,8 @@ describe(`Orders Service DynamoDbUtils tests`, () => {
       expect(DynamoDbUtils.getTransactionCancellationCode(error, 0)).toBeNull()
     })
 
-    it(`returns the requested Code if the input Error contains the requested CancellationReasons[0].Code`, () => {
+    it(`returns the requested Code if the input Error contains the requested
+        CancellationReasons[0].Code`, () => {
       const mockCancellationReasonCode = 'mockCancellationReasonCode'
       const error: Error = new TransactionCanceledException({
         $metadata: {},
@@ -35,7 +37,8 @@ describe(`Orders Service DynamoDbUtils tests`, () => {
       expect(DynamoDbUtils.getTransactionCancellationCode(error, 0)).toBe(mockCancellationReasonCode)
     })
 
-    it(`returns the requested Code if the input Error contains the requested CancellationReasons[n].Code`, () => {
+    it(`returns the requested Code if the input Error contains the requested
+        CancellationReasons[n].Code`, () => {
       const mockCancellationReasonCode = 'mockCancellationReasonCode'
       const error: Error = new TransactionCanceledException({
         $metadata: {},

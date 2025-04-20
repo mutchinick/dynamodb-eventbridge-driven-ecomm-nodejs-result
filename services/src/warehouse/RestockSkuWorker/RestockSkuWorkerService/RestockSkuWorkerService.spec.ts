@@ -109,7 +109,8 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuWorkerService tests`, () 
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent is undefined`, async () => {
     const mockDbRestockSkuClient = buildMockDbRestockSkuClient_succeeds()
     const restockSkuWorkerService = new RestockSkuWorkerService(mockDbRestockSkuClient)
     const mockTestEvent = undefined as never
@@ -119,7 +120,8 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuWorkerService tests`, () 
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent is null`, async () => {
     const mockDbRestockSkuClient = buildMockDbRestockSkuClient_succeeds()
     const restockSkuWorkerService = new RestockSkuWorkerService(mockDbRestockSkuClient)
     const mockTestEvent = null as never
@@ -129,7 +131,8 @@ describe(`Warehouse Service RestockSkuWorker RestockSkuWorkerService tests`, () 
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingSkuRestockedEvent is not an instance of the class`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingSkuRestockedEvent is not an instance of the class`, async () => {
     const mockDbRestockSkuClient = buildMockDbRestockSkuClient_succeeds()
     const restockSkuWorkerService = new RestockSkuWorkerService(mockDbRestockSkuClient)
     const mockTestEvent = { ...mockIncomingSkuRestockedEvent }

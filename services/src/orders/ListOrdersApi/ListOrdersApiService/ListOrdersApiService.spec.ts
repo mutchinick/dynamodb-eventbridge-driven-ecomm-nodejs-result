@@ -83,7 +83,8 @@ describe(`Orders Service ListOrdersApi ListOrdersApiService tests`, () => {
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListOrdersRequest is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListOrdersRequest is undefined`, async () => {
     const mockDbListOrdersClient = buildMockDbListOrdersClient_succeeds()
     const listOrdersApiService = new ListOrdersApiService(mockDbListOrdersClient)
     const mockTestRequest = undefined as never
@@ -93,7 +94,8 @@ describe(`Orders Service ListOrdersApi ListOrdersApiService tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListOrdersRequest is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListOrdersRequest is null`, async () => {
     const mockDbListOrdersClient = buildMockDbListOrdersClient_succeeds()
     const listOrdersApiService = new ListOrdersApiService(mockDbListOrdersClient)
     const mockTestRequest = null as never
@@ -103,7 +105,8 @@ describe(`Orders Service ListOrdersApi ListOrdersApiService tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListOrdersRequest is not an instance of the class`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      IncomingListOrdersRequest is not an instance of the class`, async () => {
     const mockDbListOrdersClient = buildMockDbListOrdersClient_succeeds()
     const listOrdersApiService = new ListOrdersApiService(mockDbListOrdersClient)
     const mockTestRequest = { ...mockIncomingListOrdersRequest }
@@ -149,7 +152,8 @@ describe(`Orders Service ListOrdersApi ListOrdersApiService tests`, () => {
     expect(mockDbListOrdersClient.listOrders).toHaveBeenCalledWith(expectedListOrdersCommand)
   })
 
-  it(`returns the same Failure if DbListOrdersClient.raiseListOrdersCommand returns a Failure`, async () => {
+  it(`returns the same Failure if DbListOrdersClient.raiseListOrdersCommand returns a
+      Failure`, async () => {
     const mockFailureKind = 'mockFailureKind' as never
     const mockError = 'mockError'
     const mockTransient = 'mockTransient' as never
@@ -167,7 +171,8 @@ describe(`Orders Service ListOrdersApi ListOrdersApiService tests`, () => {
    ************************************************************
    * Test expected results
    ************************************************************/
-  it(`returns the expected Success<ListOrdersApiServiceOutput> if the execution path is successful`, async () => {
+  it(`returns the expected Success<ListOrdersApiServiceOutput> if the execution path
+      is successful`, async () => {
     const mockDbListOrdersClient = buildMockDbListOrdersClient_succeeds()
     const listOrdersApiService = new ListOrdersApiService(mockDbListOrdersClient)
     const result = await listOrdersApiService.listOrders(mockIncomingListOrdersRequest)

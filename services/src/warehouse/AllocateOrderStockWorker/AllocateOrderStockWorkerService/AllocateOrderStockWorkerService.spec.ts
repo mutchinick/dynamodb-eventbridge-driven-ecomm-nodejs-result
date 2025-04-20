@@ -166,7 +166,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       expect(Result.isFailure(result)).toBe(false)
     })
 
-    it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderCreatedEvent is undefined`, async () => {
+    it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+        IncomingOrderCreatedEvent is undefined`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_succeeds()
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -182,7 +183,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       expect(Result.isFailureTransient(result)).toBe(false)
     })
 
-    it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderCreatedEvent is null`, async () => {
+    it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+        IncomingOrderCreatedEvent is null`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_succeeds()
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -198,7 +200,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       expect(Result.isFailureTransient(result)).toBe(false)
     })
 
-    it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingOrderCreatedEvent is not an instance of the class`, async () => {
+    it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+        IncomingOrderCreatedEvent is not an instance of the class`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_succeeds()
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -222,7 +225,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
    * Test when it creates the Allocation
    ************************************************************/
   describe(`Test when it creates the Allocation`, () => {
-    it(`returns the same Failure if AllocateOrderStockCommand.validateAndBuild returns a Failure`, async () => {
+    it(`returns the same Failure if AllocateOrderStockCommand.validateAndBuild returns a
+        Failure`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_succeeds()
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -254,7 +258,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       expect(mockDbAllocateOrderStockClient.allocateOrderStock).toHaveBeenCalledTimes(1)
     })
 
-    it(`calls DbAllocateOrderStockClient.allocateOrderStock with the expected AllocateOrderStockCommand`, async () => {
+    it(`calls DbAllocateOrderStockClient.allocateOrderStock with the expected
+        AllocateOrderStockCommand`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_succeeds()
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -267,7 +272,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       expect(mockDbAllocateOrderStockClient.allocateOrderStock).toHaveBeenCalledWith(expectedAllocateOrderStockCommand)
     })
 
-    it(`returns the same Failure if DbAllocateOrderStockClient.allocateOrderStock returns a Failure not accounted for`, async () => {
+    it(`returns the same Failure if DbAllocateOrderStockClient.allocateOrderStock
+        returns a Failure not accounted for`, async () => {
       const mockFailureKind = 'mockFailureKind' as never
       const mockError = 'mockError'
       const mockTransient = 'mockTransient' as never
@@ -297,7 +303,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
    * Test when the Allocation DID NOT exist and is created
    ************************************************************/
   describe(`Test when the Allocation DID NOT exist and is created`, () => {
-    it(`returns the same Failure if the OrderStockAllocatedEvent.validateAndBuild returns a Failure`, async () => {
+    it(`returns the same Failure if the OrderStockAllocatedEvent.validateAndBuild
+        returns a Failure`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_succeeds()
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -316,7 +323,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       expect(result).toStrictEqual(expectedResult)
     })
 
-    it(`calls EsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent a single time`, async () => {
+    it(`calls EsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent a
+        single time`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_succeeds()
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -329,7 +337,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       expect(mockEsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent).toHaveBeenCalledTimes(1)
     })
 
-    it(`calls EsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent with the expected OrderStockAllocatedEvent`, async () => {
+    it(`calls EsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent with
+        the expected OrderStockAllocatedEvent`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_succeeds()
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -347,7 +356,9 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       )
     })
 
-    it(`returns the same Failure if EsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent returns a Failure`, async () => {
+    it(`returns the same Failure if
+        EsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent returns a
+        Failure`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_succeeds()
       const mockFailureKind = 'mockFailureKind' as never
       const mockMessage = 'mockMessage' as never
@@ -392,7 +403,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
    * Test when the Allocation DID already exist
    ************************************************************/
   describe(`Test when the Allocation DID already exist`, () => {
-    it(`does not return a Failure if DbAllocateOrderStockClient.allocateOrderStock returns a Failure of kind DuplicateStockAllocationError`, async () => {
+    it(`does not return a Failure if DbAllocateOrderStockClient.allocateOrderStock
+        returns a Failure of kind DuplicateStockAllocationError`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DuplicateStockAllocationError')
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -405,7 +417,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       expect(Result.isFailure(result)).toBe(false)
     })
 
-    it(`returns the same Failure if the OrderStockAllocatedEvent.validateAndBuild returns a Failure`, async () => {
+    it(`returns the same Failure if the OrderStockAllocatedEvent.validateAndBuild
+        returns a Failure`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DuplicateStockAllocationError')
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -424,7 +437,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       expect(result).toStrictEqual(expectedResult)
     })
 
-    it(`calls EsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent a single time`, async () => {
+    it(`calls EsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent a
+        single time`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DuplicateStockAllocationError')
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -437,7 +451,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       expect(mockEsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent).toHaveBeenCalledTimes(1)
     })
 
-    it(`calls EsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent with the expected OrderStockAllocatedEvent`, async () => {
+    it(`calls EsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent with
+        the expected OrderStockAllocatedEvent`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DuplicateStockAllocationError')
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -455,7 +470,9 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       )
     })
 
-    it(`returns the same Failure if EsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent returns a Failure`, async () => {
+    it(`returns the same Failure if
+        EsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent returns a
+        Failure`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DuplicateStockAllocationError')
       const mockFailureKind = 'mockFailureKind' as never
       const mockMessage = 'mockMessage' as never
@@ -500,7 +517,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
    * Test when the stock for the Allocation is not enough or depleted
    ************************************************************/
   describe(`Test when the stock for the Allocation is not enough or depleted`, () => {
-    it(`does not return a Failure if DbAllocateOrderStockClient.allocateOrderStock returns a Failure of kind DepletedStockAllocationError`, async () => {
+    it(`does not return a Failure if DbAllocateOrderStockClient.allocateOrderStock
+        returns a Failure of kind DepletedStockAllocationError`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DepletedStockAllocationError')
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -513,7 +531,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       expect(Result.isFailure(result)).toBe(false)
     })
 
-    it(`returns the same Failure if the OrderStockDepletedEvent.validateAndBuild returns a Failure`, async () => {
+    it(`returns the same Failure if the OrderStockDepletedEvent.validateAndBuild returns
+        a Failure`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DepletedStockAllocationError')
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -532,7 +551,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       expect(result).toStrictEqual(expectedResult)
     })
 
-    it(`calls EsRaiseOrderStockDepletedEventClient.raiseOrderStockDepletedEvent a single time`, async () => {
+    it(`calls EsRaiseOrderStockDepletedEventClient.raiseOrderStockDepletedEvent a single
+        time`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DepletedStockAllocationError')
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -545,7 +565,8 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       expect(mockEsRaiseOrderStockDepletedEventClient.raiseOrderStockDepletedEvent).toHaveBeenCalledTimes(1)
     })
 
-    it(`calls EsRaiseOrderStockDepletedEventClient.raiseOrderStockDepletedEvent the expected OrderStockDepletedEvent`, async () => {
+    it(`calls EsRaiseOrderStockDepletedEventClient.raiseOrderStockDepletedEvent the
+        expected OrderStockDepletedEvent`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DepletedStockAllocationError')
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
@@ -563,7 +584,9 @@ describe(`Warehouse Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       )
     })
 
-    it(`returns the same Failure if EsRaiseOrderStockDepletedEventClient.raiseOrderStockDepletedEvent returns a Failure`, async () => {
+    it(`returns the same Failure if
+        EsRaiseOrderStockDepletedEventClient.raiseOrderStockDepletedEvent returns a
+        Failure`, async () => {
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DepletedStockAllocationError')
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockFailureKind = 'MockFailure' as never

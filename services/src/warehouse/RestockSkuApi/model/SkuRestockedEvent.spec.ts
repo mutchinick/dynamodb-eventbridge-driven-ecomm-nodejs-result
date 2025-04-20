@@ -31,7 +31,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
     expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput is undefined`, () => {
     const mockSkuRestockedEventInput = undefined as unknown as SkuRestockedEventInput
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -39,7 +40,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput is null`, () => {
     const mockSkuRestockedEventInput = null as unknown as SkuRestockedEventInput
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -53,7 +55,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
    ************************************************************
    * Test SkuRestockedEventInput.sku edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.sku is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.sku is undefined`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.sku = undefined
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -62,7 +65,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.sku is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.sku is null`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.sku = null
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -71,7 +75,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.sku is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.sku is empty`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.sku = ''
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -80,7 +85,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.sku is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.sku is blank`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.sku = '      '
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -89,7 +95,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.sku length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.sku length < 4`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.sku = '123'
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -104,7 +111,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
    ************************************************************
    * Test SkuRestockedEventInput.units edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.units is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.units is undefined`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.units = undefined
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -113,7 +121,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.units is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.units is null`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.units = null
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -122,7 +131,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.units < 1`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.units < 1`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.units = 0
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -131,7 +141,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.units is not an integer`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.units is not an integer`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.units = 3.45
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -140,7 +151,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.units is not a number`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.units is not a number`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.units = '1' as unknown as number
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -155,7 +167,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
    ************************************************************
    * Test SkuRestockedEventInput.lotId edge cases
    ************************************************************/
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.lotId is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.lotId is undefined`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.lotId = undefined
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -164,7 +177,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.lotId is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.lotId is null`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.lotId = null
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -173,7 +187,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.lotId is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.lotId is empty`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.lotId = ''
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -182,7 +197,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.lotId is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.lotId is blank`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.lotId = '      '
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -191,7 +207,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEventInput.lotId length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
+      SkuRestockedEventInput.lotId length < 4`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     mockSkuRestockedEventInput.lotId = '123'
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
@@ -206,7 +223,8 @@ describe(`Orders Service RestockSkuApi cEvent tests`, () => {
    ************************************************************
    * Test expected results
    ************************************************************/
-  it(`returns the expected Success<SkuRestockedEvent> if the execution path is successful`, () => {
+  it(`returns the expected Success<SkuRestockedEvent> if the execution path is
+      successful`, () => {
     const mockSkuRestockedEventInput = buildMockSkuRestockedEventInput()
     const result = SkuRestockedEvent.validateAndBuild(mockSkuRestockedEventInput)
     const expectedEvent: SkuRestockedEvent = {
