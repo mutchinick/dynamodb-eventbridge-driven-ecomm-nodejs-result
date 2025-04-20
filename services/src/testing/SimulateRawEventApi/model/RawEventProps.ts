@@ -1,4 +1,4 @@
-export type EventProps = {
+export type RawEventProps = {
   pk: string
   sk: string
   eventName: string

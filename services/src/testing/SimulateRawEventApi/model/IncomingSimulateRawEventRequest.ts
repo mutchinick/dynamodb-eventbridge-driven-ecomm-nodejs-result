@@ -1,10 +1,11 @@
 import { z } from 'zod'
+import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
-import { EventProps } from './EventProps'
+import { RawEventProps } from './RawEventProps'
 
-export type IncomingSimulateRawEventRequestInput = EventProps
+export type IncomingSimulateRawEventRequestInput = TypeUtilsPretty<RawEventProps>
 
-type IncomingSimulateRawEventRequestProps = EventProps
+type IncomingSimulateRawEventRequestProps = TypeUtilsPretty<RawEventProps>
 
 export class IncomingSimulateRawEventRequest implements IncomingSimulateRawEventRequestProps {
   //
@@ -56,7 +57,7 @@ export class IncomingSimulateRawEventRequest implements IncomingSimulateRawEvent
   //
   private static buildProps(
     incomingSimulateRawEventRequestInput: IncomingSimulateRawEventRequestInput,
-  ): Success<EventProps> | Failure<'InvalidArgumentsError'> {
+  ): Success<RawEventProps> | Failure<'InvalidArgumentsError'> {
     const inputValidationResult = this.validateInput(incomingSimulateRawEventRequestInput)
     if (Result.isFailure(inputValidationResult)) {
       return inputValidationResult
@@ -78,7 +79,7 @@ export class IncomingSimulateRawEventRequest implements IncomingSimulateRawEvent
   //
   //
   private static validateInput(
-    incomingSimulateRawEventRequestInput: EventProps,
+    incomingSimulateRawEventRequestInput: RawEventProps,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'IncomingSimulateRawEventRequest.validateInput'
 

@@ -1,10 +1,11 @@
 import { z } from 'zod'
+import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
-import { EventProps } from './EventProps'
+import { RawEventProps } from './RawEventProps'
 
-export type RawSimulatedEventInput = EventProps
+export type RawSimulatedEventInput = TypeUtilsPretty<RawEventProps>
 
-type RawSimulatedEventProps = EventProps
+type RawSimulatedEventProps = TypeUtilsPretty<RawEventProps>
 
 export class RawSimulatedEvent implements RawSimulatedEventProps {
   //
