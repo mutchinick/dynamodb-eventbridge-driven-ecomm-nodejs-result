@@ -1,6 +1,5 @@
 import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
-import { OrderEventName } from '../../model/OrderEventName'
 import { IDbCreateOrderClient } from '../DbCreateOrderClient/DbCreateOrderClient'
 import { IDbGetOrderClient } from '../DbGetOrderClient/DbGetOrderClient'
 import { IDbUpdateOrderClient } from '../DbUpdateOrderClient/DbUpdateOrderClient'
@@ -88,29 +87,27 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
         return createOrderResult
       }
 
-      const orderData = createOrderResult.value
-      const incomingEventName = incomingOrderEvent.eventName
-      const raiseEventResult = await this.raiseOrderCreatedEvent(incomingEventName, orderData)
+      const createdOrderData = createOrderResult.value
+      const raiseEventResult = await this.raiseOrderCreatedEvent(createdOrderData)
       if (Result.isFailure(raiseEventResult)) {
-        console.error(`${logContext} exit failure:`, { raiseEventResult, incomingEventName, orderData })
+        console.error(`${logContext} exit failure:`, { raiseEventResult, createdOrderData, incomingOrderEvent })
         return raiseEventResult
       }
 
-      console.info(`${logContext} exit success:`, { raiseEventResult, incomingEventName, orderData })
+      console.info(`${logContext} exit success:`, { raiseEventResult, createdOrderData, incomingOrderEvent })
       return Result.makeSuccess()
     }
 
     // When IT IS an OrderPlacedEvent and the OrderData DOES exist in the database, then we only try
     // to raise the event again because the intuition is that is was tried before but it failed.
     if (isOrderPlacedEvent && existingOrderData) {
-      const incomingEventName = incomingOrderEvent.eventName
-      const raiseEventResult = await this.raiseOrderCreatedEvent(incomingEventName, existingOrderData)
+      const raiseEventResult = await this.raiseOrderCreatedEvent(existingOrderData)
       if (Result.isFailure(raiseEventResult)) {
-        console.error(`${logContext} exit failure:`, { raiseEventResult, incomingEventName, existingOrderData })
+        console.error(`${logContext} exit failure:`, { raiseEventResult, existingOrderData, incomingOrderEvent })
         return raiseEventResult
       }
 
-      console.info(`${logContext} exit success:`, { raiseEventResult, incomingEventName, existingOrderData })
+      console.info(`${logContext} exit success:`, { raiseEventResult, existingOrderData, incomingOrderEvent })
       return Result.makeSuccess()
     }
 
@@ -119,18 +116,18 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     if (!isOrderPlacedEvent && existingOrderData) {
       const updateOrderResult = await this.updateOrder(incomingOrderEvent, existingOrderData)
       if (Result.isFailure(updateOrderResult)) {
-        console.error(`${logContext} exit failure:`, { updateOrderResult, incomingOrderEvent, existingOrderData })
+        console.error(`${logContext} exit failure:`, { updateOrderResult, existingOrderData, incomingOrderEvent })
         return updateOrderResult
       }
 
-      console.info(`${logContext} exit success:`, { updateOrderResult, incomingOrderEvent, existingOrderData })
+      console.info(`${logContext} exit success:`, { updateOrderResult, existingOrderData, incomingOrderEvent })
       return Result.makeSuccess()
     }
 
     // When IT IS NOT an OrderPlacedEvent and the OrderData DOES NOT exist in the database.
     // This means we reached an invalid operation somehow, so we must return an error.
     const invalidOpsFailure = Result.makeFailure('InvalidOperationError', 'Order to update does not exists', false)
-    console.error(`${logContext} exit failure:`, { invalidOpsFailure, incomingOrderEvent, existingOrderData })
+    console.error(`${logContext} exit failure:`, { invalidOpsFailure, existingOrderData, incomingOrderEvent })
     return invalidOpsFailure
   }
 
@@ -213,8 +210,7 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
   //
   //
   private async raiseOrderCreatedEvent(
-    incomingEventName: OrderEventName,
-    orderData: OrderData,
+    createdOrderData: OrderData,
   ): Promise<
     | Success<void>
     | Failure<'InvalidArgumentsError'>
@@ -222,9 +218,10 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     | Failure<'UnrecognizedError'>
   > {
     const logContext = 'SyncOrderWorkerService.raiseOrderCreatedEvent'
-    console.info(`${logContext} init:`, { incomingEventName, orderData })
+    console.info(`${logContext} init:`, { createdOrderData })
 
-    const orderCreatedEventInput: OrderCreatedEventInput = { incomingEventName, orderData }
+    const { orderId, sku, units, price, userId } = createdOrderData
+    const orderCreatedEventInput: OrderCreatedEventInput = { orderId, sku, units, price, userId }
     const orderCreatedEventResult = OrderCreatedEvent.validateAndBuild(orderCreatedEventInput)
     if (Result.isFailure(orderCreatedEventResult)) {
       console.error(`${logContext} exit failure:`, { orderCreatedEventResult, orderCreatedEventInput })

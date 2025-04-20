@@ -379,7 +379,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
         mockEsRaiseOrderCreatedEventClient,
       )
       await syncOrderWorkerService.syncOrder(mockOrderPlacedEvent)
-      const expectedGetOrderCommandResult = GetOrderCommand.validateAndBuild({ orderId: 'mockOrderId' })
+      const expectedGetOrderCommandResult = GetOrderCommand.validateAndBuild({ orderId: mockOrderId })
       const expectedGetOrderCommand = Result.getSuccessValueOrThrow(expectedGetOrderCommandResult)
       expect(mockDbGetOrderClient.getOrder).toHaveBeenCalledWith(expectedGetOrderCommand)
     })
@@ -541,8 +541,11 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
       )
       await syncOrderWorkerService.syncOrder(mockOrderPlacedEvent)
       const mockOrderCreatedEventInput: OrderCreatedEventInput = {
-        incomingEventName: OrderEventName.ORDER_PLACED_EVENT,
-        orderData: mockOrderData,
+        orderId: mockOrderData.orderId,
+        sku: mockOrderData.sku,
+        units: mockOrderData.units,
+        price: mockOrderData.price,
+        userId: mockOrderData.userId,
       }
       const expectedOrderCreatedEventResult = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
       const expectedOrderCreatedEvent = Result.getSuccessValueOrThrow(expectedOrderCreatedEventResult)
@@ -692,7 +695,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
         mockEsRaiseOrderCreatedEventClient,
       )
       await syncOrderWorkerService.syncOrder(mockOrderPlacedEvent)
-      const expectedGetOrderCommandResult = GetOrderCommand.validateAndBuild({ orderId: 'mockOrderId' })
+      const expectedGetOrderCommandResult = GetOrderCommand.validateAndBuild({ orderId: mockOrderId })
       const expectedGetOrderCommand = Result.getSuccessValueOrThrow(expectedGetOrderCommandResult)
       expect(mockDbGetOrderClient.getOrder).toHaveBeenCalledWith(expectedGetOrderCommand)
     })
@@ -772,8 +775,11 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
       )
       await syncOrderWorkerService.syncOrder(mockOrderPlacedEvent)
       const mockOrderCreatedEventInput: OrderCreatedEventInput = {
-        incomingEventName: OrderEventName.ORDER_PLACED_EVENT,
-        orderData: mockOrderData,
+        orderId: mockOrderData.orderId,
+        sku: mockOrderData.sku,
+        units: mockOrderData.units,
+        price: mockOrderData.price,
+        userId: mockOrderData.userId,
       }
       const expectedOrderCreatedEventResult = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
       const expectedOrderCreatedEvent = Result.getSuccessValueOrThrow(expectedOrderCreatedEventResult)
@@ -944,7 +950,7 @@ describe(`Orders Service SyncOrderWorker SyncOrderWorkerService tests`, () => {
         mockEsRaiseOrderCreatedEventClient,
       )
       await syncOrderWorkerService.syncOrder(mockOrderStockAllocatedEvent)
-      const expectedGetOrderCommandResult = GetOrderCommand.validateAndBuild({ orderId: 'mockOrderId' })
+      const expectedGetOrderCommandResult = GetOrderCommand.validateAndBuild({ orderId: mockOrderId })
       const expectedGetOrderCommand = Result.getSuccessValueOrThrow(expectedGetOrderCommandResult)
       expect(mockDbGetOrderClient.getOrder).toHaveBeenCalledWith(expectedGetOrderCommand)
     })

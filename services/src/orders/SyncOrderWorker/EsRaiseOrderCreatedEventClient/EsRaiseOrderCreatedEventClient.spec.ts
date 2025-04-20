@@ -3,7 +3,6 @@ import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
 import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
 import { OrderEventName } from '../../model/OrderEventName'
-import { OrderStatus } from '../../model/OrderStatus'
 import { OrderCreatedEvent } from '../model/OrderCreatedEvent'
 import { EsRaiseOrderCreatedEventClient } from './EsRaiseOrderCreatedEventClient'
 
@@ -14,10 +13,8 @@ process.env.EVENT_STORE_TABLE_NAME = mockEventStoreTableName
 jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
 const mockDate = new Date().toISOString()
-const mockIncomingEventName = OrderEventName.ORDER_PLACED_EVENT
 const mockEventName = OrderEventName.ORDER_CREATED_EVENT
 const mockOrderId = 'mockOrderId'
-const mockOrderStatus = OrderStatus.ORDER_CREATED_STATUS
 const mockSku = 'mockSku'
 const mockUnits = 2
 const mockPrice = 10.32
@@ -25,17 +22,11 @@ const mockUserId = 'mockUserId'
 
 function buildMockOrderCreatedEvent(): TypeUtilsMutable<OrderCreatedEvent> {
   const mockClass = OrderCreatedEvent.validateAndBuild({
-    incomingEventName: mockIncomingEventName,
-    orderData: {
-      orderId: mockOrderId,
-      orderStatus: mockOrderStatus,
-      sku: mockSku,
-      units: mockUnits,
-      price: mockPrice,
-      userId: mockUserId,
-      createdAt: mockDate,
-      updatedAt: mockDate,
-    },
+    orderId: mockOrderId,
+    sku: mockSku,
+    units: mockUnits,
+    price: mockPrice,
+    userId: mockUserId,
   })
   return Result.getSuccessValueOrThrow(mockClass)
 }
