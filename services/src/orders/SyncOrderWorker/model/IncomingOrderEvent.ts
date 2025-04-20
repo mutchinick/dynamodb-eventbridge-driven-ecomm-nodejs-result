@@ -2,6 +2,7 @@ import { AttributeValue } from '@aws-sdk/client-dynamodb'
 import { unmarshall } from '@aws-sdk/util-dynamodb'
 import { EventBridgeEvent } from 'aws-lambda'
 import { z } from 'zod'
+import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
 import { OrderEvent } from '../../model/OrderEvent'
@@ -21,7 +22,7 @@ type EventDetail = {
 
 export type IncomingOrderEventInput = EventBridgeEvent<string, EventDetail>
 
-type IncomingOrderEventData = Pick<OrderData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
+type IncomingOrderEventData = TypeUtilsPretty<Pick<OrderData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>>
 
 type IncomingOrderEventProps = OrderEvent<OrderEventName, IncomingOrderEventData>
 
