@@ -1,13 +1,14 @@
 import { z } from 'zod'
+import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
 import { RestockSkuData } from '../../model/RestockSkuData'
 import { ValueValidators } from '../../model/ValueValidators'
 import { WarehouseEvent } from '../../model/WarehouseEvent'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
 
-export type SkuRestockedEventInput = Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>
+export type SkuRestockedEventInput = TypeUtilsPretty<Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>>
 
-type SkuRestockedEventData = Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>
+type SkuRestockedEventData = TypeUtilsPretty<Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>>
 
 type SkuRestockedEventProps = WarehouseEvent<WarehouseEventName.SKU_RESTOCKED_EVENT, SkuRestockedEventData>
 
@@ -56,13 +57,12 @@ export class SkuRestockedEvent implements SkuRestockedEventProps {
     }
 
     const { sku, units, lotId } = skuRestockedEventInput
-    const date = new Date().toISOString()
-    const skuRestockedEventData: SkuRestockedEventData = { sku, units, lotId }
+    const currentDate = new Date().toISOString()
     const skuRestockedEventProps: SkuRestockedEventProps = {
       eventName: WarehouseEventName.SKU_RESTOCKED_EVENT,
-      eventData: skuRestockedEventData,
-      createdAt: date,
-      updatedAt: date,
+      eventData: { sku, units, lotId },
+      createdAt: currentDate,
+      updatedAt: currentDate,
     }
     return Result.makeSuccess(skuRestockedEventProps)
   }

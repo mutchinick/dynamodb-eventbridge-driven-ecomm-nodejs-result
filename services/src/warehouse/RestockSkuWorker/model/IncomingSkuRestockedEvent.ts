@@ -2,6 +2,7 @@ import { AttributeValue } from '@aws-sdk/client-dynamodb'
 import { unmarshall } from '@aws-sdk/util-dynamodb'
 import { EventBridgeEvent } from 'aws-lambda'
 import { z } from 'zod'
+import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
 import { RestockSkuData } from '../../model/RestockSkuData'
 import { ValueValidators } from '../../model/ValueValidators'
@@ -21,7 +22,7 @@ type EventDetail = {
 
 export type IncomingSkuRestockedEventInput = EventBridgeEvent<string, EventDetail>
 
-type IncomingSkuRestockedEventData = Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>
+type IncomingSkuRestockedEventData = TypeUtilsPretty<Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>>
 
 type IncomingSkuRestockedEventProps = WarehouseEvent<
   WarehouseEventName.SKU_RESTOCKED_EVENT,
@@ -67,7 +68,21 @@ export class IncomingSkuRestockedEvent implements IncomingSkuRestockedEventProps
   private static buildProps(
     incomingSkuRestockedEventInput: IncomingSkuRestockedEventInput,
   ): Success<IncomingSkuRestockedEventProps> | Failure<'InvalidArgumentsError'> {
-    return this.parseValidateInput(incomingSkuRestockedEventInput)
+    const inputParsingResult = this.parseValidateInput(incomingSkuRestockedEventInput)
+    if (Result.isFailure(inputParsingResult)) {
+      return inputParsingResult
+    }
+
+    const validInput = inputParsingResult.value
+    const { eventName, eventData, createdAt, updatedAt } = validInput
+    const { sku, units, lotId } = eventData
+    const incomingSkuRestockedEventProps: IncomingSkuRestockedEventProps = {
+      eventName,
+      eventData: { sku, units, lotId },
+      createdAt,
+      updatedAt,
+    }
+    return Result.makeSuccess(incomingSkuRestockedEventProps)
   }
 
   //

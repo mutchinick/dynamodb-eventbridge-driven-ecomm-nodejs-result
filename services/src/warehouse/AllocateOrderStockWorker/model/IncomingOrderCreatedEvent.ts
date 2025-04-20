@@ -2,6 +2,7 @@ import { AttributeValue } from '@aws-sdk/client-dynamodb'
 import { unmarshall } from '@aws-sdk/util-dynamodb'
 import { EventBridgeEvent } from 'aws-lambda'
 import { z } from 'zod'
+import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
 import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { ValueValidators } from '../../model/ValueValidators'
@@ -21,7 +22,9 @@ type EventDetail = {
 
 export type IncomingOrderCreatedEventInput = EventBridgeEvent<string, EventDetail>
 
-type IncomingOrderCreatedEventData = Pick<OrderAllocationData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
+type IncomingOrderCreatedEventData = TypeUtilsPretty<
+  Pick<OrderAllocationData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
+>
 
 type IncomingOrderCreatedEventProps = WarehouseEvent<
   WarehouseEventName.ORDER_CREATED_EVENT,
@@ -73,17 +76,13 @@ export class IncomingOrderCreatedEvent implements IncomingOrderCreatedEventProps
     }
 
     const validInput = inputParsingResult.value
+    const { eventName, eventData, createdAt, updatedAt } = validInput
+    const { orderId, sku, units, price, userId } = eventData
     const incomingOrderCreatedEventProps: IncomingOrderCreatedEventProps = {
-      eventName: validInput.eventName,
-      eventData: {
-        orderId: validInput.eventData.orderId,
-        sku: validInput.eventData.sku,
-        units: validInput.eventData.units,
-        price: validInput.eventData.price,
-        userId: validInput.eventData.userId,
-      },
-      createdAt: validInput.createdAt,
-      updatedAt: validInput.updatedAt,
+      eventName,
+      eventData: { orderId, sku, units, price, userId },
+      createdAt,
+      updatedAt,
     }
     return Result.makeSuccess(incomingOrderCreatedEventProps)
   }

@@ -85,13 +85,7 @@ export class IncomingOrderEvent implements IncomingOrderEventProps {
     const { orderId, sku, units, price, userId } = eventData
     const incomingOrderEventProps: IncomingOrderEventProps = {
       eventName,
-      eventData: {
-        orderId,
-        sku,
-        units,
-        price,
-        userId,
-      },
+      eventData: { orderId, sku, units, price, userId },
       createdAt,
       updatedAt,
     }
