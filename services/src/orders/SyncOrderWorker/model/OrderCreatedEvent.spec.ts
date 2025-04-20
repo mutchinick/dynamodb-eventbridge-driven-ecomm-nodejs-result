@@ -7,42 +7,50 @@ import { OrderCreatedEvent, OrderCreatedEventInput } from './OrderCreatedEvent'
 jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
 const mockDate = new Date().toISOString()
+const mockOrderId = 'mockOrderId'
+const mockOrderStatus = OrderStatus.ORDER_CREATED_STATUS
+const mockSku = 'mockSku'
+const mockUnits = 14
+const mockPrice = 1897.99
+const mockUserId = 'mockUserId'
+const mockCreatedAt = mockDate
+const mockUpdatedAt = mockDate
+const mockIncomingEventName = OrderEventName.ORDER_PLACED_EVENT
 
 function buildMockOrderData(): OrderData {
   return {
-    orderId: 'mockOrderId',
-    orderStatus: OrderStatus.ORDER_CREATED_STATUS,
-    sku: 'mockSku',
-    units: 14,
-    price: 1897.99,
-    userId: 'mockUserId',
-    createdAt: 'mockCreatedAt',
-    updatedAt: 'mockUpdatedAt',
+    orderId: mockOrderId,
+    orderStatus: mockOrderStatus,
+    sku: mockSku,
+    units: mockUnits,
+    price: mockPrice,
+    userId: mockUserId,
+    createdAt: mockCreatedAt,
+    updatedAt: mockUpdatedAt,
   }
 }
 
 function buildMockOrderCreatedEventInput(): OrderCreatedEventInput {
   return {
-    incomingEventName: OrderEventName.ORDER_PLACED_EVENT,
+    incomingEventName: mockIncomingEventName,
     orderData: buildMockOrderData(),
   }
 }
 
 describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
-  //
-  // Test valid inputs
-  //
-  it(`returns a Success if the input OrderCreatedEventInput is valid`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test OrderCreatedEventInput edge cases
+   ************************************************************/
+  it(`does not return a Failure if the input OrderCreatedEventInput is valid`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
-    expect(Result.isSuccess(result)).toBe(true)
+    expect(Result.isFailure(result)).toBe(false)
   })
 
-  //
-  // Test OrderCreatedEventInput edge cases
-  //
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput is undefined`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput is undefined`, () => {
     const mockOrderCreatedEventInput = undefined as never
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -50,8 +58,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput is null`, () => {
     const mockOrderCreatedEventInput = null as never
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
@@ -59,30 +66,13 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput is invalid`, () => {
-    const mockOrderCreatedEventInput = 'mockInvalidValue' as never
-    const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  //
-  // Test eventName edge cases
-  //
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.incomingEventName is missing`, () => {
-    const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
-    delete mockOrderCreatedEventInput.incomingEventName
-    const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.incomingEventName is undefined`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test OrderCreatedEventInput.incomingEventName edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.incomingEventName is undefined`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.incomingEventName = undefined
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -91,8 +81,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.incomingEventName is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.incomingEventName is null`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.incomingEventName = null
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -101,8 +90,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.incomingEventName is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.incomingEventName is empty`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.incomingEventName = '' as OrderEventName
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -111,8 +99,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.incomingEventName is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.incomingEventName is blank`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.incomingEventName = '      ' as OrderEventName
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -121,8 +108,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.incomingEventName is not an IncomingOrderEventName`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.incomingEventName is not an OrderEventName`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.incomingEventName = 'mockEventName' as OrderEventName
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -131,21 +117,13 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test OrderCreatedEventInput.orderData edge cases
-  //
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData is missing`, () => {
-    const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
-    delete mockOrderCreatedEventInput.orderData
-    const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData is undefined`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test OrderCreatedEventInput.orderData edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData is undefined`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData = undefined
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -154,8 +132,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData is null`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData = null
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -164,8 +141,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData is empty`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData = {} as never
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -174,21 +150,13 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test OrderCreatedEventInput.orderData.orderId edge cases
-  //
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.orderId is missing`, () => {
-    const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
-    delete mockOrderCreatedEventInput.orderData.orderId
-    const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.orderId is undefined`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test OrderCreatedEventInput.orderData.orderId edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.orderId is undefined`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.orderId = undefined
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -197,8 +165,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.orderId is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.orderId is null`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.orderId = null
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -207,8 +174,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.orderId is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.orderId is empty`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.orderId = ''
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -217,8 +183,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.orderId is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.orderId is blank`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.orderId = '      '
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -227,8 +192,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.orderId length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.orderId length < 4`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.orderId = '123'
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -237,21 +201,13 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test OrderCreatedEventInput.orderData.orderStatus edge cases
-  //
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.orderStatus is missing`, () => {
-    const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
-    delete mockOrderCreatedEventInput.orderData.orderStatus
-    const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.orderStatus is undefined`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test OrderCreatedEventInput.orderData.orderStatus edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.orderStatus is undefined`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.orderStatus = undefined
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -260,8 +216,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.orderStatus is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.orderStatus is null`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.orderStatus = null
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -270,8 +225,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.orderStatus is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.orderStatus is empty`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.orderStatus = '' as OrderStatus
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -280,8 +234,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.orderStatus is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.orderStatus is blank`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.orderStatus = '      ' as OrderStatus
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -290,8 +243,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.orderStatus not an OrderStatus`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.orderStatus not an OrderStatus`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.orderStatus = 'mockOrderStatus' as OrderStatus
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -300,21 +252,13 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test OrderCreatedEventInput.orderData.sku edge cases
-  //
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.sku is missing`, () => {
-    const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
-    delete mockOrderCreatedEventInput.orderData.sku
-    const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.sku is undefined`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test OrderCreatedEventInput.orderData.sku edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.sku is undefined`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.sku = undefined
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -323,8 +267,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.sku is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.sku is null`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.sku = null
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -333,8 +276,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.sku is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.sku is empty`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.sku = ''
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -343,8 +285,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.sku is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.sku is blank`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.sku = '      '
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -353,8 +294,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.sku length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.sku length < 4`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.sku = '123'
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -363,21 +303,13 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test OrderCreatedEventInput.orderData.units edge cases
-  //
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.units is missing`, () => {
-    const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
-    delete mockOrderCreatedEventInput.orderData.units
-    const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.units is undefined`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test OrderCreatedEventInput.orderData.units edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.units is undefined`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.units = undefined
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -386,8 +318,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.units is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.units is null`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.units = null
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -396,18 +327,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.units < 0`, () => {
-    const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
-    mockOrderCreatedEventInput.orderData.units = -1
-    const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.units == 0`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.units < 1`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.units = 0
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -416,18 +336,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.units is not a number`, () => {
-    const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
-    mockOrderCreatedEventInput.orderData.units = '1' as unknown as number
-    const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.units is not an integer`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.units is not an integer`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.units = 3.45
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -436,21 +345,22 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test OrderCreatedEventInput.orderData.price edge cases
-  //
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.price is missing`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.units is not a number`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
-    delete mockOrderCreatedEventInput.orderData.price
+    mockOrderCreatedEventInput.orderData.units = '1' as unknown as number
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.price is undefined`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test OrderCreatedEventInput.orderData.price edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.price is undefined`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.price = undefined
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -459,8 +369,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.price is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.price is null`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.price = null
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -469,8 +378,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.price < 0`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.price < 0`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.price = -1
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -479,8 +387,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.price is not a number`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.price is not a number`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.price = '1' as unknown as number
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -489,21 +396,13 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test OrderCreatedEventInput.orderData.userId edge cases
-  //
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.userId is missing`, () => {
-    const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
-    delete mockOrderCreatedEventInput.orderData.userId
-    const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.userId is undefined`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test OrderCreatedEventInput.orderData.userId edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.userId is undefined`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.userId = undefined
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -512,8 +411,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.userId is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.userId is null`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.userId = null
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -522,8 +420,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.userId is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.userId is empty`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.userId = ''
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -532,8 +429,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.userId is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.userId is blank`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.userId = '      '
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -542,8 +438,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.userId length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.userId length < 4`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.userId = '123'
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -552,21 +447,13 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test OrderCreatedEventInput.orderData.createdAt edge cases
-  //
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.createdAt is missing`, () => {
-    const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
-    delete mockOrderCreatedEventInput.orderData.createdAt
-    const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.createdAt is undefined`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test OrderCreatedEventInput.orderData.createdAt edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.createdAt is undefined`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.createdAt = undefined
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -575,8 +462,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.createdAt is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.createdAt is null`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.createdAt = null
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -585,8 +471,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.createdAt is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.createdAt is empty`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.createdAt = ''
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -595,8 +480,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.createdAt is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.createdAt is blank`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.createdAt = '      '
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -605,8 +489,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.createdAt length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.createdAt length < 4`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.createdAt = '123'
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -615,21 +498,13 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test OrderCreatedEventInput.orderData.updatedAt edge cases
-  //
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.updatedAt is missing`, () => {
-    const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
-    delete mockOrderCreatedEventInput.orderData.updatedAt
-    const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.updatedAt is undefined`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test OrderCreatedEventInput.orderData.updatedAt edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.updatedAt is undefined`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.updatedAt = undefined
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -638,8 +513,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.updatedAt is null`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.updatedAt is null`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.updatedAt = null
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -648,8 +522,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.updatedAt is empty`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.updatedAt is empty`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.updatedAt = ''
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -658,8 +531,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.updatedAt is blank`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.updatedAt is blank`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.updatedAt = '      '
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -668,8 +540,7 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderCreatedEventInput.orderData.updatedAt length < 4`, () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderCreatedEventInput.orderData.updatedAt length < 4`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     mockOrderCreatedEventInput.orderData.updatedAt = '123'
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
@@ -678,15 +549,24 @@ describe(`Orders Service SyncOrderWorker OrderCreatedEvent tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test expected results
-  //
-  it(`returns te expected Success<OrderCreatedEvent? with the expected data`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test expected results
+   ************************************************************/
+  it(`returns the expected Success<OrderCreatedEvent> if the execution path is successful`, () => {
     const mockOrderCreatedEventInput = buildMockOrderCreatedEventInput()
     const result = OrderCreatedEvent.validateAndBuild(mockOrderCreatedEventInput)
     const expectedEvent: OrderCreatedEvent = {
       eventName: OrderEventName.ORDER_CREATED_EVENT,
-      eventData: mockOrderCreatedEventInput.orderData,
+      eventData: {
+        orderId: mockOrderCreatedEventInput.orderData.orderId,
+        sku: mockOrderCreatedEventInput.orderData.sku,
+        units: mockOrderCreatedEventInput.orderData.units,
+        price: mockOrderCreatedEventInput.orderData.price,
+        userId: mockOrderCreatedEventInput.orderData.userId,
+      },
       createdAt: mockDate,
       updatedAt: mockDate,
     }

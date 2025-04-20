@@ -11,14 +11,19 @@ jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
 const mockDate = new Date().toISOString()
 
-function buildMockIncomingListSkusRequest_ListDefault(): TypeUtilsMutable<IncomingListSkusRequest> {
+function buildMockIncomingListSkusRequest(): TypeUtilsMutable<IncomingListSkusRequest> {
   const mockClass = IncomingListSkusRequest.validateAndBuild({})
   return Result.getSuccessValueOrThrow(mockClass)
 }
 
-//
-// Mock clients
-//
+const mockIncomingListSkusRequest = buildMockIncomingListSkusRequest()
+
+/*
+ *
+ *
+ ************************************************************
+ * Mock clients
+ ************************************************************/
 const mockExistingSkuData: RestockSkuData[] = [
   {
     sku: 'mockSku-1',
@@ -55,19 +60,20 @@ function buildMockDbListSkusClient_fails(
 }
 
 describe(`Warehouse Service ListSkusApi ListSkusApiService tests`, () => {
-  //
-  // Test IncomingListSkusRequestInput edge cases
-  //
-  it(`returns a Success if the input ListSkusApiServiceInput is valid`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test IncomingListSkusRequestInput edge cases
+   ************************************************************/
+  it(`does not return a Failure if the input IncomingListSkusRequest is valid`, async () => {
     const mockDbListSkusClient = buildMockDbListSkusClient_succeeds()
     const listSkusApiService = new ListSkusApiService(mockDbListSkusClient)
-    const mockTestRequest = buildMockIncomingListSkusRequest_ListDefault()
-    const result = await listSkusApiService.listSkus(mockTestRequest)
-    expect(Result.isSuccess(result)).toBe(true)
+    const result = await listSkusApiService.listSkus(mockIncomingListSkusRequest)
+    expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      ListSkusApiServiceInput is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequest is undefined`, async () => {
     const mockDbListSkusClient = buildMockDbListSkusClient_succeeds()
     const listSkusApiService = new ListSkusApiService(mockDbListSkusClient)
     const mockTestRequest = undefined as never
@@ -77,8 +83,7 @@ describe(`Warehouse Service ListSkusApi ListSkusApiService tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      ListSkusApiServiceInput is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequest is null`, async () => {
     const mockDbListSkusClient = buildMockDbListSkusClient_succeeds()
     const listSkusApiService = new ListSkusApiService(mockDbListSkusClient)
     const mockTestRequest = null as never
@@ -88,9 +93,22 @@ describe(`Warehouse Service ListSkusApi ListSkusApiService tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test internal logic
-  //
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingListSkusRequest is not an instance of the class`, async () => {
+    const mockDbListSkusClient = buildMockDbListSkusClient_succeeds()
+    const listSkusApiService = new ListSkusApiService(mockDbListSkusClient)
+    const mockTestRequest = { ...mockIncomingListSkusRequest }
+    const result = await listSkusApiService.listSkus(mockTestRequest)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  /*
+   *
+   *
+   ************************************************************
+   * Test internal logic
+   ************************************************************/
   it(`returns the same Failure if ListSkusCommand.validateAndBuild returns a Failure`, async () => {
     const mockDbListSkusClient = buildMockDbListSkusClient_succeeds()
     const listSkusApiService = new ListSkusApiService(mockDbListSkusClient)
@@ -99,8 +117,7 @@ describe(`Warehouse Service ListSkusApi ListSkusApiService tests`, () => {
     const mockTransient = 'mockTransient' as never
     const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
     jest.spyOn(ListSkusCommand, 'validateAndBuild').mockReturnValueOnce(expectedResult)
-    const mockTestRequest = buildMockIncomingListSkusRequest_ListDefault()
-    const result = await listSkusApiService.listSkus(mockTestRequest)
+    const result = await listSkusApiService.listSkus(mockIncomingListSkusRequest)
     expect(Result.isFailure(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)
   })
@@ -108,17 +125,15 @@ describe(`Warehouse Service ListSkusApi ListSkusApiService tests`, () => {
   it(`calls DbListSkusClient.raiseListSkusCommand a single time`, async () => {
     const mockDbListSkusClient = buildMockDbListSkusClient_succeeds()
     const listSkusApiService = new ListSkusApiService(mockDbListSkusClient)
-    const mockTestRequest = buildMockIncomingListSkusRequest_ListDefault()
-    await listSkusApiService.listSkus(mockTestRequest)
+    await listSkusApiService.listSkus(mockIncomingListSkusRequest)
     expect(mockDbListSkusClient.listSkus).toHaveBeenCalledTimes(1)
   })
 
   it(`calls DbListSkusClient.raiseListSkusCommand with the expected input`, async () => {
     const mockDbListSkusClient = buildMockDbListSkusClient_succeeds()
     const listSkusApiService = new ListSkusApiService(mockDbListSkusClient)
-    const mockTestRequest = buildMockIncomingListSkusRequest_ListDefault()
-    await listSkusApiService.listSkus(mockTestRequest)
-    const mockListSkusCommandInput: ListSkusCommandInput = { ...mockTestRequest }
+    await listSkusApiService.listSkus(mockIncomingListSkusRequest)
+    const mockListSkusCommandInput: ListSkusCommandInput = { ...mockIncomingListSkusRequest }
     const expectedListSkusCommandResult = ListSkusCommand.validateAndBuild(mockListSkusCommandInput)
     const expectedListSkusCommand = Result.getSuccessValueOrThrow(expectedListSkusCommandResult)
     expect(mockDbListSkusClient.listSkus).toHaveBeenCalledWith(expectedListSkusCommand)
@@ -130,21 +145,22 @@ describe(`Warehouse Service ListSkusApi ListSkusApiService tests`, () => {
     const mockTransient = 'mockTransient' as never
     const mockDbListSkusClient = buildMockDbListSkusClient_fails(mockFailureKind, mockError, mockTransient)
     const listSkusApiService = new ListSkusApiService(mockDbListSkusClient)
-    const mockTestRequest = buildMockIncomingListSkusRequest_ListDefault()
-    const result = await listSkusApiService.listSkus(mockTestRequest)
+    const result = await listSkusApiService.listSkus(mockIncomingListSkusRequest)
     const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
     expect(Result.isFailure(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)
   })
 
-  //
-  // Test expected results
-  //
-  it(`returns a Success<ListSkusApiServiceOutput> with the expected data`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test expected results
+   ************************************************************/
+  it(`returns the expected Success<ListSkusApiServiceOutput> if the execution path is successful`, async () => {
     const mockDbListSkusClient = buildMockDbListSkusClient_succeeds()
     const listSkusApiService = new ListSkusApiService(mockDbListSkusClient)
-    const mockTestRequest = buildMockIncomingListSkusRequest_ListDefault()
-    const result = await listSkusApiService.listSkus(mockTestRequest)
+    const result = await listSkusApiService.listSkus(mockIncomingListSkusRequest)
     const expectedOutput: ListSkusApiServiceOutput = {
       skus: [
         {

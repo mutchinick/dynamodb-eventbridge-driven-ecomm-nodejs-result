@@ -50,23 +50,34 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
 
     const allocateOrderResult = await this.allocateOrder(incomingOrderCreatedEvent)
 
-    if (
-      Result.isSuccess(allocateOrderResult) ||
-      Result.isFailureOfKind(allocateOrderResult, 'DuplicateStockAllocationError')
-    ) {
+    if (Result.isSuccess(allocateOrderResult)) {
       const raiseAllocatedEventResult = await this.raiseAllocatedEvent(incomingOrderCreatedEvent)
-      Result.isFailure(raiseAllocatedEventResult)
-        ? console.error(`${logContext} exit failure:`, { raiseAllocatedEventResult, incomingOrderCreatedEvent })
-        : console.info(`${logContext} exit success:`, { raiseAllocatedEventResult })
-      return raiseAllocatedEventResult
+      if (Result.isFailure(raiseAllocatedEventResult)) {
+        console.error(`${logContext} exit failure:`, { raiseAllocatedEventResult, incomingOrderCreatedEvent })
+        return raiseAllocatedEventResult
+      }
+      console.info(`${logContext} exit success:`, { raiseAllocatedEventResult })
+      return Result.makeSuccess()
+    }
+
+    if (Result.isFailureOfKind(allocateOrderResult, 'DuplicateStockAllocationError')) {
+      const raiseAllocatedEventResult = await this.raiseAllocatedEvent(incomingOrderCreatedEvent)
+      if (Result.isFailure(raiseAllocatedEventResult)) {
+        console.error(`${logContext} exit failure:`, { raiseAllocatedEventResult, incomingOrderCreatedEvent })
+        return raiseAllocatedEventResult
+      }
+      console.info(`${logContext} exit success:`, { raiseAllocatedEventResult })
+      return Result.makeSuccess()
     }
 
     if (Result.isFailureOfKind(allocateOrderResult, 'DepletedStockAllocationError')) {
       const raiseDepletedEventResult = await this.raiseDepletedEvent(incomingOrderCreatedEvent)
-      Result.isFailure(raiseDepletedEventResult)
-        ? console.error(`${logContext} exit failure:`, { raiseDepletedEventResult, incomingOrderCreatedEvent })
-        : console.info(`${logContext} exit success:`, { raiseDepletedEventResult })
-      return raiseDepletedEventResult
+      if (Result.isFailure(raiseDepletedEventResult)) {
+        console.error(`${logContext} exit failure:`, { raiseDepletedEventResult, incomingOrderCreatedEvent })
+        return raiseDepletedEventResult
+      }
+      console.info(`${logContext} exit success:`, { raiseDepletedEventResult })
+      return Result.makeSuccess()
     }
 
     console.error(`${logContext} exit failure:`, { allocateOrderResult, incomingOrderCreatedEvent })

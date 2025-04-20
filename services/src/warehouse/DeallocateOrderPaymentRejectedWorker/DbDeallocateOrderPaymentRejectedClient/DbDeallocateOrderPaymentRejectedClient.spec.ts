@@ -114,9 +114,12 @@ function buildMockDdbCommand(): TransactWriteCommand {
 
 const expectedDdbCommand = buildMockDdbCommand()
 
-//
-// Mock clients
-//
+/*
+ *
+ *
+ ************************************************************
+ * Mock clients
+ ************************************************************/
 function buildMockDdbDocClient_resolves(): DynamoDBDocumentClient {
   return { send: jest.fn() } as unknown as DynamoDBDocumentClient
 }
@@ -126,69 +129,85 @@ function buildMockDdbDocClient_throws(error?: unknown): DynamoDBDocumentClient {
 }
 
 describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DbDeallocateOrderPaymentRejectedClient tests`, () => {
-  //
-  // Test DeallocateOrderPaymentRejectedCommand edge cases
-  //
-  it(`returns a Success if the input DeallocateOrderPaymentRejectedCommand is valid`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test DeallocateOrderPaymentRejectedCommand edge cases
+   ************************************************************/
+  it(`does not return a Failure if the input DeallocateOrderPaymentRejectedCommand is valid`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbDeallocateOrderPaymentRejectedClient = new DbDeallocateOrderPaymentRejectedClient(mockDdbDocClient)
     const result = await dbDeallocateOrderPaymentRejectedClient.deallocateOrderStock(
       mockDeallocateOrderPaymentRejectedCommand,
     )
-    expect(Result.isSuccess(result)).toBe(true)
+    expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError
-      if the input DeallocateOrderPaymentRejectedCommand is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input DeallocateOrderPaymentRejectedCommand is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbDeallocateOrderPaymentRejectedClient = new DbDeallocateOrderPaymentRejectedClient(mockDdbDocClient)
-    const mockValidCommand = undefined as DeallocateOrderPaymentRejectedCommand
-    const result = await dbDeallocateOrderPaymentRejectedClient.deallocateOrderStock(mockValidCommand)
+    const mockTestCommand = undefined as DeallocateOrderPaymentRejectedCommand
+    const result = await dbDeallocateOrderPaymentRejectedClient.deallocateOrderStock(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError
-      if the input DeallocateOrderPaymentRejectedCommand is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input DeallocateOrderPaymentRejectedCommand is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbDeallocateOrderPaymentRejectedClient = new DbDeallocateOrderPaymentRejectedClient(mockDdbDocClient)
-    const mockValidCommand = null as DeallocateOrderPaymentRejectedCommand
-    const result = await dbDeallocateOrderPaymentRejectedClient.deallocateOrderStock(mockValidCommand)
+    const mockTestCommand = null as DeallocateOrderPaymentRejectedCommand
+    const result = await dbDeallocateOrderPaymentRejectedClient.deallocateOrderStock(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError
-      if the input DeallocateOrderPaymentRejectedCommand.commandData 
-      is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input DeallocateOrderPaymentRejectedCommand is not an instance of the class`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbDeallocateOrderPaymentRejectedClient = new DbDeallocateOrderPaymentRejectedClient(mockDdbDocClient)
-    const mockValidCommand = buildMockDeallocateOrderPaymentRejectedCommand()
-    mockValidCommand.commandData = undefined
-    const result = await dbDeallocateOrderPaymentRejectedClient.deallocateOrderStock(mockValidCommand)
+    const mockTestCommand = { ...mockDeallocateOrderPaymentRejectedCommand }
+    const result = await dbDeallocateOrderPaymentRejectedClient.deallocateOrderStock(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError
-      if the input DeallocateOrderPaymentRejectedCommand.commandData 
-      is null`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test DeallocateOrderPaymentRejectedCommand.commandData edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input DeallocateOrderPaymentRejectedCommand.commandData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbDeallocateOrderPaymentRejectedClient = new DbDeallocateOrderPaymentRejectedClient(mockDdbDocClient)
-    const mockValidCommand = buildMockDeallocateOrderPaymentRejectedCommand()
-    mockValidCommand.commandData = null
-    const result = await dbDeallocateOrderPaymentRejectedClient.deallocateOrderStock(mockValidCommand)
+    const mockTestCommand = buildMockDeallocateOrderPaymentRejectedCommand()
+    mockTestCommand.commandData = undefined
+    const result = await dbDeallocateOrderPaymentRejectedClient.deallocateOrderStock(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test internal logic
-  //
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input DeallocateOrderPaymentRejectedCommand.commandData is null`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
+    const dbDeallocateOrderPaymentRejectedClient = new DbDeallocateOrderPaymentRejectedClient(mockDdbDocClient)
+    const mockTestCommand = buildMockDeallocateOrderPaymentRejectedCommand()
+    mockTestCommand.commandData = null
+    const result = await dbDeallocateOrderPaymentRejectedClient.deallocateOrderStock(mockTestCommand)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  /*
+   *
+   *
+   ************************************************************
+   * Test internal logic
+   ************************************************************/
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbDeallocateOrderPaymentRejectedClient = new DbDeallocateOrderPaymentRejectedClient(mockDdbDocClient)
@@ -204,8 +223,7 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DbDeallocateOrd
   })
 
   //
-  it(`returns a transient Failure of kind UnrecognizedError
-      if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
+  it(`returns a transient Failure of kind UnrecognizedError if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbDeallocateOrderPaymentRejectedClient = new DbDeallocateOrderPaymentRejectedClient(mockDdbDocClient)
     const result = await dbDeallocateOrderPaymentRejectedClient.deallocateOrderStock(
@@ -216,12 +234,7 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DbDeallocateOrd
     expect(Result.isFailureTransient(result)).toBe(true)
   })
 
-  //
-  // Test transaction errors
-  //
-  it(`returns a non-transient Failure of kind InvalidStockDeallocationError
-      if DynamoDBDocumentClient.send throws a TransactionCanceledException error 
-      when deallocating the stock`, async () => {
+  it(`returns a non-transient Failure of kind InvalidStockDeallocationError if DynamoDBDocumentClient.send throws a TransactionCanceledException error when deallocating the stock`, async () => {
     const mockError: Error = new TransactionCanceledException({ $metadata: {}, message: '' })
     const mockDdbDocClient = buildMockDdbDocClient_throws(mockError)
     const dbDeallocateOrderPaymentRejectedClient = new DbDeallocateOrderPaymentRejectedClient(mockDdbDocClient)
@@ -233,10 +246,13 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DbDeallocateOrd
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test expected results
-  //
-  it(`returns the expected Success<void> with the expected data`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test expected results
+   ************************************************************/
+  it(`returns the expected Success<void> if the execution path is successful`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbDeallocateOrderPaymentRejectedClient = new DbDeallocateOrderPaymentRejectedClient(mockDdbDocClient)
     const result = await dbDeallocateOrderPaymentRejectedClient.deallocateOrderStock(

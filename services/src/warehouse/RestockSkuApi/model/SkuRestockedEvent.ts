@@ -5,9 +5,9 @@ import { ValueValidators } from '../../model/ValueValidators'
 import { WarehouseEvent } from '../../model/WarehouseEvent'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
 
-export type SkuRestockedEventData = Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>
+export type SkuRestockedEventInput = Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>
 
-export type SkuRestockedEventInput = SkuRestockedEventData
+type SkuRestockedEventData = Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>
 
 type SkuRestockedEventProps = WarehouseEvent<WarehouseEventName.SKU_RESTOCKED_EVENT, SkuRestockedEventData>
 

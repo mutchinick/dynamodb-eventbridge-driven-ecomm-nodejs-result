@@ -25,9 +25,14 @@ function buildMockListOrdersCommand(
   return Result.getSuccessValueOrThrow(mockClass)
 }
 
-//
-// By Order Id
-//
+const mockListOrdersCommand = buildMockListOrdersCommand({})
+
+/*
+ *
+ *
+ ************************************************************
+ * By Order Id
+ ************************************************************/
 function buildMockDdbCommand_ByOrderId(orderId: string): QueryCommand {
   const orderListPk = `ORDERS#ORDER_ID#${orderId}`
   const orderListSk = `ORDER_ID#${orderId}`
@@ -46,10 +51,13 @@ function buildMockDdbCommand_ByOrderId(orderId: string): QueryCommand {
   return ddbCommand
 }
 
-//
-// List many (sortDirection and limit)
-//
-function buildMockDdbCommand_ListMany(sortDirection: SortDirection, limit: number): QueryCommand {
+/*
+ *
+ *
+ ************************************************************
+ * List filtered (sortDirection and limit)
+ ************************************************************/
+function buildMockDdbCommand_ListFiltered(sortDirection: SortDirection, limit: number): QueryCommand {
   const indexName = 'gsi1pk-gsi1sk-index'
   const orderListGsi1pk = `ORDERS#ORDER`
   const ddbCommand = new QueryCommand({
@@ -68,9 +76,12 @@ function buildMockDdbCommand_ListMany(sortDirection: SortDirection, limit: numbe
   return ddbCommand
 }
 
-//
-// List default (no filters)
-//
+/*
+ *
+ *
+ ************************************************************
+ * List default (no filters)
+ ************************************************************/
 function buildMockDdbCommand_ListDefault(): QueryCommand {
   const indexName = 'gsi1pk-gsi1sk-index'
   const orderListGsi1pk = `ORDERS#ORDER`
@@ -90,9 +101,12 @@ function buildMockDdbCommand_ListDefault(): QueryCommand {
   return ddbCommand
 }
 
-//
-//  Mock clients
-//
+/*
+ *
+ *
+ ************************************************************
+ * Mock clients
+ ************************************************************/
 const mockExistingOrderData: OrderData[] = [
   {
     orderId: mockOrderId,
@@ -116,10 +130,12 @@ const mockExistingOrderData: OrderData[] = [
   },
 ]
 
-function buildMockDdbDocClient_resolves(listOrdersCommand?: ListOrdersCommand): DynamoDBDocumentClient {
-  const orderId = listOrdersCommand?.commandData?.orderId
+function buildMockDdbDocClient_resolves(resulting: 'many' | 'one' | 'none' = 'many'): DynamoDBDocumentClient {
+  const items = resulting === 'many' ? mockExistingOrderData : resulting === 'one' ? [mockExistingOrderData[0]] : []
+  const itemsCount = items ? items.length : 0
   const mockGetCommandResult: QueryCommandOutput = {
-    Items: orderId ? [mockExistingOrderData[0]] : mockExistingOrderData,
+    Items: items,
+    Count: itemsCount,
     $metadata: {},
   }
   return { send: jest.fn().mockResolvedValue(mockGetCommandResult) } as unknown as DynamoDBDocumentClient
@@ -138,19 +154,20 @@ function buildMockDdbDocClient_throws(error?: unknown): DynamoDBDocumentClient {
 }
 
 describe(`Orders Service ListOrdersApi DbListOrdersClient tests`, () => {
-  //
-  // Test ListOrdersCommand edge cases
-  //
-  it(`returns a Success if the input ListOrdersCommand is valid`, async () => {
-    const mockTestCommand = buildMockListOrdersCommand({})
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
+  /*
+   *
+   *
+   ************************************************************
+   * Test ListOrdersCommand edge cases
+   ************************************************************/
+  it(`does not return a Failure if the input ListOrdersCommand is valid`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
-    const result = await dbListOrdersClient.listOrders(mockTestCommand)
-    expect(Result.isSuccess(result)).toBe(true)
+    const result = await dbListOrdersClient.listOrders(mockListOrdersCommand)
+    expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      ListOrdersCommand is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input ListOrdersCommand is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
     const mockTestCommand = undefined as ListOrdersCommand
@@ -160,8 +177,7 @@ describe(`Orders Service ListOrdersApi DbListOrdersClient tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      ListOrdersCommand is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input ListOrdersCommand is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
     const mockTestCommand = null as ListOrdersCommand
@@ -171,8 +187,23 @@ describe(`Orders Service ListOrdersApi DbListOrdersClient tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    ListOrdersCommand.commandData is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input ListOrdersCommand is not an instance of the class`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
+    const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
+    const mockTestCommand = { ...mockListOrdersCommand }
+    const result = await dbListOrdersClient.listOrders(mockTestCommand)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  /*
+   *
+   *
+   ************************************************************
+   * Test ListOrdersCommand.commandData edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input ListOrdersCommand.commandData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
     const mockTestCommand = buildMockListOrdersCommand({})
@@ -183,8 +214,7 @@ describe(`Orders Service ListOrdersApi DbListOrdersClient tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    ListOrdersCommand.commandData is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input ListOrdersCommand.commandData is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
     const mockTestCommand = buildMockListOrdersCommand({})
@@ -195,75 +225,84 @@ describe(`Orders Service ListOrdersApi DbListOrdersClient tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test internal logic
-  //
+  /*
+   *
+   *
+   ************************************************************
+   * Test internal logic
+   ************************************************************/
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
-    const mockTestCommand = buildMockListOrdersCommand({})
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
-    await dbListOrdersClient.listOrders(mockTestCommand)
+    await dbListOrdersClient.listOrders(mockListOrdersCommand)
     expect(mockDdbDocClient.send).toHaveBeenCalledTimes(1)
   })
 
   it(`calls DynamoDBDocumentClient.send with the expected input (list by orderId)`, async () => {
     const mockTestCommand = buildMockListOrdersCommand({ orderId: mockOrderId })
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
     await dbListOrdersClient.listOrders(mockTestCommand)
     const expectedDdbCommand = buildMockDdbCommand_ByOrderId(mockOrderId)
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
-  it(`calls DynamoDBDocumentClient.send with the expected input (list many)`, async () => {
+  it(`calls DynamoDBDocumentClient.send with the expected input (list filtered)`, async () => {
     const mockTestCommand = buildMockListOrdersCommand({ sortDirection: mockSortDirection, limit: mockLimit })
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
     await dbListOrdersClient.listOrders(mockTestCommand)
-    const expectedDdbCommand = buildMockDdbCommand_ListMany(mockSortDirection, mockLimit)
+    const expectedDdbCommand = buildMockDdbCommand_ListFiltered(mockSortDirection, mockLimit)
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
   it(`calls DynamoDBDocumentClient.send with the expected input (list default)`, async () => {
-    const mockTestCommand = buildMockListOrdersCommand({})
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
-    await dbListOrdersClient.listOrders(mockTestCommand)
+    await dbListOrdersClient.listOrders(mockListOrdersCommand)
     const expectedDdbCommand = buildMockDdbCommand_ListDefault()
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
-  it(`returns a transient Failure of kind UnrecognizedError if 
-      DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
-    const mockTestCommand = buildMockListOrdersCommand({})
+  it(`returns a transient Failure of kind UnrecognizedError if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
-    const result = await dbListOrdersClient.listOrders(mockTestCommand)
+    const result = await dbListOrdersClient.listOrders(mockListOrdersCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'UnrecognizedError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(true)
   })
 
-  //
-  // Test expected result
-  //
-  it(`returns the expected Success<[]> if DynamoDBDocumentClient.send returns null Items`, async () => {
-    const mockTestCommand = buildMockListOrdersCommand({})
+  /*
+   *
+   *
+   ************************************************************
+   * Test expected result
+   ************************************************************/
+  it(`returns the expected empty Success<OrderData[]> if DynamoDBDocumentClient.send returns Items with null items`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_nullItems()
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
-    const result = await dbListOrdersClient.listOrders(mockTestCommand)
+    const result = await dbListOrdersClient.listOrders(mockListOrdersCommand)
     const expectedOrders: OrderData[] = []
     const expectedResult = Result.makeSuccess(expectedOrders)
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it(`returns the expected Success<OrderData[]> if DynamoDBDocumentClient.send
-    returns Items with data (list by orderId)`, async () => {
-    const mockTestCommand = buildMockListOrdersCommand({ orderId: mockOrderId })
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
+  it(`returns the expected empty Success<[]> if DynamoDBDocumentClient.send returns Items with no items`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves('none')
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
-    const result = await dbListOrdersClient.listOrders(mockTestCommand)
+    const result = await dbListOrdersClient.listOrders(mockListOrdersCommand)
+    const expectedOrders: OrderData[] = []
+    const expectedResult = Result.makeSuccess(expectedOrders)
+    expect(Result.isSuccess(result)).toBe(true)
+    expect(result).toStrictEqual(expectedResult)
+  })
+
+  it(`returns the expected Success<OrderData[]> if DynamoDBDocumentClient.send returns Items with one item`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves('one')
+    const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
+    const result = await dbListOrdersClient.listOrders(mockListOrdersCommand)
     const expectedOrders: OrderData[] = [
       {
         orderId: mockExistingOrderData[0].orderId,
@@ -281,45 +320,10 @@ describe(`Orders Service ListOrdersApi DbListOrdersClient tests`, () => {
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it(`returns the expected Success<OrderData[]> if DynamoDBDocumentClient.send
-      returns Items with data (list many)`, async () => {
-    const mockTestCommand = buildMockListOrdersCommand({ sortDirection: mockSortDirection, limit: mockLimit })
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
+  it(`returns the expected Success<OrderData[]> if DynamoDBDocumentClient.send returns Items with many items`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves('many')
     const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
-    const result = await dbListOrdersClient.listOrders(mockTestCommand)
-    const expectedOrders: OrderData[] = [
-      {
-        orderId: mockExistingOrderData[0].orderId,
-        orderStatus: mockExistingOrderData[0].orderStatus,
-        sku: mockExistingOrderData[0].sku,
-        units: mockExistingOrderData[0].units,
-        price: mockExistingOrderData[0].price,
-        userId: mockExistingOrderData[0].userId,
-        createdAt: mockExistingOrderData[0].createdAt,
-        updatedAt: mockExistingOrderData[0].updatedAt,
-      },
-      {
-        orderId: mockExistingOrderData[1].orderId,
-        orderStatus: mockExistingOrderData[1].orderStatus,
-        sku: mockExistingOrderData[1].sku,
-        units: mockExistingOrderData[1].units,
-        price: mockExistingOrderData[1].price,
-        userId: mockExistingOrderData[1].userId,
-        createdAt: mockExistingOrderData[1].createdAt,
-        updatedAt: mockExistingOrderData[1].updatedAt,
-      },
-    ]
-    const expectedResult = Result.makeSuccess(expectedOrders)
-    expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toStrictEqual(expectedResult)
-  })
-
-  it(`returns the expected Success<OrderData[]> if DynamoDBDocumentClient.send
-      returns Items with data (list default)`, async () => {
-    const mockTestCommand = buildMockListOrdersCommand({})
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
-    const dbListOrdersClient = new DbListOrdersClient(mockDdbDocClient)
-    const result = await dbListOrdersClient.listOrders(mockTestCommand)
+    const result = await dbListOrdersClient.listOrders(mockListOrdersCommand)
     const expectedOrders: OrderData[] = [
       {
         orderId: mockExistingOrderData[0].orderId,

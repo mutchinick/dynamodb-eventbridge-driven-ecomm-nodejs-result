@@ -91,11 +91,13 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
       const orderData = createOrderResult.value
       const incomingEventName = incomingOrderEvent.eventName
       const raiseEventResult = await this.raiseOrderCreatedEvent(incomingEventName, orderData)
-      Result.isFailure(raiseEventResult)
-        ? console.error(`${logContext} exit failure:`, { raiseEventResult, incomingEventName, orderData })
-        : console.info(`${logContext} exit success:`, { raiseEventResult, incomingEventName, orderData })
+      if (Result.isFailure(raiseEventResult)) {
+        console.error(`${logContext} exit failure:`, { raiseEventResult, incomingEventName, orderData })
+        return raiseEventResult
+      }
 
-      return raiseEventResult
+      console.info(`${logContext} exit success:`, { raiseEventResult, incomingEventName, orderData })
+      return Result.makeSuccess()
     }
 
     // When IT IS an OrderPlacedEvent and the OrderData DOES exist in the database, then we only try
@@ -103,11 +105,13 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     if (isOrderPlacedEvent && existingOrderData) {
       const incomingEventName = incomingOrderEvent.eventName
       const raiseEventResult = await this.raiseOrderCreatedEvent(incomingEventName, existingOrderData)
-      Result.isFailure(raiseEventResult)
-        ? console.error(`${logContext} exit failure:`, { raiseEventResult, incomingEventName, existingOrderData })
-        : console.info(`${logContext} exit success:`, { raiseEventResult, incomingEventName, existingOrderData })
+      if (Result.isFailure(raiseEventResult)) {
+        console.error(`${logContext} exit failure:`, { raiseEventResult, incomingEventName, existingOrderData })
+        return raiseEventResult
+      }
 
-      return raiseEventResult
+      console.info(`${logContext} exit success:`, { raiseEventResult, incomingEventName, existingOrderData })
+      return Result.makeSuccess()
     }
 
     // When IT IS NOT an OrderPlacedEvent and the OrderData DOES exist in the database, then we need to
@@ -120,7 +124,7 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
       }
 
       console.info(`${logContext} exit success:`, { updateOrderResult, incomingOrderEvent, existingOrderData })
-      return Result.makeSuccess() // void the result as we don't use the OrderData in the Controller.
+      return Result.makeSuccess()
     }
 
     // When IT IS NOT an OrderPlacedEvent and the OrderData DOES NOT exist in the database.

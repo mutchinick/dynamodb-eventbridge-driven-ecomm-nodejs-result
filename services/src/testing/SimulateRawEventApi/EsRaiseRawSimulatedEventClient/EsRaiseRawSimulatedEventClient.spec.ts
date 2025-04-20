@@ -53,9 +53,12 @@ function buildMockDdbCommand(): PutCommand {
 
 const expectedDdbCommand = buildMockDdbCommand()
 
-//
-// Mock clients
-//
+/*
+ *
+ *
+ ************************************************************
+ * Mock clients
+ ************************************************************/
 function buildMockDdbDocClient_succeeds(): DynamoDBDocumentClient {
   return { send: jest.fn() } as unknown as DynamoDBDocumentClient
 }
@@ -65,14 +68,17 @@ function buildMockDdbDocClient_throws(error?: unknown): DynamoDBDocumentClient {
 }
 
 describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tests`, () => {
-  //
-  // Test RawSimulatedEvent edge cases
-  //
-  it(`returns a Success if the input RawSimulatedEvent is valid`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test RawSimulatedEvent edge cases
+   ************************************************************/
+  it(`does not return a Failure if the input RawSimulatedEvent is valid`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_succeeds()
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
     const result = await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockRawSimulatedEvent)
-    expect(Result.isSuccess(result)).toBe(true)
+    expect(Result.isFailure(result)).toBe(false)
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEvent is undefined`, async () => {
@@ -95,9 +101,22 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test internal logic
-  //
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input RawSimulatedEvent is not an instance of the class`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_succeeds()
+    const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
+    const mockTestEvent = { ...mockRawSimulatedEvent }
+    const result = await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockTestEvent)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  /*
+   *
+   *
+   ************************************************************
+   * Test internal logic
+   ************************************************************/
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_succeeds()
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
@@ -122,8 +141,7 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
     expect(Result.isFailureTransient(result)).toBe(true)
   })
 
-  it(`returns a non-transient Failure of kind DuplicateEventRaisedError if DynamoDBDocumentClient.send
-      throws a ConditionalCheckFailedException`, async () => {
+  it(`returns a non-transient Failure of kind DuplicateEventRaisedError if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException`, async () => {
     const mockError = new ConditionalCheckFailedException({ $metadata: {}, message: '' })
     const mockDdbDocClient = buildMockDdbDocClient_throws(mockError)
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
@@ -133,10 +151,13 @@ describe(`Testing Service SimulateRawEventApi EsRaiseRawSimulatedEventClient tes
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test expected result
-  //
-  it(`returns the expected Success<void> with the expected data`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test expected result
+   ************************************************************/
+  it(`returns the expected Success<void> if the execution path is successful`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_succeeds()
     const esRaiseRawSimulatedEventClient = new EsRaiseRawSimulatedEventClient(mockDdbDocClient)
     const result = await esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(mockRawSimulatedEvent)

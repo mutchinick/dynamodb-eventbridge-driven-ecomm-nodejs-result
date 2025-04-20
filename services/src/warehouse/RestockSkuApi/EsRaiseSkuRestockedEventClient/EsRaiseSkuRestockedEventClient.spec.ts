@@ -55,35 +55,35 @@ function buildMockDdbCommand(): PutCommand {
 
 const expectedDdbCommand = buildMockDdbCommand()
 
-//
-// Mock clients
-//
+/*
+ *
+ *
+ ************************************************************
+ * Mock clients
+ ************************************************************/
 function buildMockDdbDocClient_resolves(): DynamoDBDocumentClient {
   return { send: jest.fn() } as unknown as DynamoDBDocumentClient
 }
 
-function buildMockDdbDocClient_throws(): DynamoDBDocumentClient {
-  return { send: jest.fn().mockRejectedValue(new Error()) } as unknown as DynamoDBDocumentClient
-}
-
-function buildMockDdbDocClient_throws_ConditionalCheckFailedException(): DynamoDBDocumentClient {
-  const error = new ConditionalCheckFailedException({ $metadata: {}, message: '' })
-  return { send: jest.fn().mockRejectedValue(error) } as unknown as DynamoDBDocumentClient
+function buildMockDdbDocClient_throws(error?: unknown): DynamoDBDocumentClient {
+  return { send: jest.fn().mockRejectedValue(error ?? new Error()) } as unknown as DynamoDBDocumentClient
 }
 
 describe(`Warehouse Service RestockSkuApi EsRaiseSkuRestockedEventClient tests`, () => {
-  //
-  // Test SkuRestockedEvent edge cases
-  //
-  it(`returns a Success if the input SkuRestockedEvent is valid`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test SkuRestockedEvent edge cases
+   ************************************************************/
+  it(`does not return a Failure if the input SkuRestockedEvent is valid`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseSkuRestockedEventClient = new EsRaiseSkuRestockedEventClient(mockDdbDocClient)
     const result = await esRaiseSkuRestockedEventClient.raiseSkuRestockedEvent(mockSkuRestockedEvent)
-    expect(Result.isSuccess(result)).toBe(true)
+    expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      SkuRestockedEvent is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEvent is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseSkuRestockedEventClient = new EsRaiseSkuRestockedEventClient(mockDdbDocClient)
     const mockTestEvent = undefined as SkuRestockedEvent
@@ -93,8 +93,7 @@ describe(`Warehouse Service RestockSkuApi EsRaiseSkuRestockedEventClient tests`,
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      SkuRestockedEvent is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEvent is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseSkuRestockedEventClient = new EsRaiseSkuRestockedEventClient(mockDdbDocClient)
     const mockTestEvent = null as SkuRestockedEvent
@@ -104,8 +103,23 @@ describe(`Warehouse Service RestockSkuApi EsRaiseSkuRestockedEventClient tests`,
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      SkuRestockedEvent.eventData is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEvent is not an instance of the class`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
+    const esRaiseSkuRestockedEventClient = new EsRaiseSkuRestockedEventClient(mockDdbDocClient)
+    const mockTestEvent = { ...mockSkuRestockedEvent }
+    const result = await esRaiseSkuRestockedEventClient.raiseSkuRestockedEvent(mockTestEvent)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  /*
+   *
+   *
+   ************************************************************
+   * Test SkuRestockedEvent.eventData edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEvent.eventData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseSkuRestockedEventClient = new EsRaiseSkuRestockedEventClient(mockDdbDocClient)
     const mockTestEvent = buildMockSkuRestockedEvent()
@@ -116,8 +130,7 @@ describe(`Warehouse Service RestockSkuApi EsRaiseSkuRestockedEventClient tests`,
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      SkuRestockedEvent.eventData is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input SkuRestockedEvent.eventData is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseSkuRestockedEventClient = new EsRaiseSkuRestockedEventClient(mockDdbDocClient)
     const mockTestEvent = buildMockSkuRestockedEvent()
@@ -128,9 +141,12 @@ describe(`Warehouse Service RestockSkuApi EsRaiseSkuRestockedEventClient tests`,
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test internal logic
-  //
+  /*
+   *
+   *
+   ************************************************************
+   * Test internal logic
+   ************************************************************/
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseSkuRestockedEventClient = new EsRaiseSkuRestockedEventClient(mockDdbDocClient)
@@ -145,8 +161,7 @@ describe(`Warehouse Service RestockSkuApi EsRaiseSkuRestockedEventClient tests`,
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
-  it(`returns a transient Failure of kind UnrecognizedError if
-      DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
+  it(`returns a transient Failure of kind UnrecognizedError if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const esRaiseSkuRestockedEventClient = new EsRaiseSkuRestockedEventClient(mockDdbDocClient)
     const result = await esRaiseSkuRestockedEventClient.raiseSkuRestockedEvent(mockSkuRestockedEvent)
@@ -155,9 +170,9 @@ describe(`Warehouse Service RestockSkuApi EsRaiseSkuRestockedEventClient tests`,
     expect(Result.isFailureTransient(result)).toBe(true)
   })
 
-  it(`returns a non-transient Failure of kind DuplicateEventRaisedError
-      if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_throws_ConditionalCheckFailedException()
+  it(`returns a non-transient Failure of kind DuplicateEventRaisedError if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException`, async () => {
+    const mockError = new ConditionalCheckFailedException({ $metadata: {}, message: 'ConditionalCheckFailed' })
+    const mockDdbDocClient = buildMockDdbDocClient_throws(mockError)
     const esRaiseSkuRestockedEventClient = new EsRaiseSkuRestockedEventClient(mockDdbDocClient)
     const result = await esRaiseSkuRestockedEventClient.raiseSkuRestockedEvent(mockSkuRestockedEvent)
     expect(Result.isFailure(result)).toBe(true)
@@ -165,10 +180,13 @@ describe(`Warehouse Service RestockSkuApi EsRaiseSkuRestockedEventClient tests`,
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test expected result
-  //
-  it(`returns the expected Success<void> with the expected data`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test expected result
+   ************************************************************/
+  it(`returns the expected Success<void> if the execution path is successful`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseSkuRestockedEventClient = new EsRaiseSkuRestockedEventClient(mockDdbDocClient)
     const result = await esRaiseSkuRestockedEventClient.raiseSkuRestockedEvent(mockSkuRestockedEvent)

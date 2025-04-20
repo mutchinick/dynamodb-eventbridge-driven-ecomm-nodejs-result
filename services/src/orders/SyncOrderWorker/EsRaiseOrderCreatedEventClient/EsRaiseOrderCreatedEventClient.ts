@@ -84,8 +84,8 @@ export class EsRaiseOrderCreatedEventClient implements IEsRaiseOrderCreatedEvent
     try {
       const tableName = process.env.EVENT_STORE_TABLE_NAME
 
-      const { eventData } = orderCreatedEvent
-      const { orderId, orderStatus, sku, units, price, userId, createdAt, updatedAt } = eventData
+      const { eventName, eventData, createdAt, updatedAt } = orderCreatedEvent
+      const { orderId, sku, units, price, userId } = eventData
 
       const eventPk = `EVENTS#ORDER_ID#${orderId}`
       const eventSk = `EVENT#${orderCreatedEvent.eventName}`
@@ -99,19 +99,16 @@ export class EsRaiseOrderCreatedEventClient implements IEsRaiseOrderCreatedEvent
         Item: {
           pk: eventPk,
           sk: eventSk,
-          eventName: orderCreatedEvent.eventName,
+          eventName,
           eventData: {
             orderId,
-            orderStatus,
             sku,
             units,
             price,
             userId,
-            createdAt,
-            updatedAt,
           },
-          createdAt: orderCreatedEvent.createdAt,
-          updatedAt: orderCreatedEvent.updatedAt,
+          createdAt,
+          updatedAt,
           _tn: eventTn,
           _sn: eventSn,
           gsi1pk: eventGsi1pk,

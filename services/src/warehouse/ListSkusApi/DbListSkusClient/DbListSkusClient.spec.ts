@@ -22,9 +22,14 @@ function buildMockListSkusCommand(listSkusCommandInput: ListSkusCommandInput): T
   return Result.getSuccessValueOrThrow(mockClass)
 }
 
-//
-// By Sku
-//
+const mockListSkusCommand = buildMockListSkusCommand({})
+
+/*
+ *
+ *
+ ************************************************************
+ * By Sku Id
+ ************************************************************/
 function buildMockDdbCommand_BySku(sku: string): QueryCommand {
   const skuListPk = `WAREHOUSE#SKU#${sku}`
   const skuListSk = `SKU#${sku}`
@@ -43,10 +48,13 @@ function buildMockDdbCommand_BySku(sku: string): QueryCommand {
   return ddbCommand
 }
 
-//
-// List many (sortDirection and limit)
-//
-function buildMockDdbCommand_ListMany(sortDirection: SortDirection, limit: number): QueryCommand {
+/*
+ *
+ *
+ ************************************************************
+ * List filtered (sortDirection and limit)
+ ************************************************************/
+function buildMockDdbCommand_ListFiltered(sortDirection: SortDirection, limit: number): QueryCommand {
   const indexName = 'gsi1pk-gsi1sk-index'
   const skuListGsi1pk = `WAREHOUSE#SKU`
   const ddbCommand = new QueryCommand({
@@ -65,9 +73,12 @@ function buildMockDdbCommand_ListMany(sortDirection: SortDirection, limit: numbe
   return ddbCommand
 }
 
-//
-// List default (no filters)
-//
+/*
+ *
+ *
+ ************************************************************
+ * List default (no filters)
+ ************************************************************/
 function buildMockDdbCommand_ListDefault(): QueryCommand {
   const indexName = 'gsi1pk-gsi1sk-index'
   const skuListGsi1pk = `WAREHOUSE#SKU`
@@ -87,9 +98,12 @@ function buildMockDdbCommand_ListDefault(): QueryCommand {
   return ddbCommand
 }
 
-//
-//  Mock clients
-//
+/*
+ *
+ *
+ ************************************************************
+ * Mock clients
+ ************************************************************/
 const mockExistingSkuData: RestockSkuData[] = [
   {
     sku: mockSku,
@@ -107,10 +121,12 @@ const mockExistingSkuData: RestockSkuData[] = [
   },
 ]
 
-function buildMockDdbDocClient_resolves(listSkusCommand?: ListSkusCommand): DynamoDBDocumentClient {
-  const sku = listSkusCommand?.commandData?.sku
+function buildMockDdbDocClient_resolves(resulting: 'many' | 'one' | 'none' = 'many'): DynamoDBDocumentClient {
+  const items = resulting === 'many' ? mockExistingSkuData : resulting === 'one' ? [mockExistingSkuData[0]] : []
+  const itemsCount = items ? items.length : 0
   const mockGetCommandResult: QueryCommandOutput = {
-    Items: sku ? [mockExistingSkuData[0]] : mockExistingSkuData,
+    Items: items,
+    Count: itemsCount,
     $metadata: {},
   }
   return { send: jest.fn().mockResolvedValue(mockGetCommandResult) } as unknown as DynamoDBDocumentClient
@@ -129,19 +145,20 @@ function buildMockDdbDocClient_throws(error?: unknown): DynamoDBDocumentClient {
 }
 
 describe(`Warehouse Service ListSkusApi DbListSkusClient tests`, () => {
-  //
-  // Test ListSkusCommand edge cases
-  //
-  it(`returns a Success if the input ListSkusCommand is valid`, async () => {
-    const mockTestCommand = buildMockListSkusCommand({})
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
+  /*
+   *
+   *
+   ************************************************************
+   * Test ListSkusCommand edge cases
+   ************************************************************/
+  it(`does not return a Failure if the input ListSkusCommand is valid`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
-    const result = await dbListSkusClient.listSkus(mockTestCommand)
-    expect(Result.isSuccess(result)).toBe(true)
+    const result = await dbListSkusClient.listSkus(mockListSkusCommand)
+    expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      ListSkusCommand is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input ListSkusCommand is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     const mockTestCommand = undefined as ListSkusCommand
@@ -151,8 +168,7 @@ describe(`Warehouse Service ListSkusApi DbListSkusClient tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      ListSkusCommand is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input ListSkusCommand is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     const mockTestCommand = null as ListSkusCommand
@@ -162,8 +178,23 @@ describe(`Warehouse Service ListSkusApi DbListSkusClient tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    ListSkusCommand.commandData is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input ListSkusCommand is not an instance of the class`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
+    const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
+    const mockTestCommand = { ...mockListSkusCommand }
+    const result = await dbListSkusClient.listSkus(mockTestCommand)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  /*
+   *
+   *
+   ************************************************************
+   * Test ListSkusCommand.commandData edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input ListSkusCommand.commandData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     const mockTestCommand = buildMockListSkusCommand({})
@@ -174,8 +205,7 @@ describe(`Warehouse Service ListSkusApi DbListSkusClient tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    ListSkusCommand.commandData is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input ListSkusCommand.commandData is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     const mockTestCommand = buildMockListSkusCommand({})
@@ -186,75 +216,84 @@ describe(`Warehouse Service ListSkusApi DbListSkusClient tests`, () => {
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test internal logic
-  //
+  /*
+   *
+   *
+   ************************************************************
+   * Test internal logic
+   ************************************************************/
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
-    const mockTestCommand = buildMockListSkusCommand({})
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
-    await dbListSkusClient.listSkus(mockTestCommand)
+    await dbListSkusClient.listSkus(mockListSkusCommand)
     expect(mockDdbDocClient.send).toHaveBeenCalledTimes(1)
   })
 
   it(`calls DynamoDBDocumentClient.send with the expected input (list by sku)`, async () => {
     const mockTestCommand = buildMockListSkusCommand({ sku: mockSku })
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     await dbListSkusClient.listSkus(mockTestCommand)
     const expectedDdbCommand = buildMockDdbCommand_BySku(mockSku)
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
-  it(`calls DynamoDBDocumentClient.send with the expected input (list many)`, async () => {
+  it(`calls DynamoDBDocumentClient.send with the expected input (list filtered)`, async () => {
     const mockTestCommand = buildMockListSkusCommand({ sortDirection: mockSortDirection, limit: mockLimit })
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     await dbListSkusClient.listSkus(mockTestCommand)
-    const expectedDdbCommand = buildMockDdbCommand_ListMany(mockSortDirection, mockLimit)
+    const expectedDdbCommand = buildMockDdbCommand_ListFiltered(mockSortDirection, mockLimit)
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
   it(`calls DynamoDBDocumentClient.send with the expected input (list default)`, async () => {
-    const mockTestCommand = buildMockListSkusCommand({})
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
-    await dbListSkusClient.listSkus(mockTestCommand)
+    await dbListSkusClient.listSkus(mockListSkusCommand)
     const expectedDdbCommand = buildMockDdbCommand_ListDefault()
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
-  it(`returns a transient Failure of kind UnrecognizedError if 
-      DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
-    const mockTestCommand = buildMockListSkusCommand({})
+  it(`returns a transient Failure of kind UnrecognizedError if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
-    const result = await dbListSkusClient.listSkus(mockTestCommand)
+    const result = await dbListSkusClient.listSkus(mockListSkusCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'UnrecognizedError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(true)
   })
 
-  //
-  // Test expected result
-  //
-  it(`returns the expected Success<[]> if DynamoDBDocumentClient.send returns null Items`, async () => {
-    const mockTestCommand = buildMockListSkusCommand({})
+  /*
+   *
+   *
+   ************************************************************
+   * Test expected result
+   ************************************************************/
+  it(`returns the expected empty Success<RestockSkuData[]> if DynamoDBDocumentClient.send returns Items with null items`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_nullItems()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
-    const result = await dbListSkusClient.listSkus(mockTestCommand)
+    const result = await dbListSkusClient.listSkus(mockListSkusCommand)
     const expectedSkus: RestockSkuData[] = []
     const expectedResult = Result.makeSuccess(expectedSkus)
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it(`returns the expected Success<RestockSkuData[]> if DynamoDBDocumentClient.send
-    returns Items with data (list by sku)`, async () => {
-    const mockTestCommand = buildMockListSkusCommand({ sku: mockSku })
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
+  it(`returns the expected empty Success<[]> if DynamoDBDocumentClient.send returns Items with no items`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves('none')
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
-    const result = await dbListSkusClient.listSkus(mockTestCommand)
+    const result = await dbListSkusClient.listSkus(mockListSkusCommand)
+    const expectedSkus: RestockSkuData[] = []
+    const expectedResult = Result.makeSuccess(expectedSkus)
+    expect(Result.isSuccess(result)).toBe(true)
+    expect(result).toStrictEqual(expectedResult)
+  })
+
+  it(`returns the expected Success<RestockSkuData[]> if DynamoDBDocumentClient.send returns Items with one item`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves('one')
+    const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
+    const result = await dbListSkusClient.listSkus(mockListSkusCommand)
     const expectedSkus: RestockSkuData[] = [
       {
         sku: mockExistingSkuData[0].sku,
@@ -269,39 +308,10 @@ describe(`Warehouse Service ListSkusApi DbListSkusClient tests`, () => {
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it(`returns the expected Success<RestockSkuData[]> if DynamoDBDocumentClient.send
-      returns Items with data (list many)`, async () => {
-    const mockTestCommand = buildMockListSkusCommand({ sortDirection: mockSortDirection, limit: mockLimit })
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
+  it(`returns the expected Success<RestockSkuData[]> if DynamoDBDocumentClient.send returns Items with many items`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves('many')
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
-    const result = await dbListSkusClient.listSkus(mockTestCommand)
-    const expectedSkus: RestockSkuData[] = [
-      {
-        sku: mockExistingSkuData[0].sku,
-        units: mockExistingSkuData[0].units,
-        lotId: mockExistingSkuData[0].lotId,
-        createdAt: mockExistingSkuData[0].createdAt,
-        updatedAt: mockExistingSkuData[0].updatedAt,
-      },
-      {
-        sku: mockExistingSkuData[1].sku,
-        units: mockExistingSkuData[1].units,
-        lotId: mockExistingSkuData[1].lotId,
-        createdAt: mockExistingSkuData[1].createdAt,
-        updatedAt: mockExistingSkuData[1].updatedAt,
-      },
-    ]
-    const expectedResult = Result.makeSuccess(expectedSkus)
-    expect(Result.isSuccess(result)).toBe(true)
-    expect(result).toStrictEqual(expectedResult)
-  })
-
-  it(`returns the expected Success<RestockSkuData[]> if DynamoDBDocumentClient.send
-      returns Items with data (list default)`, async () => {
-    const mockTestCommand = buildMockListSkusCommand({})
-    const mockDdbDocClient = buildMockDdbDocClient_resolves(mockTestCommand)
-    const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
-    const result = await dbListSkusClient.listSkus(mockTestCommand)
+    const result = await dbListSkusClient.listSkus(mockListSkusCommand)
     const expectedSkus: RestockSkuData[] = [
       {
         sku: mockExistingSkuData[0].sku,

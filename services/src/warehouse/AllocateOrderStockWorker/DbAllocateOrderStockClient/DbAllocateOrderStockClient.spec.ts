@@ -2,11 +2,11 @@ import { TransactionCanceledException } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, TransactWriteCommand } from '@aws-sdk/lib-dynamodb'
 import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
+import { AllocationStatus } from '../../model/AllocationStatus'
 import { WarehouseEventName } from '../../model/WarehouseEventName'
 import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { AllocateOrderStockCommand } from '../model/AllocateOrderStockCommand'
 import { DbAllocateOrderStockClient } from './DbAllocateOrderStockClient'
-import { AllocationStatus } from '../../model/AllocationStatus'
 
 const mockWarehouseTableName = 'mockWarehouseTableName'
 
@@ -94,9 +94,12 @@ function buildMockDdbCommand(): TransactWriteCommand {
 
 const expectedDdbCommand = buildMockDdbCommand()
 
-//
-// Mock clients
-//
+/*
+ *
+ *
+ ************************************************************
+ * Mock clients
+ ************************************************************/
 function buildMockDdbDocClient_resolves(): DynamoDBDocumentClient {
   return { send: jest.fn() } as unknown as DynamoDBDocumentClient
 }
@@ -142,67 +145,83 @@ function buildMockDdbDocClient_throws_ConditionalCheckFailedException_Depleted()
 }
 
 describe(`Warehouse Service AllocateOrderStockWorker DbAllocateOrderStockClient tests`, () => {
-  //
-  // Test AllocateOrderStockCommand edge cases
-  //
-  it(`returns a Success if the input AllocateOrderStockCommand is valid`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test AllocateOrderStockCommand edge cases
+   ************************************************************/
+  it(`does not return a Failure if the input AllocateOrderStockCommand is valid`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
     const result = await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
-    expect(Result.isSuccess(result)).toBe(true)
+    expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError
-      if the input AllocateOrderStockCommand is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input AllocateOrderStockCommand is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
-    const mockValidCommand = undefined as AllocateOrderStockCommand
-    const result = await dbAllocateOrderStockClient.allocateOrderStock(mockValidCommand)
+    const mockTestCommand = undefined as AllocateOrderStockCommand
+    const result = await dbAllocateOrderStockClient.allocateOrderStock(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError
-      if the input AllocateOrderStockCommand is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input AllocateOrderStockCommand is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
-    const mockValidCommand = null as AllocateOrderStockCommand
-    const result = await dbAllocateOrderStockClient.allocateOrderStock(mockValidCommand)
+    const mockTestCommand = null as AllocateOrderStockCommand
+    const result = await dbAllocateOrderStockClient.allocateOrderStock(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError
-      if the input AllocateOrderStockCommand.commandData 
-      is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input AllocateOrderStockCommand is not an instance of the class`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
-    const mockValidCommand = buildMockAllocateOrderStockCommand()
-    mockValidCommand.commandData = undefined
-    const result = await dbAllocateOrderStockClient.allocateOrderStock(mockValidCommand)
+    const mockTestCommand = { ...mockAllocateOrderStockCommand }
+    const result = await dbAllocateOrderStockClient.allocateOrderStock(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError
-      if the input AllocateOrderStockCommand.commandData 
-      is null`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test AllocateOrderStockCommand.commandData edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input AllocateOrderStockCommand.commandData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
-    const mockValidCommand = buildMockAllocateOrderStockCommand()
-    mockValidCommand.commandData = null
-    const result = await dbAllocateOrderStockClient.allocateOrderStock(mockValidCommand)
+    const mockTestCommand = buildMockAllocateOrderStockCommand()
+    mockTestCommand.commandData = undefined
+    const result = await dbAllocateOrderStockClient.allocateOrderStock(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test internal logic
-  //
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input AllocateOrderStockCommand.commandData is null`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
+    const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
+    const mockTestCommand = buildMockAllocateOrderStockCommand()
+    mockTestCommand.commandData = null
+    const result = await dbAllocateOrderStockClient.allocateOrderStock(mockTestCommand)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  /*
+   *
+   *
+   ************************************************************
+   * Test internal logic
+   ************************************************************/
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
@@ -218,8 +237,7 @@ describe(`Warehouse Service AllocateOrderStockWorker DbAllocateOrderStockClient 
   })
 
   //
-  it(`returns a transient Failure of kind UnrecognizedError
-      if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
+  it(`returns a transient Failure of kind UnrecognizedError if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
     const result = await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
@@ -228,12 +246,13 @@ describe(`Warehouse Service AllocateOrderStockWorker DbAllocateOrderStockClient 
     expect(Result.isFailureTransient(result)).toBe(true)
   })
 
-  //
-  // Test transaction errors
-  //
-  it(`returns a non-transient Failure of kind DuplicateStockAllocationError
-      if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException error 
-      when allocating the stock`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test transaction errors
+   ************************************************************/
+  it(`returns a non-transient Failure of kind DuplicateStockAllocationError if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException error when allocating the stock`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws_ConditionalCheckFailedException_Duplicate()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
     const result = await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
@@ -242,9 +261,7 @@ describe(`Warehouse Service AllocateOrderStockWorker DbAllocateOrderStockClient 
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind DuplicateStockAllocationError
-      if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException error 
-      when both allocating and subtracting the stock`, async () => {
+  it(`returns a non-transient Failure of kind DuplicateStockAllocationError if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException error when both allocating and subtracting the stock`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws_ConditionalCheckFailedException_Duplicate_Depleted()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
     const result = await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
@@ -253,9 +270,7 @@ describe(`Warehouse Service AllocateOrderStockWorker DbAllocateOrderStockClient 
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind DepletedStockAllocationError
-      if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException error
-      when subtracting the sku stock`, async () => {
+  it(`returns a non-transient Failure of kind DepletedStockAllocationError if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException error when subtracting the sku stock`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws_ConditionalCheckFailedException_Depleted()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
     const result = await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)
@@ -264,10 +279,13 @@ describe(`Warehouse Service AllocateOrderStockWorker DbAllocateOrderStockClient 
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test expected results
-  //
-  it(`returns the expected Success<void> with the expected data`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test expected results
+   ************************************************************/
+  it(`returns the expected Success<void> if the execution path is successful`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
     const result = await dbAllocateOrderStockClient.allocateOrderStock(mockAllocateOrderStockCommand)

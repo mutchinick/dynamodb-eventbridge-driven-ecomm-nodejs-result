@@ -38,9 +38,12 @@ function buildMockDdbCommand(): GetCommand {
 
 const expectedDdbCommand = buildMockDdbCommand()
 
-//
-// Mock clients
-//
+/*
+ *
+ *
+ ************************************************************
+ * Mock clients
+ ************************************************************/
 const mockExistingOrderData: OrderAllocationData = {
   orderId: mockGetOrderAllocationCommand.commandData.orderId,
   sku: mockGetOrderAllocationCommand.commandData.sku,
@@ -68,23 +71,25 @@ function buildMockDdbDocClient_resolves_nullItem(): DynamoDBDocumentClient {
   return { send: jest.fn().mockResolvedValue(mockDdbOutput) } as unknown as DynamoDBDocumentClient
 }
 
-function buildMockDdbDocClient_throws(): DynamoDBDocumentClient {
-  return { syncOrder: jest.fn().mockRejectedValue(new Error()) } as unknown as DynamoDBDocumentClient
+function buildMockDdbDocClient_throws(error?: unknown): DynamoDBDocumentClient {
+  return { syncOrder: jest.fn().mockRejectedValue(error ?? new Error()) } as unknown as DynamoDBDocumentClient
 }
 
 describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DbGetOrderAllocationClient tests`, () => {
-  //
-  // Test GetOrderAllocationCommand edge cases
-  //
-  it(`returns a Success if the input GetOrderAllocationCommand is valid`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test GetOrderAllocationCommand edge cases
+   ************************************************************/
+  it(`does not return a Failure if the input GetOrderAllocationCommand is valid`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderAllocationClient = new DbGetOrderAllocationClient(mockDdbDocClient)
     const result = await dbGetOrderAllocationClient.getOrderAllocation(mockGetOrderAllocationCommand)
-    expect(Result.isSuccess(result)).toBe(true)
+    expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      GetOrderAllocationCommand is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommand is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderAllocationClient = new DbGetOrderAllocationClient(mockDdbDocClient)
     const mockTestCommand = undefined as GetOrderAllocationCommand
@@ -94,8 +99,7 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DbGetOrderAlloc
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      GetOrderAllocationCommand is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommand is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderAllocationClient = new DbGetOrderAllocationClient(mockDdbDocClient)
     const mockTestCommand = null as GetOrderAllocationCommand
@@ -105,8 +109,23 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DbGetOrderAlloc
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      GetOrderAllocationCommand.commandData is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommand is not an instance of the class`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
+    const dbGetOrderAllocationClient = new DbGetOrderAllocationClient(mockDdbDocClient)
+    const mockTestCommand = { ...mockGetOrderAllocationCommand }
+    const result = await dbGetOrderAllocationClient.getOrderAllocation(mockTestCommand)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  /*
+   *
+   *
+   ************************************************************
+   * Test GetOrderAllocationCommand.commandData edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommand.commandData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderAllocationClient = new DbGetOrderAllocationClient(mockDdbDocClient)
     const mockTestCommand = buildMockGetOrderAllocationCommand()
@@ -117,8 +136,7 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DbGetOrderAlloc
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      GetOrderAllocationCommand.commandData is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input GetOrderAllocationCommand.commandData is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderAllocationClient = new DbGetOrderAllocationClient(mockDdbDocClient)
     const mockTestCommand = buildMockGetOrderAllocationCommand()
@@ -129,9 +147,12 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DbGetOrderAlloc
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test internal logic
-  //
+  /*
+   *
+   *
+   ************************************************************
+   * Test internal logic
+   ************************************************************/
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_validItem()
     const dbGetOrderAllocationClient = new DbGetOrderAllocationClient(mockDdbDocClient)
@@ -146,8 +167,7 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DbGetOrderAlloc
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
-  it(`returns a transient Failure of kind UnrecognizedError if
-      DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
+  it(`returns a transient Failure of kind UnrecognizedError if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const dbGetOrderAllocationClient = new DbGetOrderAllocationClient(mockDdbDocClient)
     const result = await dbGetOrderAllocationClient.getOrderAllocation(mockGetOrderAllocationCommand)
@@ -156,9 +176,12 @@ describe(`Warehouse Service DeallocateOrderPaymentRejectedWorker DbGetOrderAlloc
     expect(Result.isFailureTransient(result)).toBe(true)
   })
 
-  //
-  // Test expected results
-  //
+  /*
+   *
+   *
+   ************************************************************
+   * Test expected results
+   ************************************************************/
   it(`returns the expected Success<null> if DynamoDBDocumentClient.send returns a null item`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_nullItem()
     const dbGetOrderAllocationClient = new DbGetOrderAllocationClient(mockDdbDocClient)

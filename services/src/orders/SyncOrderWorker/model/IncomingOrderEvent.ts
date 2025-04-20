@@ -3,7 +3,8 @@ import { unmarshall } from '@aws-sdk/util-dynamodb'
 import { EventBridgeEvent } from 'aws-lambda'
 import { z } from 'zod'
 import { Failure, Result, Success } from '../../errors/Result'
-import { OrderEvent, OrderEventData } from '../../model/OrderEvent'
+import { OrderData } from '../../model/OrderData'
+import { OrderEvent } from '../../model/OrderEvent'
 import { OrderEventName } from '../../model/OrderEventName'
 import { ValueValidators } from '../../model/ValueValidators'
 
@@ -20,7 +21,9 @@ type EventDetail = {
 
 export type IncomingOrderEventInput = EventBridgeEvent<string, EventDetail>
 
-type IncomingOrderEventProps = OrderEvent<OrderEventName, OrderEventData>
+type IncomingOrderEventData = Pick<OrderData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
+
+type IncomingOrderEventProps = OrderEvent<OrderEventName, IncomingOrderEventData>
 
 //
 //
@@ -31,7 +34,7 @@ export class IncomingOrderEvent implements IncomingOrderEventProps {
   //
   private constructor(
     readonly eventName: OrderEventName,
-    readonly eventData: OrderEventData,
+    readonly eventData: IncomingOrderEventData,
     readonly createdAt: string,
     readonly updatedAt: string,
   ) {}
@@ -71,7 +74,27 @@ export class IncomingOrderEvent implements IncomingOrderEventProps {
   private static buildProps(
     incomingOrderEventInput: IncomingOrderEventInput,
   ): Success<IncomingOrderEventProps> | Failure<'InvalidArgumentsError'> {
-    return this.parseValidateInput(incomingOrderEventInput)
+    const inputParsingResult = this.parseValidateInput(incomingOrderEventInput)
+    if (Result.isFailure(inputParsingResult)) {
+      return inputParsingResult
+    }
+
+    const validInput = inputParsingResult.value
+    const { eventName, eventData, createdAt, updatedAt } = validInput
+    const { orderId, sku, units, price, userId } = eventData
+    const incomingOrderEventProps: IncomingOrderEventProps = {
+      eventName,
+      eventData: {
+        orderId,
+        sku,
+        units,
+        price,
+        userId,
+      },
+      createdAt,
+      updatedAt,
+    }
+    return Result.makeSuccess(incomingOrderEventProps)
   }
 
   //
@@ -87,13 +110,10 @@ export class IncomingOrderEvent implements IncomingOrderEventProps {
       eventName: ValueValidators.validIncomingEventName(),
       eventData: z.object({
         orderId: ValueValidators.validOrderId(),
-        orderStatus: ValueValidators.validOrderStatus().optional(),
-        sku: ValueValidators.validSku().optional(),
-        units: ValueValidators.validUnits().optional(),
-        price: ValueValidators.validPrice().optional(),
-        userId: ValueValidators.validUserId().optional(),
-        createdAt: ValueValidators.validCreatedAt().optional(),
-        updatedAt: ValueValidators.validUpdatedAt().optional(),
+        sku: ValueValidators.validSku(),
+        units: ValueValidators.validUnits(),
+        price: ValueValidators.validPrice(),
+        userId: ValueValidators.validUserId(),
       }),
       createdAt: ValueValidators.validCreatedAt(),
       updatedAt: ValueValidators.validUpdatedAt(),

@@ -21,9 +21,12 @@ function buildMockIncomingPlaceOrderRequest(): TypeUtilsMutable<IncomingPlaceOrd
 
 const mockIncomingPlaceOrderRequest = buildMockIncomingPlaceOrderRequest()
 
-//
-// Mock clients
-//
+/*
+ *
+ *
+ ************************************************************
+ * Mock clients
+ ************************************************************/
 function buildMockEsRaiseOrderPlacedEventClient_succeeds(value?: unknown): IEsRaiseOrderPlacedEventClient {
   const mockResult = Result.makeSuccess(value)
   return { raiseOrderPlacedEvent: jest.fn().mockResolvedValue(mockResult) }
@@ -43,39 +46,55 @@ function buildMockEsRaiseOrderPlacedEventClient_fails(
 }
 
 describe(`Orders Service PlaceOrderApi PlaceOrderApiService tests`, () => {
-  //
-  // Test IncomingPlaceOrderRequestInput edge cases
-  //
-  it(`returns a Success if the input PlaceOrderApiServiceInput is valid`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test IncomingPlaceOrderRequestInput edge cases
+   ************************************************************/
+  it(`does not return a Failure if the input IncomingPlaceOrderRequest is valid`, async () => {
     const mockEsRaiseOrderPlacedEventClient = buildMockEsRaiseOrderPlacedEventClient_succeeds()
     const placeOrderApiService = new PlaceOrderApiService(mockEsRaiseOrderPlacedEventClient)
     const result = await placeOrderApiService.placeOrder(mockIncomingPlaceOrderRequest)
-    expect(Result.isSuccess(result)).toBe(true)
+    expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      PlaceOrderApiServiceInput is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingPlaceOrderRequest is undefined`, async () => {
     const mockEsRaiseOrderPlacedEventClient = buildMockEsRaiseOrderPlacedEventClient_succeeds()
     const placeOrderApiService = new PlaceOrderApiService(mockEsRaiseOrderPlacedEventClient)
-    const result = await placeOrderApiService.placeOrder(undefined)
+    const mockTestRequest = undefined as never
+    const result = await placeOrderApiService.placeOrder(mockTestRequest)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      PlaceOrderApiServiceInput is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingPlaceOrderRequest is null`, async () => {
     const mockEsRaiseOrderPlacedEventClient = buildMockEsRaiseOrderPlacedEventClient_succeeds()
     const placeOrderApiService = new PlaceOrderApiService(mockEsRaiseOrderPlacedEventClient)
-    const result = await placeOrderApiService.placeOrder(null)
+    const mockTestRequest = null as never
+    const result = await placeOrderApiService.placeOrder(mockTestRequest)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test internal logic
-  //
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input IncomingPlaceOrderRequest is not an instance of the class`, async () => {
+    const mockEsRaiseOrderPlacedEventClient = buildMockEsRaiseOrderPlacedEventClient_succeeds()
+    const placeOrderApiService = new PlaceOrderApiService(mockEsRaiseOrderPlacedEventClient)
+    const mockTestRequest = { ...mockIncomingPlaceOrderRequest }
+    const result = await placeOrderApiService.placeOrder(mockTestRequest)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  /*
+   *
+   *
+   ************************************************************
+   * Test internal logic
+   ************************************************************/
   it(`returns the same Failure if OrderPlacedEvent.validateAndBuild returns a Failure`, async () => {
     const mockEsRaiseOrderPlacedEventClient = buildMockEsRaiseOrderPlacedEventClient_succeeds()
     const placeOrderApiService = new PlaceOrderApiService(mockEsRaiseOrderPlacedEventClient)
@@ -122,18 +141,28 @@ describe(`Orders Service PlaceOrderApi PlaceOrderApiService tests`, () => {
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it(`returns a Success if EsRaiseOrderPlacedEventClient.raiseOrderPlacedEvent
-      returns a Failure of kind DuplicateEventRaisedError`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test expected results
+   ************************************************************/
+  it(`returns the expected Success<PlaceOrderApiServiceOutput> if EsRaiseOrderPlacedEventClient.placeOrder returns a Failure of kind DuplicateEventRaisedError`, async () => {
     const mockEsRaiseOrderPlacedEventClient = buildMockEsRaiseOrderPlacedEventClient_fails('DuplicateEventRaisedError')
     const placeOrderApiService = new PlaceOrderApiService(mockEsRaiseOrderPlacedEventClient)
     const result = await placeOrderApiService.placeOrder(mockIncomingPlaceOrderRequest)
-    expect(Result.isSuccess(result)).toBe(true)
+    const expectedOutput: PlaceOrderApiServiceOutput = {
+      orderId: mockIncomingPlaceOrderRequest.orderId,
+      sku: mockIncomingPlaceOrderRequest.sku,
+      units: mockIncomingPlaceOrderRequest.units,
+      price: mockIncomingPlaceOrderRequest.price,
+      userId: mockIncomingPlaceOrderRequest.userId,
+    }
+    const expectedResult = Result.makeSuccess(expectedOutput)
+    expect(result).toStrictEqual(expectedResult)
   })
 
-  //
-  // Test expected results
-  //
-  it(`returns a Success<PlaceOrderApiServiceOutput> with the expected data`, async () => {
+  it(`returns the expected Success<PlaceOrderApiServiceOutput> if the execution path is successful`, async () => {
     const mockEsRaiseOrderPlacedEventClient = buildMockEsRaiseOrderPlacedEventClient_succeeds()
     const placeOrderApiService = new PlaceOrderApiService(mockEsRaiseOrderPlacedEventClient)
     const result = await placeOrderApiService.placeOrder(mockIncomingPlaceOrderRequest)

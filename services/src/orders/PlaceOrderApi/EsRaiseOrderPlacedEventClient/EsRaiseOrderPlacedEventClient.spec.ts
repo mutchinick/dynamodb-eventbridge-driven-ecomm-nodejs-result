@@ -2,9 +2,9 @@ import { ConditionalCheckFailedException } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
 import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
+import { OrderEventName } from '../../model/OrderEventName'
 import { OrderPlacedEvent } from '../model/OrderPlacedEvent'
 import { EsRaiseOrderPlacedEventClient } from './EsRaiseOrderPlacedEventClient'
-import { OrderEventName } from '../../model/OrderEventName'
 
 const mockEventStoreTableName = 'mockEventStoreTableName'
 
@@ -61,35 +61,35 @@ function buildMockDdbCommand(): PutCommand {
 
 const expectedDdbCommand = buildMockDdbCommand()
 
-//
-//  Mock clients
-//
+/*
+ *
+ *
+ ************************************************************
+ * Mock clients
+ ************************************************************/
 function buildMockDdbDocClient_resolves(): DynamoDBDocumentClient {
   return { send: jest.fn() } as unknown as DynamoDBDocumentClient
 }
 
-function buildMockDdbDocClient_throws(): DynamoDBDocumentClient {
-  return { send: jest.fn().mockRejectedValue(new Error()) } as unknown as DynamoDBDocumentClient
-}
-
-function buildMockDdbDocClient_throws_ConditionalCheckFailedException(): DynamoDBDocumentClient {
-  const error = new ConditionalCheckFailedException({ $metadata: {}, message: '' })
-  return { send: jest.fn().mockRejectedValue(error) } as unknown as DynamoDBDocumentClient
+function buildMockDdbDocClient_throws(error?: unknown): DynamoDBDocumentClient {
+  return { send: jest.fn().mockRejectedValue(error ?? new Error()) } as unknown as DynamoDBDocumentClient
 }
 
 describe(`Orders Service PlaceOrderApi EsRaiseOrderPlacedEventClient tests`, () => {
-  //
-  // Test OrderPlacedEvent edge cases
-  //
-  it(`returns a Success if the input OrderPlacedEvent is valid`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test OrderPlacedEvent edge cases
+   ************************************************************/
+  it(`does not return a Failure if the input OrderPlacedEvent is valid`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
     const result = await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockOrderPlacedEvent)
-    expect(Result.isSuccess(result)).toBe(true)
+    expect(Result.isFailure(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderPlacedEvent is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderPlacedEvent is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
     const mockTestEvent = undefined as OrderPlacedEvent
@@ -99,8 +99,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderPlacedEventClient tests`, () 
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      OrderPlacedEvent is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderPlacedEvent is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
     const mockTestEvent = null as OrderPlacedEvent
@@ -110,8 +109,23 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderPlacedEventClient tests`, () 
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    OrderPlacedEvent.eventData is undefined`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderPlacedEvent is not an instance of the class`, async () => {
+    const mockDdbDocClient = buildMockDdbDocClient_resolves()
+    const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
+    const mockTestEvent = { ...mockOrderPlacedEvent }
+    const result = await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockTestEvent)
+    expect(Result.isFailure(result)).toBe(true)
+    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
+    expect(Result.isFailureTransient(result)).toBe(false)
+  })
+
+  /*
+   *
+   *
+   ************************************************************
+   * Test OrderPlacedEvent.eventData edge cases
+   ************************************************************/
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderPlacedEvent.eventData is undefined`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
     const mockTestEvent = buildMockOrderPlacedEvent()
@@ -122,8 +136,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderPlacedEventClient tests`, () 
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-    OrderPlacedEvent.eventData is null`, async () => {
+  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input OrderPlacedEvent.eventData is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
     const mockTestEvent = buildMockOrderPlacedEvent()
@@ -134,9 +147,12 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderPlacedEventClient tests`, () 
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test internal logic
-  //
+  /*
+   *
+   *
+   ************************************************************
+   * Test internal logic
+   ************************************************************/
   it(`calls DynamoDBDocumentClient.send a single time`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
@@ -151,8 +167,7 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderPlacedEventClient tests`, () 
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
-  it(`returns a transient Failure of kind UnrecognizedError if 
-      DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
+  it(`returns a transient Failure of kind UnrecognizedError if DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
     const result = await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockOrderPlacedEvent)
@@ -161,9 +176,9 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderPlacedEventClient tests`, () 
     expect(Result.isFailureTransient(result)).toBe(true)
   })
 
-  it(`returns a non-transient Failure of kind DuplicateEventRaisedError
-      if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_throws_ConditionalCheckFailedException()
+  it(`returns a non-transient Failure of kind DuplicateEventRaisedError if DynamoDBDocumentClient.send throws a ConditionalCheckFailedException`, async () => {
+    const mockError = new ConditionalCheckFailedException({ $metadata: {}, message: '' })
+    const mockDdbDocClient = buildMockDdbDocClient_throws(mockError)
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
     const result = await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockOrderPlacedEvent)
     expect(Result.isFailure(result)).toBe(true)
@@ -171,10 +186,13 @@ describe(`Orders Service PlaceOrderApi EsRaiseOrderPlacedEventClient tests`, () 
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
-  // Test expected result
-  //
-  it(`returns the expected Success<void> with the expected data`, async () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test expected result
+   ************************************************************/
+  it(`returns the expected Success<void> if the execution path is successful`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const esRaiseOrderPlacedEventClient = new EsRaiseOrderPlacedEventClient(mockDdbDocClient)
     const result = await esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(mockOrderPlacedEvent)

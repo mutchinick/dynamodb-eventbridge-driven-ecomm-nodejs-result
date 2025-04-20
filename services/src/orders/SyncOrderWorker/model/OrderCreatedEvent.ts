@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
-import { OrderEvent, OrderEventData } from '../../model/OrderEvent'
+import { OrderEvent } from '../../model/OrderEvent'
 import { OrderEventName } from '../../model/OrderEventName'
 import { ValueValidators } from '../../model/ValueValidators'
 
-type OrderCreatedEventData = Required<OrderEventData>
+type OrderCreatedEventData = Pick<OrderData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>
 
 export interface OrderCreatedEventInput {
   incomingEventName: OrderEventName
@@ -59,13 +59,13 @@ export class OrderCreatedEvent implements OrderCreatedEventProps {
     }
 
     const { orderData } = orderCreatedEventInput
-    const { orderId, orderStatus, sku, units, price, userId, createdAt, updatedAt } = orderData
-    const date = new Date().toISOString()
+    const { orderId, sku, units, price, userId } = orderData
+    const currentDate = new Date().toISOString()
     const orderCreatedEventProps: OrderCreatedEventProps = {
       eventName: OrderEventName.ORDER_CREATED_EVENT,
-      eventData: { orderId, orderStatus, sku, units, price, userId, createdAt, updatedAt },
-      createdAt: date,
-      updatedAt: date,
+      eventData: { orderId, sku, units, price, userId },
+      createdAt: currentDate,
+      updatedAt: currentDate,
     }
     return Result.makeSuccess(orderCreatedEventProps)
   }

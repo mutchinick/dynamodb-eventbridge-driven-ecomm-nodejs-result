@@ -3,8 +3,16 @@
   "jsxSingleQuote": true,
   "semi": false,
   "tabWidth": 2,
-  "printWidth": 120,
   "bracketSpacing": true,
   "arrowParens": "always",
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "printWidth": 120,
+  "overrides": [
+    {
+      "files": ["*.spec.ts", "*.test.ts"],
+      "options": {
+        "printWidth": 120
+      }
+    }
+  ]
 }
