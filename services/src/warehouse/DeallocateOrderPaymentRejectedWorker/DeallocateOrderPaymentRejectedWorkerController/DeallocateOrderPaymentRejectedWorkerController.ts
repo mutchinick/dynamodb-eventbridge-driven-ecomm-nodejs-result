@@ -66,18 +66,16 @@ export class DeallocateOrderPaymentRejectedWorkerController implements IDealloca
     const logContext = 'DeallocateOrderPaymentRejectedWorkerController.deallocateOrderSingle'
     console.info(`${logContext} init:`, { sqsRecord })
 
-    const unverifiedInputResult = this.parseInputSqsRecord(sqsRecord)
-    if (Result.isFailure(unverifiedInputResult)) {
-      console.error(`${logContext} exit failure:`, { unverifiedInputResult, sqsRecord })
-      return unverifiedInputResult
+    const parseInputEventResult = this.parseInputEvent(sqsRecord)
+    if (Result.isFailure(parseInputEventResult)) {
+      console.error(`${logContext} exit failure:`, { parseInputEventResult, sqsRecord })
+      return parseInputEventResult
     }
 
-    const unverifiedInput = unverifiedInputResult.value
-    const incomingOrderPaymentRejectedEventResult = IncomingOrderPaymentRejectedEvent.validateAndBuild(
-      unverifiedInput as never,
-    )
+    const unverifiedEvent = parseInputEventResult.value as IncomingOrderPaymentRejectedEventInput
+    const incomingOrderPaymentRejectedEventResult = IncomingOrderPaymentRejectedEvent.validateAndBuild(unverifiedEvent)
     if (Result.isFailure(incomingOrderPaymentRejectedEventResult)) {
-      console.error(`${logContext} exit failure:`, { incomingOrderPaymentRejectedEventResult, unverifiedInput })
+      console.error(`${logContext} exit failure:`, { incomingOrderPaymentRejectedEventResult, unverifiedEvent })
       return incomingOrderPaymentRejectedEventResult
     }
 
@@ -98,14 +96,12 @@ export class DeallocateOrderPaymentRejectedWorkerController implements IDealloca
   //
   //
   //
-  private parseInputSqsRecord(
-    sqsRecord: SQSRecord,
-  ): Success<IncomingOrderPaymentRejectedEventInput> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'DeallocateOrderPaymentRejectedWorkerController.parseInputSqsRecord'
+  private parseInputEvent(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'DeallocateOrderPaymentRejectedWorkerController.parseInputEvent'
 
     try {
-      const unverifiedInput = JSON.parse(sqsRecord.body) as IncomingOrderPaymentRejectedEventInput
-      return Result.makeSuccess(unverifiedInput)
+      const unverifiedEvent = JSON.parse(sqsRecord.body)
+      return Result.makeSuccess<unknown>(unverifiedEvent)
     } catch (error) {
       console.error(`${logContext} error caught:`, { error, sqsRecord })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)

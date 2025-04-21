@@ -51,13 +51,13 @@ export class ListSkusApiController implements IListSkusApiController {
     const logContext = 'ListSkusApiController.listSkusSafe'
     console.info(`${logContext} init:`, { apiEvent })
 
-    const parseRequestBodyResult = this.parseValidateRequestBody(apiEvent)
-    if (Result.isFailure(parseRequestBodyResult)) {
-      console.error(`${logContext} failure exit:`, { parseRequestResult: parseRequestBodyResult, apiEvent })
-      return parseRequestBodyResult
+    const parseInputRequestResult = this.parseInputRequest(apiEvent)
+    if (Result.isFailure(parseInputRequestResult)) {
+      console.error(`${logContext} failure exit:`, { parseInputRequestResult, apiEvent })
+      return parseInputRequestResult
     }
 
-    const unverifiedRequest = parseRequestBodyResult.value as IncomingListSkusRequestInput
+    const unverifiedRequest = parseInputRequestResult.value as IncomingListSkusRequestInput
     const incomingListSkusRequestResult = IncomingListSkusRequest.validateAndBuild(unverifiedRequest)
     if (Result.isFailure(incomingListSkusRequestResult)) {
       console.error(`${logContext} failure exit:`, { incomingListSkusRequestResult, unverifiedRequest })
@@ -76,10 +76,8 @@ export class ListSkusApiController implements IListSkusApiController {
   //
   //
   //
-  private parseValidateRequestBody(
-    apiEvent: APIGatewayProxyEventV2,
-  ): Success<unknown> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'ListSkusApiController.parseValidateRequestBody'
+  private parseInputRequest(apiEvent: APIGatewayProxyEventV2): Success<unknown> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'ListSkusApiController.parseInputRequest'
 
     try {
       const unverifiedRequest = JSON.parse(apiEvent.body)

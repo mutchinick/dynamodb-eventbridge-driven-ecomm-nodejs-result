@@ -51,13 +51,13 @@ export class RestockSkuApiController implements IRestockSkuApiController {
     const logContext = 'RestockSkuApiController.restockSkuSafe'
     console.info(`${logContext} init:`, { apiEvent })
 
-    const parseRequestBodyResult = this.parseValidateRequestBody(apiEvent)
-    if (Result.isFailure(parseRequestBodyResult)) {
-      console.error(`${logContext} failure exit:`, { parseRequestResult: parseRequestBodyResult, apiEvent })
-      return parseRequestBodyResult
+    const parseInputRequestResult = this.parseInputRequest(apiEvent)
+    if (Result.isFailure(parseInputRequestResult)) {
+      console.error(`${logContext} failure exit:`, { parseInputRequestResult, apiEvent })
+      return parseInputRequestResult
     }
 
-    const unverifiedRequest = parseRequestBodyResult.value as IncomingRestockSkuRequestInput
+    const unverifiedRequest = parseInputRequestResult.value as IncomingRestockSkuRequestInput
     const incomingRestockSkuRequestResult = IncomingRestockSkuRequest.validateAndBuild(unverifiedRequest)
     if (Result.isFailure(incomingRestockSkuRequestResult)) {
       console.error(`${logContext} failure exit:`, { incomingRestockSkuRequestResult, unverifiedRequest })
@@ -76,10 +76,8 @@ export class RestockSkuApiController implements IRestockSkuApiController {
   //
   //
   //
-  private parseValidateRequestBody(
-    apiEvent: APIGatewayProxyEventV2,
-  ): Success<unknown> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'RestockSkuApiController.parseValidateRequestBody'
+  private parseInputRequest(apiEvent: APIGatewayProxyEventV2): Success<unknown> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'RestockSkuApiController.parseInputRequest'
 
     try {
       const unverifiedRequest = JSON.parse(apiEvent.body)

@@ -1,7 +1,7 @@
 import { SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda'
 import { Failure, Result, Success } from '../../errors/Result'
 import { IAllocateOrderStockWorkerService } from '../AllocateOrderStockWorkerService/AllocateOrderStockWorkerService'
-import { IncomingOrderCreatedEvent } from '../model/IncomingOrderCreatedEvent'
+import { IncomingOrderCreatedEvent, IncomingOrderCreatedEventInput } from '../model/IncomingOrderCreatedEvent'
 
 export interface IAllocateOrderStockWorkerController {
   allocateOrdersStock: (sqsEvent: SQSEvent) => Promise<SQSBatchResponse>
@@ -58,16 +58,16 @@ export class AllocateOrderStockWorkerController implements IAllocateOrderStockWo
     const logContext = 'AllocateOrderStockWorkerController.allocateSingleOrder'
     console.info(`${logContext} init:`, { sqsRecord })
 
-    const eventBridgeEventResult = this.parseEventBrideEvent(sqsRecord)
-    if (Result.isFailure(eventBridgeEventResult)) {
-      console.error(`${logContext} exit failure:`, { eventBridgeEventResult, sqsRecord })
-      return eventBridgeEventResult
+    const parseInputEventResult = this.parseInputEvent(sqsRecord)
+    if (Result.isFailure(parseInputEventResult)) {
+      console.error(`${logContext} exit failure:`, { parseInputEventResult, sqsRecord })
+      return parseInputEventResult
     }
 
-    const eventBridgeEvent = eventBridgeEventResult.value
-    const incomingOrderCreatedEventResult = IncomingOrderCreatedEvent.validateAndBuild(eventBridgeEvent as never)
+    const unverifiedEvent = parseInputEventResult.value as IncomingOrderCreatedEventInput
+    const incomingOrderCreatedEventResult = IncomingOrderCreatedEvent.validateAndBuild(unverifiedEvent)
     if (Result.isFailure(incomingOrderCreatedEventResult)) {
-      console.error(`${logContext} exit failure:`, { incomingOrderCreatedEventResult, eventBridgeEvent })
+      console.error(`${logContext} exit failure:`, { incomingOrderCreatedEventResult, unverifiedEvent })
       return incomingOrderCreatedEventResult
     }
 
@@ -85,12 +85,12 @@ export class AllocateOrderStockWorkerController implements IAllocateOrderStockWo
   //
   //
   //
-  private parseEventBrideEvent(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'AllocateOrderStockWorkerController.parseEventBrideEvent'
+  private parseInputEvent(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'AllocateOrderStockWorkerController.parseInputEvent'
 
     try {
-      const eventBridgeEvent = JSON.parse(sqsRecord.body)
-      return Result.makeSuccess<unknown>(eventBridgeEvent)
+      const unverifiedEvent = JSON.parse(sqsRecord.body)
+      return Result.makeSuccess<unknown>(unverifiedEvent)
     } catch (error) {
       console.error(`${logContext} error caught:`, { error, sqsRecord })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)

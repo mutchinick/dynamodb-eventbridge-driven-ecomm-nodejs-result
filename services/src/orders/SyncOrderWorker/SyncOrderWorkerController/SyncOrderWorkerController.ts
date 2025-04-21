@@ -51,16 +51,16 @@ export class SyncOrderWorkerController implements ISyncOrderWorkerController {
     const logContext = 'SyncOrderWorkerController.syncSingleOrderSafe'
     console.info(`${logContext} init:`, { sqsRecord })
 
-    const parseEventBodyResult = this.parseValidateEventBody(sqsRecord)
-    if (Result.isFailure(parseEventBodyResult)) {
-      console.error(`${logContext} failure exit:`, { parseEventBodyResult, sqsRecord })
-      return parseEventBodyResult
+    const parseInputEventResult = this.parseInputEvent(sqsRecord)
+    if (Result.isFailure(parseInputEventResult)) {
+      console.error(`${logContext} failure exit:`, { parseInputEventResult, sqsRecord })
+      return parseInputEventResult
     }
 
-    const eventBridgeEvent = parseEventBodyResult.value as IncomingOrderEventInput
-    const incomingRestockSkuEventResult = IncomingOrderEvent.validateAndBuild(eventBridgeEvent)
+    const unverifiedEvent = parseInputEventResult.value as IncomingOrderEventInput
+    const incomingRestockSkuEventResult = IncomingOrderEvent.validateAndBuild(unverifiedEvent)
     if (Result.isFailure(incomingRestockSkuEventResult)) {
-      console.error(`${logContext} failure exit:`, { incomingRestockSkuEventResult, eventBridgeEvent })
+      console.error(`${logContext} failure exit:`, { incomingRestockSkuEventResult, unverifiedEvent })
       return incomingRestockSkuEventResult
     }
 
@@ -76,12 +76,12 @@ export class SyncOrderWorkerController implements ISyncOrderWorkerController {
   //
   //
   //
-  private parseValidateEventBody(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'SyncOrderWorkerController.parseValidateEventBody'
+  private parseInputEvent(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'SyncOrderWorkerController.parseInputEvent'
 
     try {
-      const eventBridgeEvent = JSON.parse(sqsRecord.body)
-      return Result.makeSuccess<unknown>(eventBridgeEvent)
+      const unverifiedEvent = JSON.parse(sqsRecord.body)
+      return Result.makeSuccess<unknown>(unverifiedEvent)
     } catch (error) {
       console.error(`${logContext} error caught:`, { error, sqsRecord })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)

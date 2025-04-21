@@ -51,13 +51,13 @@ export class PlaceOrderApiController implements IPlaceOrderApiController {
     const logContext = 'PlaceOrderApiController.placeOrderSafe'
     console.info(`${logContext} init:`, { apiEvent })
 
-    const parseRequestBodyResult = this.parseValidateRequestBody(apiEvent)
-    if (Result.isFailure(parseRequestBodyResult)) {
-      console.error(`${logContext} failure exit:`, { parseRequestResult: parseRequestBodyResult, apiEvent })
-      return parseRequestBodyResult
+    const parseInputRequestResult = this.parseInputRequest(apiEvent)
+    if (Result.isFailure(parseInputRequestResult)) {
+      console.error(`${logContext} failure exit:`, { parseInputRequestResult, apiEvent })
+      return parseInputRequestResult
     }
 
-    const unverifiedRequest = parseRequestBodyResult.value as IncomingPlaceOrderRequestInput
+    const unverifiedRequest = parseInputRequestResult.value as IncomingPlaceOrderRequestInput
     const incomingPlaceOrderRequestResult = IncomingPlaceOrderRequest.validateAndBuild(unverifiedRequest)
     if (Result.isFailure(incomingPlaceOrderRequestResult)) {
       console.error(`${logContext} failure exit:`, { incomingPlaceOrderRequestResult, unverifiedRequest })
@@ -76,10 +76,8 @@ export class PlaceOrderApiController implements IPlaceOrderApiController {
   //
   //
   //
-  private parseValidateRequestBody(
-    apiEvent: APIGatewayProxyEventV2,
-  ): Success<unknown> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'PlaceOrderApiController.parseValidateRequestBody'
+  private parseInputRequest(apiEvent: APIGatewayProxyEventV2): Success<unknown> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'PlaceOrderApiController.parseInputRequest'
 
     try {
       const unverifiedRequest = JSON.parse(apiEvent.body)

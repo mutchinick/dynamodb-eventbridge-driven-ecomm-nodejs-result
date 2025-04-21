@@ -56,13 +56,13 @@ export class SimulateRawEventApiController implements ISimulateRawEventApiContro
     const logContext = 'SimulateRawEventApiController.simulateRawEventSafe'
     console.info(`${logContext} init:`, { apiEvent })
 
-    const parseRequestBodyResult = this.parseValidateRequestBody(apiEvent)
-    if (Result.isFailure(parseRequestBodyResult)) {
-      console.error(`${logContext} failure exit:`, { parseRequestResult: parseRequestBodyResult, apiEvent })
-      return parseRequestBodyResult
+    const parseInputRequestResult = this.parseInputRequest(apiEvent)
+    if (Result.isFailure(parseInputRequestResult)) {
+      console.error(`${logContext} failure exit:`, { parseInputRequestResult, apiEvent })
+      return parseInputRequestResult
     }
 
-    const unverifiedRequest = parseRequestBodyResult.value as IncomingSimulateRawEventRequestInput
+    const unverifiedRequest = parseInputRequestResult.value as IncomingSimulateRawEventRequestInput
     const incomingSimulateRawEventRequestResult = IncomingSimulateRawEventRequest.validateAndBuild(unverifiedRequest)
     if (Result.isFailure(incomingSimulateRawEventRequestResult)) {
       console.error(`${logContext} failure exit:`, { incomingSimulateRawEventRequestResult, unverifiedRequest })
@@ -83,10 +83,8 @@ export class SimulateRawEventApiController implements ISimulateRawEventApiContro
   //
   //
   //
-  private parseValidateRequestBody(
-    apiEvent: APIGatewayProxyEventV2,
-  ): Success<unknown> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'SimulateRawEventApiController.parseValidateRequestBody'
+  private parseInputRequest(apiEvent: APIGatewayProxyEventV2): Success<unknown> | Failure<'InvalidArgumentsError'> {
+    const logContext = 'SimulateRawEventApiController.parseInputRequest'
 
     try {
       const unverifiedRequest = JSON.parse(apiEvent.body)
