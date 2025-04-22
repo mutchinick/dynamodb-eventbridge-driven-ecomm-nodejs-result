@@ -58,21 +58,30 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
       return getOrderAllocationResult
     }
 
+    // FIXME: If the Allocation DOES NOT exist there in no sense in going further.
+    // Still the Deallocation Command will result in an error, so it's "handled", but is better
+    // to handle it cleanly here first.
     const existingOrderAllocationData = getOrderAllocationResult.value
     const deallocateOrderResult = await this.deallocateOrder(
       existingOrderAllocationData,
       incomingOrderPaymentRejectedEvent,
     )
 
-    Result.isFailure(deallocateOrderResult)
-      ? console.error(`${logContext} exit failure:`, {
-          deallocateOrderResult,
-          existingOrderAllocationData,
-          incomingOrderPaymentRejectedEvent,
-        })
-      : console.info(`${logContext} exit success:`, { deallocateOrderResult })
+    if (Result.isFailure(deallocateOrderResult)) {
+      console.error(`${logContext} exit failure:`, {
+        deallocateOrderResult,
+        existingOrderAllocationData,
+        incomingOrderPaymentRejectedEvent,
+      })
+      return deallocateOrderResult
+    }
 
-    return deallocateOrderResult
+    console.info(`${logContext} exit success:`, {
+      deallocateOrderResult,
+      existingOrderAllocationData,
+      incomingOrderPaymentRejectedEvent,
+    })
+    return Result.makeSuccess()
   }
 
   //
@@ -115,7 +124,7 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
     const getOrderAllocationResult = await this.dbGetOrderAllocationClient.getOrderAllocation(getOrderAllocationCommand)
     Result.isFailure(getOrderAllocationResult)
       ? console.error(`${logContext} exit failure:`, { getOrderAllocationResult, getOrderAllocationCommand })
-      : console.info(`${logContext} exit success:`, { getOrderAllocationResult })
+      : console.info(`${logContext} exit success:`, { getOrderAllocationResult, getOrderAllocationCommand })
 
     return getOrderAllocationResult
   }
@@ -140,26 +149,16 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
       incomingOrderPaymentRejectedEvent,
     }
     const buildDeallocateCommandResult = DeallocateOrderPaymentRejectedCommand.validateAndBuild(deallocateCommandInput)
-
     if (Result.isFailure(buildDeallocateCommandResult)) {
-      console.error(`${logContext} exit failure:`, {
-        buildDeallocateCommandResult,
-        existingOrderAllocationData,
-        incomingOrderPaymentRejectedEvent,
-      })
+      console.error(`${logContext} exit failure:`, { buildDeallocateCommandResult, deallocateCommandInput })
       return buildDeallocateCommandResult
     }
 
     const deallocateCommand = buildDeallocateCommandResult.value
     const deallocateResult = await this.dbDeallocateOrderPaymentRejectedClient.deallocateOrderStock(deallocateCommand)
-
     Result.isFailure(deallocateResult)
-      ? console.error(`${logContext} exit failure:`, {
-          deallocateResult,
-          existingOrderAllocationData,
-          incomingOrderPaymentRejectedEvent,
-        })
-      : console.info(`${logContext} exit success:`, { deallocateResult })
+      ? console.error(`${logContext} exit failure:`, { deallocateResult, deallocateCommand })
+      : console.info(`${logContext} exit success:`, { deallocateResult, deallocateCommand })
 
     return deallocateResult
   }

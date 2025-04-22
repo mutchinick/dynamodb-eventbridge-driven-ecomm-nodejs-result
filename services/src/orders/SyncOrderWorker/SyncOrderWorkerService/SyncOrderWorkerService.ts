@@ -114,7 +114,7 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     // When IT IS NOT an OrderPlacedEvent and the OrderData DOES exist in the database, then we need to
     // update the Order to a new state. No event needs to be raised because we are in tracking mode.
     if (!isOrderPlacedEvent && existingOrderData) {
-      const updateOrderResult = await this.updateOrder(incomingOrderEvent, existingOrderData)
+      const updateOrderResult = await this.updateOrder(existingOrderData, incomingOrderEvent)
       if (Result.isFailure(updateOrderResult)) {
         console.error(`${logContext} exit failure:`, { updateOrderResult, existingOrderData, incomingOrderEvent })
         return updateOrderResult
@@ -241,8 +241,8 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
   //
   //
   private async updateOrder(
-    incomingOrderEvent: IncomingOrderEvent,
     existingOrderData: OrderData,
+    incomingOrderEvent: IncomingOrderEvent,
   ): Promise<
     | Success<OrderData>
     | Failure<'InvalidArgumentsError'>

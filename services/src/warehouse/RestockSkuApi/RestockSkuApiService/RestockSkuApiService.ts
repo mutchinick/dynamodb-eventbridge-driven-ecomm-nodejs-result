@@ -2,7 +2,7 @@ import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
 import { IEsRaiseSkuRestockedEventClient } from '../EsRaiseSkuRestockedEventClient/EsRaiseSkuRestockedEventClient'
 import { IncomingRestockSkuRequest } from '../model/IncomingRestockSkuRequest'
-import { SkuRestockedEvent } from '../model/SkuRestockedEvent'
+import { SkuRestockedEvent, SkuRestockedEventInput } from '../model/SkuRestockedEvent'
 
 export interface IRestockSkuApiService {
   restockSku: (
@@ -34,10 +34,21 @@ export class RestockSkuApiService implements IRestockSkuApiService {
     }
 
     const raiseEventResult = await this.raiseSkuRestockedEvent(incomingRestockSkuRequest)
-    if (Result.isSuccess(raiseEventResult) || Result.isFailureOfKind(raiseEventResult, 'DuplicateEventRaisedError')) {
+    if (Result.isSuccess(raiseEventResult)) {
       const serviceOutput: RestockSkuApiServiceOutput = { ...incomingRestockSkuRequest }
       const serviceOutputResult = Result.makeSuccess(serviceOutput)
       console.info(`${logContext} exit success:`, { serviceOutputResult, incomingRestockSkuRequest })
+      return serviceOutputResult
+    }
+
+    if (Result.isFailureOfKind(raiseEventResult, 'DuplicateEventRaisedError')) {
+      const serviceOutput: RestockSkuApiServiceOutput = { ...incomingRestockSkuRequest }
+      const serviceOutputResult = Result.makeSuccess(serviceOutput)
+      console.info(`${logContext} exit success: from-error:`, {
+        raiseEventResult,
+        serviceOutputResult,
+        incomingRestockSkuRequest,
+      })
       return serviceOutputResult
     }
 
@@ -78,17 +89,19 @@ export class RestockSkuApiService implements IRestockSkuApiService {
     const logContext = 'RestockSkuApiService.raiseSkuRestockedEvent'
     console.info(`${logContext} init:`, { incomingRestockSkuRequest })
 
-    const skuRestockedEventResult = SkuRestockedEvent.validateAndBuild(incomingRestockSkuRequest)
+    const { sku, units, lotId } = incomingRestockSkuRequest
+    const skuRestockedEventInput: SkuRestockedEventInput = { sku, units, lotId }
+    const skuRestockedEventResult = SkuRestockedEvent.validateAndBuild(skuRestockedEventInput)
     if (Result.isFailure(skuRestockedEventResult)) {
-      console.error(`${logContext} exit failure:`, { skuRestockedEventResult, incomingRestockSkuRequest })
+      console.error(`${logContext} exit failure:`, { skuRestockedEventResult, skuRestockedEventInput })
       return skuRestockedEventResult
     }
 
     const skuRestockedEvent = skuRestockedEventResult.value
     const raiseEventResult = await this.esRaiseSkuRestockedEventClient.raiseSkuRestockedEvent(skuRestockedEvent)
     Result.isFailure(raiseEventResult)
-      ? console.error(`${logContext} exit failure:`, { raiseEventResult, incomingRestockSkuRequest })
-      : console.info(`${logContext} exit success:`, { raiseEventResult, incomingRestockSkuRequest })
+      ? console.error(`${logContext} exit failure:`, { raiseEventResult, skuRestockedEvent })
+      : console.info(`${logContext} exit success:`, { raiseEventResult, skuRestockedEvent })
 
     return raiseEventResult
   }

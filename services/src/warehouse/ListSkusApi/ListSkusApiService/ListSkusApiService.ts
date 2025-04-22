@@ -2,7 +2,7 @@ import { Failure, Result, Success } from '../../errors/Result'
 import { RestockSkuData } from '../../model/RestockSkuData'
 import { IDbListSkusClient } from '../DbListSkusClient/DbListSkusClient'
 import { IncomingListSkusRequest } from '../model/IncomingListSkusRequest'
-import { ListSkusCommand } from '../model/ListSkusCommand'
+import { ListSkusCommand, ListSkusCommandInput } from '../model/ListSkusCommand'
 
 export interface IListSkusApiService {
   listSkus: (
@@ -33,13 +33,13 @@ export class ListSkusApiService implements IListSkusApiService {
       return inputValidationResult
     }
 
-    const skusResult = await this.queryDatabase(incomingListSkusRequest)
-    if (Result.isFailure(skusResult)) {
-      console.error(`${logContext} exit failure:`, { skusResult, incomingListSkusRequest })
-      return skusResult
+    const querySkusResult = await this.querySkus(incomingListSkusRequest)
+    if (Result.isFailure(querySkusResult)) {
+      console.error(`${logContext} exit failure:`, { querySkusResult, incomingListSkusRequest })
+      return querySkusResult
     }
 
-    const skus = skusResult.value
+    const skus = querySkusResult.value
     const serviceOutput: ListSkusApiServiceOutput = { skus }
     const serviceOutputResult = Result.makeSuccess(serviceOutput)
     console.info(`${logContext} exit success:`, { serviceOutputResult, incomingListSkusRequest })
@@ -68,24 +68,26 @@ export class ListSkusApiService implements IListSkusApiService {
   //
   //
   //
-  private async queryDatabase(
+  private async querySkus(
     incomingListSkusRequest: IncomingListSkusRequest,
   ): Promise<Success<RestockSkuData[]> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
-    const logContext = 'ListSkusApiService.queryDatabase'
+    const logContext = 'ListSkusApiService.querySkus'
     console.info(`${logContext} init:`, { incomingListSkusRequest })
 
-    const listSkusCommandResult = ListSkusCommand.validateAndBuild(incomingListSkusRequest)
+    const { sku, sortDirection, limit } = incomingListSkusRequest
+    const listSkusCommandInput: ListSkusCommandInput = { sku, sortDirection, limit }
+    const listSkusCommandResult = ListSkusCommand.validateAndBuild(listSkusCommandInput)
     if (Result.isFailure(listSkusCommandResult)) {
-      console.error(`${logContext} exit failure:`, { listSkusCommandResult, incomingListSkusRequest })
+      console.error(`${logContext} exit failure:`, { listSkusCommandResult, listSkusCommandInput })
       return listSkusCommandResult
     }
 
     const listSkusCommand = listSkusCommandResult.value
-    const skusResult = await this.dbListSkusClient.listSkus(listSkusCommand)
-    Result.isFailure(skusResult)
-      ? console.error(`${logContext} exit failure:`, { skusResult, incomingListSkusRequest })
-      : console.info(`${logContext} exit success:`, { skusResult, incomingListSkusRequest })
+    const listSkusResult = await this.dbListSkusClient.listSkus(listSkusCommand)
+    Result.isFailure(listSkusResult)
+      ? console.error(`${logContext} exit failure:`, { listSkusResult, listSkusCommand })
+      : console.info(`${logContext} exit success:`, { listSkusResult, listSkusCommand })
 
-    return skusResult
+    return listSkusResult
   }
 }

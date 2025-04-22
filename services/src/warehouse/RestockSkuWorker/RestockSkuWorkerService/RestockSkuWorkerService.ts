@@ -1,7 +1,7 @@
 import { Failure, Result, Success } from '../../errors/Result'
 import { IDbRestockSkuClient } from '../DbRestockSkuClient/DbRestockSkuClient'
 import { IncomingSkuRestockedEvent } from '../model/IncomingSkuRestockedEvent'
-import { RestockSkuCommand } from '../model/RestockSkuCommand'
+import { RestockSkuCommand, RestockSkuCommandInput } from '../model/RestockSkuCommand'
 
 export interface IRestockSkuWorkerService {
   restockSku: (
@@ -40,9 +40,10 @@ export class RestockSkuWorkerService implements IRestockSkuWorkerService {
       return inputValidationResult
     }
 
-    const restockSkuCommandResult = RestockSkuCommand.validateAndBuild({ incomingSkuRestockedEvent })
+    const restockSkuCommandInput: RestockSkuCommandInput = { incomingSkuRestockedEvent }
+    const restockSkuCommandResult = RestockSkuCommand.validateAndBuild(restockSkuCommandInput)
     if (Result.isFailure(restockSkuCommandResult)) {
-      console.error(`${logContext} exit failure:`, { restockSkuCommandResult, incomingSkuRestockedEvent })
+      console.error(`${logContext} exit failure:`, { restockSkuCommandResult, restockSkuCommandInput })
       return restockSkuCommandResult
     }
 

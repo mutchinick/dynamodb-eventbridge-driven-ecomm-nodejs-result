@@ -1,7 +1,7 @@
 import { Failure, Result, Success } from '../../errors/Result'
 import { IEsRaiseRawSimulatedEventClient } from '../EsRaiseRawSimulatedEventClient/EsRaiseRawSimulatedEventClient'
 import { IncomingSimulateRawEventRequest } from '../model/IncomingSimulateRawEventRequest'
-import { RawSimulatedEvent } from '../model/RawSimulatedEvent'
+import { RawSimulatedEvent, RawSimulatedEventInput } from '../model/RawSimulatedEvent'
 
 export interface ISimulateRawEventApiService {
   simulateRawEvent: (
@@ -37,10 +37,21 @@ export class SimulateRawEventApiService implements ISimulateRawEventApiService {
     }
 
     const raiseEventResult = await this.raiseRawSimulatedEvent(incomingSimulateRawEventRequest)
-    if (Result.isSuccess(raiseEventResult) || Result.isFailureOfKind(raiseEventResult, 'DuplicateEventRaisedError')) {
+    if (Result.isSuccess(raiseEventResult)) {
       const serviceOutput: SimulateRawEventApiServiceOutput = { ...incomingSimulateRawEventRequest }
       const serviceOutputResult = Result.makeSuccess(serviceOutput)
       console.info(`${logContext} exit success:`, { serviceOutputResult, incomingSimulateRawEventRequest })
+      return serviceOutputResult
+    }
+
+    if (Result.isFailureOfKind(raiseEventResult, 'DuplicateEventRaisedError')) {
+      const serviceOutput: SimulateRawEventApiServiceOutput = { ...incomingSimulateRawEventRequest }
+      const serviceOutputResult = Result.makeSuccess(serviceOutput)
+      console.info(`${logContext} exit success: from-error:`, {
+        raiseEventResult,
+        serviceOutputResult,
+        incomingSimulateRawEventRequest,
+      })
       return serviceOutputResult
     }
 
@@ -79,17 +90,19 @@ export class SimulateRawEventApiService implements ISimulateRawEventApiService {
     const logContext = 'SimulateRawEventApiService.raiseRawSimulatedEvent'
     console.info(`${logContext} init:`, { incomingSimulateRawEventRequest })
 
-    const rawSimulatedEventResult = RawSimulatedEvent.validateAndBuild(incomingSimulateRawEventRequest)
+    const { pk, sk, eventName, eventData, createdAt, updatedAt } = incomingSimulateRawEventRequest
+    const rawSimulatedEventInput: RawSimulatedEventInput = { pk, sk, eventName, eventData, createdAt, updatedAt }
+    const rawSimulatedEventResult = RawSimulatedEvent.validateAndBuild(rawSimulatedEventInput)
     if (Result.isFailure(rawSimulatedEventResult)) {
-      console.error(`${logContext} exit failure:`, { rawSimulatedEventResult, incomingSimulateRawEventRequest })
+      console.error(`${logContext} exit failure:`, { rawSimulatedEventResult, rawSimulatedEventInput })
       return rawSimulatedEventResult
     }
 
     const rawSimulatedEvent = rawSimulatedEventResult.value
     const raiseEventResult = await this.esRaiseRawSimulatedEventClient.raiseRawSimulatedEvent(rawSimulatedEvent)
     Result.isFailure(raiseEventResult)
-      ? console.error(`${logContext} exit failure:`, { raiseEventResult, incomingSimulateRawEventRequest })
-      : console.info(`${logContext} exit success:`, { raiseEventResult, incomingSimulateRawEventRequest })
+      ? console.error(`${logContext} exit failure:`, { raiseEventResult, rawSimulatedEvent })
+      : console.info(`${logContext} exit success:`, { raiseEventResult, rawSimulatedEvent })
 
     return raiseEventResult
   }

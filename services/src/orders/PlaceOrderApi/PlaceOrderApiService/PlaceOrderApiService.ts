@@ -1,7 +1,7 @@
 import { Failure, Result, Success } from '../../errors/Result'
 import { IEsRaiseOrderPlacedEventClient } from '../EsRaiseOrderPlacedEventClient/EsRaiseOrderPlacedEventClient'
 import { IncomingPlaceOrderRequest } from '../model/IncomingPlaceOrderRequest'
-import { OrderPlacedEvent } from '../model/OrderPlacedEvent'
+import { OrderPlacedEvent, OrderPlacedEventInput } from '../model/OrderPlacedEvent'
 
 export interface IPlaceOrderApiService {
   placeOrder: (
@@ -33,10 +33,21 @@ export class PlaceOrderApiService implements IPlaceOrderApiService {
     }
 
     const raiseEventResult = await this.raiseOrderPlacedEvent(incomingPlaceOrderRequest)
-    if (Result.isSuccess(raiseEventResult) || Result.isFailureOfKind(raiseEventResult, 'DuplicateEventRaisedError')) {
+    if (Result.isSuccess(raiseEventResult)) {
       const serviceOutput: PlaceOrderApiServiceOutput = { ...incomingPlaceOrderRequest }
       const serviceOutputResult = Result.makeSuccess(serviceOutput)
       console.info(`${logContext} exit success:`, { serviceOutputResult, incomingPlaceOrderRequest })
+      return serviceOutputResult
+    }
+
+    if (Result.isFailureOfKind(raiseEventResult, 'DuplicateEventRaisedError')) {
+      const serviceOutput: PlaceOrderApiServiceOutput = { ...incomingPlaceOrderRequest }
+      const serviceOutputResult = Result.makeSuccess(serviceOutput)
+      console.info(`${logContext} exit success: from-error:`, {
+        raiseEventResult,
+        serviceOutputResult,
+        incomingPlaceOrderRequest,
+      })
       return serviceOutputResult
     }
 
@@ -75,17 +86,19 @@ export class PlaceOrderApiService implements IPlaceOrderApiService {
     const logContext = 'PlaceOrderApiService.raiseOrderPlacedEvent'
     console.info(`${logContext} init:`, { incomingPlaceOrderRequest })
 
-    const orderPlacedEventResult = OrderPlacedEvent.validateAndBuild(incomingPlaceOrderRequest)
+    const { orderId, sku, units, price, userId } = incomingPlaceOrderRequest
+    const orderPlacedEventInput: OrderPlacedEventInput = { orderId, sku, units, price, userId }
+    const orderPlacedEventResult = OrderPlacedEvent.validateAndBuild(orderPlacedEventInput)
     if (Result.isFailure(orderPlacedEventResult)) {
-      console.error(`${logContext} exit failure:`, { orderPlacedEventResult, incomingPlaceOrderRequest })
+      console.error(`${logContext} exit failure:`, { orderPlacedEventResult, orderPlacedEventInput })
       return orderPlacedEventResult
     }
 
     const orderPlacedEvent = orderPlacedEventResult.value
     const raiseEventResult = await this.esRaiseOrderPlacedEventClient.raiseOrderPlacedEvent(orderPlacedEvent)
     Result.isFailure(raiseEventResult)
-      ? console.error(`${logContext} exit failure:`, { raiseEventResult, incomingPlaceOrderRequest })
-      : console.info(`${logContext} exit success:`, { raiseEventResult, incomingPlaceOrderRequest })
+      ? console.error(`${logContext} exit failure:`, { raiseEventResult, orderPlacedEvent })
+      : console.info(`${logContext} exit success:`, { raiseEventResult, orderPlacedEvent })
 
     return raiseEventResult
   }

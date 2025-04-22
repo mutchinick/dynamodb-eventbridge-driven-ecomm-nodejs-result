@@ -2,7 +2,7 @@ import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
 import { IDbListOrdersClient } from '../DbListOrdersClient/DbListOrdersClient'
 import { IncomingListOrdersRequest } from '../model/IncomingListOrdersRequest'
-import { ListOrdersCommand } from '../model/ListOrdersCommand'
+import { ListOrdersCommand, ListOrdersCommandInput } from '../model/ListOrdersCommand'
 
 export interface IListOrdersApiService {
   listOrders: (
@@ -33,13 +33,13 @@ export class ListOrdersApiService implements IListOrdersApiService {
       return inputValidationResult
     }
 
-    const ordersResult = await this.queryDatabase(incomingListOrdersRequest)
-    if (Result.isFailure(ordersResult)) {
-      console.error(`${logContext} exit failure:`, { ordersResult, incomingListOrdersRequest })
-      return ordersResult
+    const queryOrdersResult = await this.queryOrders(incomingListOrdersRequest)
+    if (Result.isFailure(queryOrdersResult)) {
+      console.error(`${logContext} exit failure:`, { queryOrdersResult, incomingListOrdersRequest })
+      return queryOrdersResult
     }
 
-    const orders = ordersResult.value
+    const orders = queryOrdersResult.value
     const serviceOutput: ListOrdersApiServiceOutput = { orders }
     const serviceOutputResult = Result.makeSuccess(serviceOutput)
     console.info(`${logContext} exit success:`, { serviceOutputResult, incomingListOrdersRequest })
@@ -66,24 +66,26 @@ export class ListOrdersApiService implements IListOrdersApiService {
   //
   //
   //
-  private async queryDatabase(
+  private async queryOrders(
     incomingListOrdersRequest: IncomingListOrdersRequest,
   ): Promise<Success<OrderData[]> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
-    const logContext = 'ListOrdersApiService.queryDatabase'
+    const logContext = 'ListOrdersApiService.queryOrders'
     console.info(`${logContext} init:`, { incomingListOrdersRequest })
 
-    const listOrdersCommandResult = ListOrdersCommand.validateAndBuild(incomingListOrdersRequest)
+    const { orderId, sortDirection, limit } = incomingListOrdersRequest
+    const listOrdersCommandInput: ListOrdersCommandInput = { orderId, sortDirection, limit }
+    const listOrdersCommandResult = ListOrdersCommand.validateAndBuild(listOrdersCommandInput)
     if (Result.isFailure(listOrdersCommandResult)) {
-      console.error(`${logContext} exit failure:`, { listOrdersCommandResult, incomingListOrdersRequest })
+      console.error(`${logContext} exit failure:`, { listOrdersCommandResult, listOrdersCommandInput })
       return listOrdersCommandResult
     }
 
     const listOrdersCommand = listOrdersCommandResult.value
-    const ordersResult = await this.dbListOrdersClient.listOrders(listOrdersCommand)
-    Result.isFailure(ordersResult)
-      ? console.error(`${logContext} exit failure:`, { ordersResult, incomingListOrdersRequest })
-      : console.info(`${logContext} exit success:`, { ordersResult, incomingListOrdersRequest })
+    const listOrdersResult = await this.dbListOrdersClient.listOrders(listOrdersCommand)
+    Result.isFailure(listOrdersResult)
+      ? console.error(`${logContext} exit failure:`, { listOrdersResult, listOrdersCommand })
+      : console.info(`${logContext} exit success:`, { listOrdersResult, listOrdersCommand })
 
-    return ordersResult
+    return listOrdersResult
   }
 }
