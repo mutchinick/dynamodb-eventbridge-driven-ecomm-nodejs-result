@@ -1,0 +1,58 @@
+@inventoryApiBaseUrl = {{$dotenv INVENTORY_API_BASE_URL}}
+
+### SKU_RESTOCKED_EVENT
+### POST ###
+POST {{inventoryApiBaseUrl}}/api/v1/inventory/restockSku
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "sku": "APPLES",
+  "units": 100,
+  "lotId": "A00002"
+}
+
+### SKU_RESTOCKED_EVENT
+### POST ###
+POST {{inventoryApiBaseUrl}}/api/v1/inventory/restockSku
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "sku": "GRAPES",
+  "units": 1000,
+  "lotId": "B00001"
+}
+
+### SKU_RESTOCKED_EVENT
+### POST ###
+POST {{inventoryApiBaseUrl}}/api/v1/inventory/restockSku
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "sku": "ORANGES",
+  "units": 175,
+  "lotId": "C00001"
+}
+
+### RANDOM
+### SKU_RESTOCKED_EVENT
+### POST ###
+@randomUnits = {{$randomInt 20 500}}
+@randomLodId = "ZZ{{$randomInt 1000 9999}}"
+POST {{inventoryApiBaseUrl}}/api/v1/inventory/restockSku
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "sku": "ORANGES",
+  "units": {{randomUnits}},
+  "lotId": {{randomLodId}}
+}
+
+### CORS QUERY
+### OPTIONS ###
+OPTIONS {{inventoryApiBaseUrl}}/api/v1/inventory/restockSku
+Origin: https://localhost
+Access-Control-Request-Method: POST

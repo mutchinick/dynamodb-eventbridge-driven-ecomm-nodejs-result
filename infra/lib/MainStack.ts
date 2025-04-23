@@ -10,11 +10,11 @@ import { PlaceOrderApiLambdaConstruct } from './orders/PlaceOrderApiLambdaConstr
 import { SyncOrderWorkerConstruct } from './orders/SyncOrderWorkerConstruct'
 import { SimulateRawEventApiLambdaConstruct } from './testing/SimulateRawEventApiLambdaConstruct'
 import { TestingApiConstruct } from './testing/TestingApiConstruct'
-import { AllocateOrderStockWorkerConstruct } from './warehouse/AllocateOrderStockWorkerConstruct'
-import { DeallocateOrderPaymentRejectedWorkerConstruct } from './warehouse/DeallocateOrderPaymentRejectedWorkerConstruct'
-import { ListSkusApiLambdaConstruct } from './warehouse/ListSkusApiLambdaConstruct'
-import { RestockSkuApiLambdaConstruct } from './warehouse/RestockSkuApiLambdaConstruct'
-import { RestockSkuWorkerConstruct } from './warehouse/RestockSkuWorkerConstruct'
+import { AllocateOrderStockWorkerConstruct } from './inventory/AllocateOrderStockWorkerConstruct'
+import { DeallocateOrderPaymentRejectedWorkerConstruct } from './inventory/DeallocateOrderPaymentRejectedWorkerConstruct'
+import { ListSkusApiLambdaConstruct } from './inventory/ListSkusApiLambdaConstruct'
+import { RestockSkuApiLambdaConstruct } from './inventory/RestockSkuApiLambdaConstruct'
+import { RestockSkuWorkerConstruct } from './inventory/RestockSkuWorkerConstruct'
 
 export interface IMainStackProps extends StackProps {
   config: {
@@ -38,8 +38,8 @@ export class MainStack extends Stack {
     // Testing
     this.createTestingService(id, dynamoDbTable)
 
-    // Warehouse
-    this.createWarehouseService(id, dynamoDbTable, eventBus)
+    // Inventory
+    this.createInventoryService(id, dynamoDbTable, eventBus)
   }
 
   //
@@ -111,11 +111,11 @@ export class MainStack extends Stack {
   //
   //
   //
-  private createWarehouseService(id: string, dynamoDbTable: Table, eventBus: EventBus) {
-    const serviceId = `${id}-Warehouse`
+  private createInventoryService(id: string, dynamoDbTable: Table, eventBus: EventBus) {
+    const serviceId = `${id}-Inventory`
 
-    const warehouseApiConstructName = `${serviceId}-Api`
-    const { httpApi } = new TestingApiConstruct(this, warehouseApiConstructName)
+    const inventoryApiConstructName = `${serviceId}-Api`
+    const { httpApi } = new TestingApiConstruct(this, inventoryApiConstructName)
 
     const restockSkuApiConstructName = `${serviceId}-RestockSkuApi`
     new RestockSkuApiLambdaConstruct(this, restockSkuApiConstructName, {

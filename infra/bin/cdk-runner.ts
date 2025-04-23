@@ -117,9 +117,9 @@ function writeOutputsToEnvFiles(outputsFilePath: string, deploymentPrefix: strin
       envVarName: 'TESTING_API_BASE_URL',
     },
     {
-      cdkOutputName: `${outputPrefix}WarehouseApiHttpApiUrl`,
-      envFilePath: '../_restclient/warehouse/.env',
-      envVarName: 'WAREHOUSE_API_BASE_URL',
+      cdkOutputName: `${outputPrefix}InventoryApiHttpApiUrl`,
+      envFilePath: '../_restclient/inventory/.env',
+      envVarName: 'INVENTORY_API_BASE_URL',
     },
   ]
 

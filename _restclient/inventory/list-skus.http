@@ -1,0 +1,42 @@
+@inventoryApiBaseUrl = {{$dotenv INVENTORY_API_BASE_URL}}
+
+### LIST BY SKU
+### POST ###
+POST {{inventoryApiBaseUrl}}/api/v1/inventory/listSkus
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "sku": "ORANGES"
+}
+
+### LIST BY SKU
+### POST ###
+POST {{inventoryApiBaseUrl}}/api/v1/inventory/listSkus
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "sku": "GRAPES"
+}
+
+### LIST MANY
+### POST ###
+POST {{inventoryApiBaseUrl}}/api/v1/inventory/listSkus
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "limit": 10,
+  "sortDirection": "desc"
+}
+
+### LIST DEFAULT
+### POST ###
+POST {{inventoryApiBaseUrl}}/api/v1/inventory/listSkus
+Origin: https://localhost
+Content-Type: application/json
+
+{
+}
+

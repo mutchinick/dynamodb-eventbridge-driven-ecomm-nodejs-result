@@ -197,8 +197,8 @@ Content-Type: application/json
   "eventData": {
     "orderId": "{{orderId}}",
     "sku": "ORANGES",
-    "units": 24,
-    "price": 15.59,
+    "units": 2,
+    "price": 22.99,
     "userId": "123456"
   }
 }
