@@ -373,3 +373,68 @@ describe(`Inventory Service DeallocateOrderPaymentRejectedWorker
     expect(result).toStrictEqual(expectedResult)
   })
 })
+
+//
+// New tests for when the read Allocation, DOES-exist/DOES-NOT-exist logic implemented in the service
+//
+
+/*
+ *
+ *
+ ************************************************************
+ * Test when it validates the IncomingOrderCreatedEvent
+ ************************************************************/
+describe(`Test when it validates the IncomingOrderPaymentRejectedEvent`, () => {})
+
+/*
+ *
+ *
+ ************************************************************
+ * Test when it reads the Allocation
+ ************************************************************/
+describe(`Test when it reads the Allocation`, () => {})
+
+/*
+ *
+ *
+ ************************************************************
+ * Test when the Allocation DOES NOT exist
+ ************************************************************/
+describe(`Test when the Allocation DOES NOT exist`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test when it deallocates the Allocation
+   ************************************************************/
+})
+
+/*
+ *
+ *
+ ************************************************************
+ * Test when the Allocation DID NOT exist when read but was created by another instance
+ ************************************************************/
+describe(`Test when the Allocation DID NOT exist when read but was created by another instance`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test when it deallocates the Allocation
+   ************************************************************/
+})
+
+/*
+ *
+ *
+ ************************************************************
+ * Test when the Allocation DOES exist
+ ************************************************************/
+describe(`Test when the Allocation DOES exist`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test that it does not deallocates the Allocation
+   ************************************************************/
+})
