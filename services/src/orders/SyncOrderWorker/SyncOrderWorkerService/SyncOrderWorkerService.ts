@@ -54,13 +54,13 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     const logContext = 'SyncOrderWorkerService.syncOrder'
     console.info(`${logContext} init:`, { incomingOrderEvent })
 
-    // Not the smallest, cleanest method. Could be compacted by composing or delegating some of the tasks,
-    // but I wanted to follow the logic step by step for clarity and not hide it or abstract it.
-    // Also, with the current degree of logging (basically everything), the truth is that some of the
-    // methods are just going to be damn ugly (and not just this one).
+    // This is one of those methods that is long and ugly, I have explored some ways to make it more readable,
+    // and have liked some of them, but for now I have decided to keep it as is: verbose with naming, verbose
+    // with error handling and verbose with logging. Also not a big fan of the comments =).
+    // At some point I come back to it and shorten contextualized names, use helpers to clean up logging, etc.
 
     // The input IncomingOrderEvent should already be valid because it can only be built through the same
-    // IncomingOrderEvent class which enforces strict validation. Still we perform just enough validation to
+    // IncomingOrderEvent class which enforces strict validation. Still it performs just enough validation to
     // prevent unlikely but still possible "exceptions" for some properties that are accessed directly.
 
     const inputValidationResult = this.validateInput(incomingOrderEvent)
@@ -78,7 +78,7 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     const existingOrderData = getOrderResult.value
     const isOrderPlacedEvent = IncomingOrderEvent.isOrderPlacedEvent(incomingOrderEvent)
 
-    // When IT IS an OrderPlacedEvent and the OrderData DOES NOT exist in the database then we need to
+    // When IT IS an OrderPlacedEvent and the OrderData DOES NOT exist in the database then it needs to
     // create the Order and then raise the event. This is the starting point for the Order.
     if (isOrderPlacedEvent && !existingOrderData) {
       const createOrderResult = await this.createOrder(incomingOrderEvent)
@@ -98,7 +98,7 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
       return Result.makeSuccess()
     }
 
-    // When IT IS an OrderPlacedEvent and the OrderData DOES exist in the database, then we only try
+    // When IT IS an OrderPlacedEvent and the OrderData DOES exist in the database, it only tries
     // to raise the event again because the intuition is that is was tried before but it failed.
     if (isOrderPlacedEvent && existingOrderData) {
       const raiseEventResult = await this.raiseOrderCreatedEvent(existingOrderData)
@@ -111,8 +111,8 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
       return Result.makeSuccess()
     }
 
-    // When IT IS NOT an OrderPlacedEvent and the OrderData DOES exist in the database, then we need to
-    // update the Order to a new state. No event needs to be raised because we are in tracking mode.
+    // When IT IS NOT an OrderPlacedEvent and the OrderData DOES exist in the database, then it needs to
+    // update the Order to a new state. No event needs to be raised because it is in tracking mode.
     if (!isOrderPlacedEvent && existingOrderData) {
       const updateOrderResult = await this.updateOrder(existingOrderData, incomingOrderEvent)
       if (Result.isFailure(updateOrderResult)) {
@@ -125,7 +125,7 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     }
 
     // When IT IS NOT an OrderPlacedEvent and the OrderData DOES NOT exist in the database.
-    // This means we reached an invalid operation somehow, so we must return an error.
+    // This means it reached an invalid operation somehow, so it must return an error.
     const invalidOpsFailure = Result.makeFailure('InvalidOperationError', 'Order to update does not exists', false)
     console.error(`${logContext} exit failure:`, { invalidOpsFailure, existingOrderData, incomingOrderEvent })
     return invalidOpsFailure
