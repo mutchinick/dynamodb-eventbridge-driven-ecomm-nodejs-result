@@ -5,24 +5,24 @@ import { Construct } from 'constructs'
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface IOrdersApiConstructProps {}
 
-//
-//
-//
+/**
+ *
+ */
 export class OrdersApiConstruct extends Construct {
   public readonly httpApi
 
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(scope: Construct, id: string) {
     super(scope, id)
     this.httpApi = this.createOrdersApiHttpApi(scope, id)
   }
 
-  //
-  //
-  //
-  private createOrdersApiHttpApi(scope: Construct, id: string) {
+  /**
+   *
+   */
+  private createOrdersApiHttpApi(scope: Construct, id: string): HttpApi {
     const httpApiName = `${id}-HttpApi`
     const httpApi = new HttpApi(scope, httpApiName, {
       apiName: httpApiName,

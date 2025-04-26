@@ -12,23 +12,23 @@ export interface IListSkusApiLambdaConstructProps {
   dynamoDbTable: Table
 }
 
-//
-//
-//
+/**
+ *
+ */
 export class ListSkusApiLambdaConstruct extends Construct {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(scope: Construct, id: string, props: IListSkusApiLambdaConstructProps) {
     super(scope, id)
     const lambdaFunc = this.createListSkusApiLambdaFunction(scope, id, props.dynamoDbTable)
     this.createListSkusApiLambdaIntegration(id, lambdaFunc, props.httpApi)
   }
 
-  //
-  //
-  //
-  private createListSkusApiLambdaFunction(scope: Construct, id: string, dynamoDbTable: Table) {
+  /**
+   *
+   */
+  private createListSkusApiLambdaFunction(scope: Construct, id: string, dynamoDbTable: Table): NodejsFunction {
     const lambdaFuncName = `${id}-Lambda`
     const lambdaFunc = new NodejsFunction(scope, lambdaFuncName, {
       functionName: lambdaFuncName,
@@ -46,10 +46,10 @@ export class ListSkusApiLambdaConstruct extends Construct {
     return lambdaFunc
   }
 
-  //
-  //
-  //
-  private createListSkusApiLambdaIntegration(id: string, lambdaFunc: NodejsFunction, httpApi: HttpApi) {
+  /**
+   *
+   */
+  private createListSkusApiLambdaIntegration(id: string, lambdaFunc: NodejsFunction, httpApi: HttpApi): void {
     const lambdaIntegrationName = `${id}-LambdaIntegration`
     const lambdaIntegration = new HttpLambdaIntegration(lambdaIntegrationName, lambdaFunc, {
       payloadFormatVersion: PayloadFormatVersion.VERSION_2_0,

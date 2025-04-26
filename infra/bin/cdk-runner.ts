@@ -23,6 +23,9 @@ function getCdkCommand(): string {
   return cdkCommand
 }
 
+/**
+ *
+ */
 function getDeploymentPrefix(): string {
   const deploymentPrefix = process.env.npm_package_config_deployment_prefix
   console.info(`cdk-runner: Deployment prefix = ${deploymentPrefix}`)
@@ -33,6 +36,9 @@ function getDeploymentPrefix(): string {
   return deploymentPrefix
 }
 
+/**
+ *
+ */
 function getDeploymentStage(): string {
   const deploymentStageArg = process.argv[3]
   const deploymentStageEnv = process.env.DEPLOYMENT_STAGE
@@ -83,7 +89,7 @@ function getCdkCliArgs(
 /**
  * SECTION: Run CDK
  */
-function runCdkCommand(cdkCommand: string, deploymentPrefix: string, deploymentStage: string, cliArgs: string[]) {
+function runCdkCommand(cdkCommand: string, deploymentPrefix: string, deploymentStage: string, cliArgs: string[]): void {
   console.info(`cdk-runner: Stack name = ${deploymentPrefix}-${deploymentStage}`)
   console.info('cdk-runner: executing CDK...\n')
 
@@ -97,7 +103,7 @@ function runCdkCommand(cdkCommand: string, deploymentPrefix: string, deploymentS
 /**
  * SECTION: Write outputs to .env files
  */
-function writeOutputsToEnvFiles(outputsFilePath: string, deploymentPrefix: string, deploymentStage: string) {
+function writeOutputsToEnvFiles(outputsFilePath: string, deploymentPrefix: string, deploymentStage: string): void {
   const outputsFileContents = readFileSync(outputsFilePath, 'utf8')
   const outputsJson = JSON.parse(outputsFileContents) as Record<string, Record<string, string>>
 
@@ -138,7 +144,7 @@ function writeOutputsToEnvFiles(outputsFilePath: string, deploymentPrefix: strin
 /**
  * SECTION: Main
  */
-function main() {
+function main(): void {
   const cdkCommand = getCdkCommand()
   const deploymentPrefix = getDeploymentPrefix()
   const deploymentStage = getDeploymentStage()

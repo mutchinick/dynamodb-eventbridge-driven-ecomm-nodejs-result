@@ -15,13 +15,13 @@ export interface IRestockSkuWorkerConstructProps {
   eventBus: EventBus
 }
 
-//
-//
-//
+/**
+ *
+ */
 export class RestockSkuWorkerConstruct extends Construct {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(scope: Construct, id: string, props: IRestockSkuWorkerConstructProps) {
     super(scope, id)
     const dlq = this.createRestockSkuWorkerDlq(scope, id)
@@ -30,10 +30,10 @@ export class RestockSkuWorkerConstruct extends Construct {
     this.createRestockSkuWorkerRoutingRule(scope, id, props.dynamoDbTable, props.eventBus, queue)
   }
 
-  //
-  //
-  //
-  private createRestockSkuWorkerDlq(scope: Construct, id: string) {
+  /**
+   *
+   */
+  private createRestockSkuWorkerDlq(scope: Construct, id: string): Queue {
     const dlqName = `${id}-Dlq`
     const dlq = new Queue(scope, dlqName, {
       queueName: dlqName,
@@ -42,10 +42,10 @@ export class RestockSkuWorkerConstruct extends Construct {
     return dlq
   }
 
-  //
-  //
-  //
-  private createRestockSkuWorkerQueue(scope: Construct, id: string, dlq: Queue) {
+  /**
+   *
+   */
+  private createRestockSkuWorkerQueue(scope: Construct, id: string, dlq: Queue): Queue {
     const queueName = `${id}-Queue`
     const { maxReceiveCount, receiveMessageWaitTime, visibilityTimeout } = settings.SQS
     const queue = new Queue(scope, queueName, {
@@ -60,10 +60,15 @@ export class RestockSkuWorkerConstruct extends Construct {
     return queue
   }
 
-  //
-  //
-  //
-  private createRestockSkuWorkerFunction(scope: Construct, id: string, dynamoDbTable: Table, queue: Queue) {
+  /**
+   *
+   */
+  private createRestockSkuWorkerFunction(
+    scope: Construct,
+    id: string,
+    dynamoDbTable: Table,
+    queue: Queue,
+  ): NodejsFunction {
     const lambdaFuncName = `${id}-Lambda`
     const lambdaFunc = new NodejsFunction(scope, lambdaFuncName, {
       functionName: lambdaFuncName,
@@ -93,16 +98,16 @@ export class RestockSkuWorkerConstruct extends Construct {
     return lambdaFunc
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private createRestockSkuWorkerRoutingRule(
     scope: Construct,
     id: string,
     dynamoDbTable: Table,
     eventBus: EventBus,
     queue: Queue,
-  ) {
+  ): void {
     const ruleName = `${id}-EventBridgeRoutingRule`
     const routingRule = new Rule(scope, ruleName, {
       eventBus,

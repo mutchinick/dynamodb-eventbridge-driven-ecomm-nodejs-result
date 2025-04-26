@@ -12,23 +12,23 @@ export interface IListOrdersApiLambdaConstructProps {
   dynamoDbTable: Table
 }
 
-//
-//
-//
+/**
+ *
+ */
 export class ListOrdersApiLambdaConstruct extends Construct {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(scope: Construct, id: string, props: IListOrdersApiLambdaConstructProps) {
     super(scope, id)
     const lambdaFunc = this.createListOrdersApiLambdaFunction(scope, id, props.dynamoDbTable)
     this.createListOrdersApiLambdaIntegration(id, lambdaFunc, props.httpApi)
   }
 
-  //
-  //
-  //
-  private createListOrdersApiLambdaFunction(scope: Construct, id: string, dynamoDbTable: Table) {
+  /**
+   *
+   */
+  private createListOrdersApiLambdaFunction(scope: Construct, id: string, dynamoDbTable: Table): NodejsFunction {
     const lambdaFuncName = `${id}-Lambda`
     const lambdaFunc = new NodejsFunction(scope, lambdaFuncName, {
       functionName: lambdaFuncName,
@@ -46,10 +46,10 @@ export class ListOrdersApiLambdaConstruct extends Construct {
     return lambdaFunc
   }
 
-  //
-  //
-  //
-  private createListOrdersApiLambdaIntegration(id: string, lambdaFunc: NodejsFunction, httpApi: HttpApi) {
+  /**
+   *
+   */
+  private createListOrdersApiLambdaIntegration(id: string, lambdaFunc: NodejsFunction, httpApi: HttpApi): void {
     const lambdaIntegrationName = `${id}-LambdaIntegration`
     const lambdaIntegration = new HttpLambdaIntegration(lambdaIntegrationName, lambdaFunc, {
       payloadFormatVersion: PayloadFormatVersion.VERSION_2_0,

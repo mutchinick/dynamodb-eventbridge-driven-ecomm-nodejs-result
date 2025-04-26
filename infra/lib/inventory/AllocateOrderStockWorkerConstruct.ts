@@ -15,13 +15,13 @@ export interface IAllocateOrderStockWorkerConstructProps {
   eventBus: EventBus
 }
 
-//
-//
-//
+/**
+ *
+ */
 export class AllocateOrderStockWorkerConstruct extends Construct {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(scope: Construct, id: string, props: IAllocateOrderStockWorkerConstructProps) {
     super(scope, id)
     const dlq = this.createAllocateOrderStockWorkerDlq(scope, id)
@@ -30,10 +30,10 @@ export class AllocateOrderStockWorkerConstruct extends Construct {
     this.createAllocateOrderStockWorkerRoutingRule(scope, id, props.dynamoDbTable, props.eventBus, queue)
   }
 
-  //
-  //
-  //
-  private createAllocateOrderStockWorkerDlq(scope: Construct, id: string) {
+  /**
+   *
+   */
+  private createAllocateOrderStockWorkerDlq(scope: Construct, id: string): Queue {
     const dlqName = `${id}-Dlq`
     const dlq = new Queue(scope, dlqName, {
       queueName: dlqName,
@@ -42,10 +42,10 @@ export class AllocateOrderStockWorkerConstruct extends Construct {
     return dlq
   }
 
-  //
-  //
-  //
-  private createAllocateOrderStockWorkerQueue(scope: Construct, id: string, dlq: Queue) {
+  /**
+   *
+   */
+  private createAllocateOrderStockWorkerQueue(scope: Construct, id: string, dlq: Queue): Queue {
     const queueName = `${id}-Queue`
     const { maxReceiveCount, receiveMessageWaitTime, visibilityTimeout } = settings.SQS
     const queue = new Queue(scope, queueName, {
@@ -60,10 +60,15 @@ export class AllocateOrderStockWorkerConstruct extends Construct {
     return queue
   }
 
-  //
-  //
-  //
-  private createAllocateOrderStockWorkerFunction(scope: Construct, id: string, dynamoDbTable: Table, queue: Queue) {
+  /**
+   *
+   */
+  private createAllocateOrderStockWorkerFunction(
+    scope: Construct,
+    id: string,
+    dynamoDbTable: Table,
+    queue: Queue,
+  ): NodejsFunction {
     const lambdaFuncName = `${id}-Lambda`
     const lambdaFunc = new NodejsFunction(scope, lambdaFuncName, {
       functionName: lambdaFuncName,
@@ -93,16 +98,16 @@ export class AllocateOrderStockWorkerConstruct extends Construct {
     return lambdaFunc
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private createAllocateOrderStockWorkerRoutingRule(
     scope: Construct,
     id: string,
     dynamoDbTable: Table,
     eventBus: EventBus,
     queue: Queue,
-  ) {
+  ): void {
     const ruleName = `${id}-EventBridgeRoutingRule`
     const routingRule = new Rule(scope, ruleName, {
       eventBus,

@@ -2,24 +2,24 @@ import { RemovalPolicy } from 'aws-cdk-lib'
 import { AttributeType, BillingMode, StreamViewType, Table } from 'aws-cdk-lib/aws-dynamodb'
 import { Construct } from 'constructs'
 
-//
-//
-//
+/**
+ *
+ */
 export class DynamoDbConstruct extends Construct {
   public dynamoDbTable: Table
 
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(scope: Construct, id: string) {
     super(scope, id)
     this.dynamoDbTable = this.createDynamoDbTable(scope, id)
   }
 
-  //
-  //
-  //
-  private createDynamoDbTable(scope: Construct, id: string) {
+  /**
+   *
+   */
+  private createDynamoDbTable(scope: Construct, id: string): Table {
     const tableName = `${id}-Table`
     const dynamoDbTable = new Table(scope, tableName, {
       tableName,

@@ -12,23 +12,23 @@ export interface ISimulateRawEventApiLambdaConstructProps {
   dynamoDbTable: Table
 }
 
-//
-//
-//
+/**
+ *
+ */
 export class SimulateRawEventApiLambdaConstruct extends Construct {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(scope: Construct, id: string, props: ISimulateRawEventApiLambdaConstructProps) {
     super(scope, id)
     const lambdaFunc = this.createSimulateRawEventApiLambdaFunction(scope, id, props.dynamoDbTable)
     this.createSimulateRawEventApiLambdaIntegration(id, lambdaFunc, props.httpApi)
   }
 
-  //
-  //
-  //
-  private createSimulateRawEventApiLambdaFunction(scope: Construct, id: string, dynamoDbTable: Table) {
+  /**
+   *
+   */
+  private createSimulateRawEventApiLambdaFunction(scope: Construct, id: string, dynamoDbTable: Table): NodejsFunction {
     const lambdaFuncName = `${id}-Lambda`
     const lambdaFunc = new NodejsFunction(scope, lambdaFuncName, {
       functionName: lambdaFuncName,
@@ -46,10 +46,10 @@ export class SimulateRawEventApiLambdaConstruct extends Construct {
     return lambdaFunc
   }
 
-  //
-  //
-  //
-  private createSimulateRawEventApiLambdaIntegration(id: string, lambdaFunc: NodejsFunction, httpApi: HttpApi) {
+  /**
+   *
+   */
+  private createSimulateRawEventApiLambdaIntegration(id: string, lambdaFunc: NodejsFunction, httpApi: HttpApi): void {
     const lambdaIntegrationName = `${id}-LambdaIntegration`
     const lambdaIntegration = new HttpLambdaIntegration(lambdaIntegrationName, lambdaFunc, {
       payloadFormatVersion: PayloadFormatVersion.VERSION_2_0,

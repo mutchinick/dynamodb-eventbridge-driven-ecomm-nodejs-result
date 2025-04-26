@@ -12,23 +12,23 @@ export interface IRestockSkuApiLambdaConstructProps {
   dynamoDbTable: Table
 }
 
-//
-//
-//
+/**
+ *
+ */
 export class RestockSkuApiLambdaConstruct extends Construct {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(scope: Construct, id: string, props: IRestockSkuApiLambdaConstructProps) {
     super(scope, id)
     const lambdaFunc = this.createRestockSkuApiLambdaFunction(scope, id, props.dynamoDbTable)
     this.createRestockSkuApiLambdaIntegration(id, lambdaFunc, props.httpApi)
   }
 
-  //
-  //
-  //
-  private createRestockSkuApiLambdaFunction(scope: Construct, id: string, dynamoDbTable: Table) {
+  /**
+   *
+   */
+  private createRestockSkuApiLambdaFunction(scope: Construct, id: string, dynamoDbTable: Table): NodejsFunction {
     const lambdaFuncName = `${id}-Lambda`
     const lambdaFunc = new NodejsFunction(scope, lambdaFuncName, {
       functionName: lambdaFuncName,
@@ -46,10 +46,10 @@ export class RestockSkuApiLambdaConstruct extends Construct {
     return lambdaFunc
   }
 
-  //
-  //
-  //
-  private createRestockSkuApiLambdaIntegration(id: string, lambdaFunc: NodejsFunction, httpApi: HttpApi) {
+  /**
+   *
+   */
+  private createRestockSkuApiLambdaIntegration(id: string, lambdaFunc: NodejsFunction, httpApi: HttpApi): void {
     const lambdaIntegrationName = `${id}-LambdaIntegration`
     const lambdaIntegration = new HttpLambdaIntegration(lambdaIntegrationName, lambdaFunc, {
       payloadFormatVersion: PayloadFormatVersion.VERSION_2_0,

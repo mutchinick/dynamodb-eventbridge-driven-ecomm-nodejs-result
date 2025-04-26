@@ -8,24 +8,24 @@ export interface IEventBusConstructProps {
   dynamoDbTable: Table
 }
 
-//
-//
-//
+/**
+ *
+ */
 export class EventBusConstruct extends Construct {
   public eventBus: EventBus
 
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(scope: Construct, id: string, props: IEventBusConstructProps) {
     super(scope, id)
     this.eventBus = this.createEventBusEventBus(scope, id, props.dynamoDbTable)
   }
 
-  //
-  //
-  //
-  private createEventBusEventBus(scope: Construct, id: string, dynamoDbTable: Table) {
+  /**
+   *
+   */
+  private createEventBusEventBus(scope: Construct, id: string, dynamoDbTable: Table): EventBus {
     const eventBusName = `${id}-Bus`
     const eventBus = new EventBus(scope, eventBusName, {
       eventBusName,

@@ -16,13 +16,13 @@ export interface IDeallocateOrderPaymentRejectedWorkerConstructProps {
   eventBus: EventBus
 }
 
-//
-//
-//
+/**
+ *
+ */
 export class DeallocateOrderPaymentRejectedWorkerConstruct extends Construct {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(scope: Construct, id: string, props: IDeallocateOrderPaymentRejectedWorkerConstructProps) {
     super(scope, id)
     const dlq = this.createDeallocateOrderPaymentRejectedWorkerDlq(scope, id)
@@ -31,10 +31,10 @@ export class DeallocateOrderPaymentRejectedWorkerConstruct extends Construct {
     this.createDeallocateOrderPaymentRejectedWorkerRoutingRule(scope, id, props.dynamoDbTable, props.eventBus, queue)
   }
 
-  //
-  //
-  //
-  private createDeallocateOrderPaymentRejectedWorkerDlq(scope: Construct, id: string) {
+  /**
+   *
+   */
+  private createDeallocateOrderPaymentRejectedWorkerDlq(scope: Construct, id: string): Queue {
     const dlqName = `${id}-Dlq`
     const dlq = new Queue(scope, dlqName, {
       queueName: dlqName,
@@ -43,10 +43,10 @@ export class DeallocateOrderPaymentRejectedWorkerConstruct extends Construct {
     return dlq
   }
 
-  //
-  //
-  //
-  private createDeallocateOrderPaymentRejectedWorkerQueue(scope: Construct, id: string, dlq: Queue) {
+  /**
+   *
+   */
+  private createDeallocateOrderPaymentRejectedWorkerQueue(scope: Construct, id: string, dlq: Queue): Queue {
     const queueName = `${id}-Queue`
     const { maxReceiveCount, receiveMessageWaitTime, visibilityTimeout } = settings.SQS
     const queue = new Queue(scope, queueName, {
@@ -61,15 +61,15 @@ export class DeallocateOrderPaymentRejectedWorkerConstruct extends Construct {
     return queue
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private createDeallocateOrderPaymentRejectedWorkerFunction(
     scope: Construct,
     id: string,
     dynamoDbTable: Table,
     queue: Queue,
-  ) {
+  ): NodejsFunction {
     const lambdaFuncName = trimStringTo64(`${id}-Lambda`)
     const lambdaFunc = new NodejsFunction(scope, lambdaFuncName, {
       functionName: lambdaFuncName,
@@ -99,16 +99,16 @@ export class DeallocateOrderPaymentRejectedWorkerConstruct extends Construct {
     return lambdaFunc
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private createDeallocateOrderPaymentRejectedWorkerRoutingRule(
     scope: Construct,
     id: string,
     dynamoDbTable: Table,
     eventBus: EventBus,
     queue: Queue,
-  ) {
+  ): void {
     const ruleName = `${id}-EventBridgeRoutingRule`
     const routingRule = new Rule(scope, ruleName, {
       eventBus,

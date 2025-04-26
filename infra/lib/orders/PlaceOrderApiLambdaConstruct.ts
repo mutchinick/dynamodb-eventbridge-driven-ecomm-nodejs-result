@@ -12,23 +12,23 @@ export interface IPlaceOrderApiLambdaConstructProps {
   dynamoDbTable: Table
 }
 
-//
-//
-//
+/**
+ *
+ */
 export class PlaceOrderApiLambdaConstruct extends Construct {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(scope: Construct, id: string, props: IPlaceOrderApiLambdaConstructProps) {
     super(scope, id)
     const lambdaFunc = this.createPlaceOrderApiLambdaFunction(scope, id, props.dynamoDbTable)
     this.createPlaceOrderApiLambdaIntegration(id, lambdaFunc, props.httpApi)
   }
 
-  //
-  //
-  //
-  private createPlaceOrderApiLambdaFunction(scope: Construct, id: string, dynamoDbTable: Table) {
+  /**
+   *
+   */
+  private createPlaceOrderApiLambdaFunction(scope: Construct, id: string, dynamoDbTable: Table): NodejsFunction {
     const lambdaFuncName = `${id}-Lambda`
     const lambdaFunc = new NodejsFunction(scope, lambdaFuncName, {
       functionName: lambdaFuncName,
@@ -46,10 +46,10 @@ export class PlaceOrderApiLambdaConstruct extends Construct {
     return lambdaFunc
   }
 
-  //
-  //
-  //
-  private createPlaceOrderApiLambdaIntegration(id: string, lambdaFunc: NodejsFunction, httpApi: HttpApi) {
+  /**
+   *
+   */
+  private createPlaceOrderApiLambdaIntegration(id: string, lambdaFunc: NodejsFunction, httpApi: HttpApi): void {
     const lambdaIntegrationName = `${id}-LambdaIntegration`
     const lambdaIntegration = new HttpLambdaIntegration(lambdaIntegrationName, lambdaFunc, {
       payloadFormatVersion: PayloadFormatVersion.VERSION_2_0,

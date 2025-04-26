@@ -22,10 +22,13 @@ export interface IMainStackProps extends StackProps {
   }
 }
 
-//
-//
-//
+/**
+ *
+ */
 export class MainStack extends Stack {
+  /**
+   *
+   */
   constructor(scope: Construct, id: string, props?: IMainStackProps) {
     super(scope, id, props)
 
@@ -42,9 +45,9 @@ export class MainStack extends Stack {
     this.createInventoryService(id, dynamoDbTable, eventBus)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private createCommon(id: string): {
     dynamoDbTable: Table
     eventBus: EventBus
@@ -64,9 +67,9 @@ export class MainStack extends Stack {
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private createOrdersService(id: string, dynamoDbTable: Table, eventBus: EventBus): void {
     const serviceId = `${id}-Orders`
 
@@ -92,9 +95,9 @@ export class MainStack extends Stack {
     })
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private createTestingService(id: string, dynamoDbTable: Table): void {
     const serviceId = `${id}-Testing`
 
@@ -108,10 +111,10 @@ export class MainStack extends Stack {
     })
   }
 
-  //
-  //
-  //
-  private createInventoryService(id: string, dynamoDbTable: Table, eventBus: EventBus) {
+  /**
+   *
+   */
+  private createInventoryService(id: string, dynamoDbTable: Table, eventBus: EventBus): void {
     const serviceId = `${id}-Inventory`
 
     const inventoryApiConstructName = `${serviceId}-Api`
