@@ -7,17 +7,20 @@ export interface IRestockSkuWorkerController {
   restockSkus: (sqsEvent: SQSEvent) => Promise<SQSBatchResponse>
 }
 
+/**
+ *
+ */
 export class RestockSkuWorkerController implements IRestockSkuWorkerController {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly restockSkuWorkerService: IRestockSkuWorkerService) {
     this.restockSkus = this.restockSkus.bind(this)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async restockSkus(sqsEvent: SQSEvent): Promise<SQSBatchResponse> {
     const logContext = 'RestockSkuWorkerController.restockSkus'
     console.info(`${logContext} init:`, { sqsEvent })
@@ -34,7 +37,7 @@ export class RestockSkuWorkerController implements IRestockSkuWorkerController {
     for (const record of sqsEvent.Records) {
       // If the failure is transient then we add it to the batch errors to requeue and retry
       // If the failure is non-transient then we ignore it to remove it from the queue
-      const restockSkuResult = await this.restockSingleSkuSafe(record)
+      const restockSkuResult = await this.restockSkuSafe(record)
       if (Result.isFailureTransient(restockSkuResult)) {
         sqsBatchResponse.batchItemFailures.push({ itemIdentifier: record.messageId })
       }
@@ -44,10 +47,10 @@ export class RestockSkuWorkerController implements IRestockSkuWorkerController {
     return sqsBatchResponse
   }
 
-  //
-  //
-  //
-  private async restockSingleSkuSafe(
+  /**
+   *
+   */
+  private async restockSkuSafe(
     sqsRecord: SQSRecord,
   ): Promise<
     | Success<void>
@@ -55,7 +58,7 @@ export class RestockSkuWorkerController implements IRestockSkuWorkerController {
     | Failure<'DuplicateRestockOperationError'>
     | Failure<'UnrecognizedError'>
   > {
-    const logContext = 'RestockSkuApiController.restockSingleSkuSafe'
+    const logContext = 'RestockSkuApiController.restockSkuSafe'
     console.info(`${logContext} init:`, { sqsRecord })
 
     const parseInputEventResult = this.parseInputEvent(sqsRecord)
@@ -80,9 +83,9 @@ export class RestockSkuWorkerController implements IRestockSkuWorkerController {
     return restockSkuResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private parseInputEvent(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
     const logContext = 'RestockSkuApiController.parseInputEvent'
 

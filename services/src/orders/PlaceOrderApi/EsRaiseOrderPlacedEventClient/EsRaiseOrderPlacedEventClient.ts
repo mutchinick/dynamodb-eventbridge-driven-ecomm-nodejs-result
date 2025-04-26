@@ -14,15 +14,18 @@ export interface IEsRaiseOrderPlacedEventClient {
   >
 }
 
+/**
+ *
+ */
 export class EsRaiseOrderPlacedEventClient implements IEsRaiseOrderPlacedEventClient {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly ddbDocClient: DynamoDBDocumentClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async raiseOrderPlacedEvent(
     orderPlacedEvent: OrderPlacedEvent,
   ): Promise<
@@ -55,9 +58,9 @@ export class EsRaiseOrderPlacedEventClient implements IEsRaiseOrderPlacedEventCl
     return sendCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(orderPlacedEvent: OrderPlacedEvent): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'EsRaiseOrderPlacedEventClient.validateInput'
 
@@ -71,9 +74,9 @@ export class EsRaiseOrderPlacedEventClient implements IEsRaiseOrderPlacedEventCl
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildDdbCommand(orderPlacedEvent: OrderPlacedEvent): Success<PutCommand> | Failure<'InvalidArgumentsError'> {
     const logContext = 'EsRaiseOrderPlacedEventClient.buildDdbCommand'
 
@@ -123,9 +126,9 @@ export class EsRaiseOrderPlacedEventClient implements IEsRaiseOrderPlacedEventCl
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async sendDdbCommand(
     ddbCommand: PutCommand,
   ): Promise<Success<void> | Failure<'DuplicateEventRaisedError'> | Failure<'UnrecognizedError'>> {

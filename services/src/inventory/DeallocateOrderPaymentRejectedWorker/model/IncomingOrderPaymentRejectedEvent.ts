@@ -31,10 +31,13 @@ type IncomingOrderPaymentRejectedEventProps = InventoryEvent<
   IncomingOrderPaymentRejectedEventData
 >
 
+/**
+ *
+ */
 export class IncomingOrderPaymentRejectedEvent implements IncomingOrderPaymentRejectedEventProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     readonly eventName: InventoryEventName.ORDER_PAYMENT_REJECTED_EVENT,
     readonly eventData: IncomingOrderPaymentRejectedEventData,
@@ -42,9 +45,9 @@ export class IncomingOrderPaymentRejectedEvent implements IncomingOrderPaymentRe
     readonly updatedAt: string,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     incomingOrderPaymentRejectedEventInput: IncomingOrderPaymentRejectedEventInput,
   ): Success<IncomingOrderPaymentRejectedEvent> | Failure<'InvalidArgumentsError'> {
@@ -69,9 +72,9 @@ export class IncomingOrderPaymentRejectedEvent implements IncomingOrderPaymentRe
     return incomingOrderPaymentRejectedEventResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     incomingOrderPaymentRejectedEventInput: IncomingOrderPaymentRejectedEventInput,
   ): Success<IncomingOrderPaymentRejectedEventProps> | Failure<'InvalidArgumentsError'> {
@@ -92,9 +95,9 @@ export class IncomingOrderPaymentRejectedEvent implements IncomingOrderPaymentRe
     return Result.makeSuccess(incomingOrderPaymentRejectedEventProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static parseValidateInput(
     incomingOrderPaymentRejectedEventInput: IncomingOrderPaymentRejectedEventInput,
   ): Success<IncomingOrderPaymentRejectedEventProps> | Failure<'InvalidArgumentsError'> {

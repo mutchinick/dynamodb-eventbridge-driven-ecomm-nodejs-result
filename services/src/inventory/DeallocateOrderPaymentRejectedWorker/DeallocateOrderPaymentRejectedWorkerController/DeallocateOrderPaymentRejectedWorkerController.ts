@@ -10,22 +10,22 @@ export interface IDeallocateOrderPaymentRejectedWorkerController {
   deallocateOrdersStock: (sqsEvent: SQSEvent) => Promise<SQSBatchResponse>
 }
 
-//
-//
-//
+/**
+ *
+ */
 export class DeallocateOrderPaymentRejectedWorkerController implements IDeallocateOrderPaymentRejectedWorkerController {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(
     private readonly deallocateOrderPaymentRejectedWorkerService: IDeallocateOrderPaymentRejectedWorkerService,
   ) {
     this.deallocateOrdersStock = this.deallocateOrdersStock.bind(this)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async deallocateOrdersStock(sqsEvent: SQSEvent): Promise<SQSBatchResponse> {
     const logContext = 'DeallocateOrderPaymentRejectedWorkerController.deallocateOrdersStock'
     console.info(`${logContext} init:`, { sqsEvent })
@@ -42,7 +42,7 @@ export class DeallocateOrderPaymentRejectedWorkerController implements IDealloca
     for (const record of sqsEvent.Records) {
       // If the failure is transient then we add it to the batch errors to requeue and retry
       // If the failure is non-transient then we ignore it to remove it from the queue
-      const deallocateOrderPaymentRejectedResult = await this.deallocateOrderSingle(record)
+      const deallocateOrderPaymentRejectedResult = await this.deallocateOrderSafe(record)
       if (Result.isFailureTransient(deallocateOrderPaymentRejectedResult)) {
         sqsBatchResponse.batchItemFailures.push({ itemIdentifier: record.messageId })
       }
@@ -52,10 +52,10 @@ export class DeallocateOrderPaymentRejectedWorkerController implements IDealloca
     return sqsBatchResponse
   }
 
-  //
-  //
-  //
-  private async deallocateOrderSingle(
+  /**
+   *
+   */
+  private async deallocateOrderSafe(
     sqsRecord: SQSRecord,
   ): Promise<
     | Success<void>
@@ -63,7 +63,7 @@ export class DeallocateOrderPaymentRejectedWorkerController implements IDealloca
     | Failure<'InvalidStockDeallocationError'>
     | Failure<'UnrecognizedError'>
   > {
-    const logContext = 'DeallocateOrderPaymentRejectedWorkerController.deallocateOrderSingle'
+    const logContext = 'DeallocateOrderPaymentRejectedWorkerController.deallocateOrderSafe'
     console.info(`${logContext} init:`, { sqsRecord })
 
     const parseInputEventResult = this.parseInputEvent(sqsRecord)
@@ -93,9 +93,9 @@ export class DeallocateOrderPaymentRejectedWorkerController implements IDealloca
     return deallocateOrderPaymentRejectedResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private parseInputEvent(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
     const logContext = 'DeallocateOrderPaymentRejectedWorkerController.parseInputEvent'
 

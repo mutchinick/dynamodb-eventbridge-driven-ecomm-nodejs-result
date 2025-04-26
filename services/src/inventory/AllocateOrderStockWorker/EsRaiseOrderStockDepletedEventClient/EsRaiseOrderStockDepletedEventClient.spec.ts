@@ -101,7 +101,6 @@ describe(`Inventory Service AllocateOrderStockWorker EsRaiseOrderStockDepletedEv
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  //
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       OrderStockDepletedEvent is null`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()

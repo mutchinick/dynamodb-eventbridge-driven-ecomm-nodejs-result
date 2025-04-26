@@ -19,10 +19,13 @@ type OrderStockAllocatedEventProps = InventoryEvent<
   OrderStockAllocatedEventData
 >
 
+/**
+ *
+ */
 export class OrderStockAllocatedEvent implements OrderStockAllocatedEventProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly eventName: InventoryEventName.ORDER_STOCK_ALLOCATED_EVENT,
     public readonly eventData: OrderStockAllocatedEventData,
@@ -30,9 +33,9 @@ export class OrderStockAllocatedEvent implements OrderStockAllocatedEventProps {
     public readonly updatedAt: string,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     orderStockAllocatedEventInput: OrderStockAllocatedEventInput,
   ): Success<OrderStockAllocatedEvent> | Failure<'InvalidArgumentsError'> {
@@ -52,9 +55,9 @@ export class OrderStockAllocatedEvent implements OrderStockAllocatedEventProps {
     return orderStockAllocatedEventResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     orderStockAllocatedEventInput: OrderStockAllocatedEventInput,
   ): Success<OrderStockAllocatedEventProps> | Failure<'InvalidArgumentsError'> {
@@ -74,9 +77,9 @@ export class OrderStockAllocatedEvent implements OrderStockAllocatedEventProps {
     return Result.makeSuccess(orderStockAllocatedEventProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     orderStockAllocatedEventInput: OrderStockAllocatedEventData,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

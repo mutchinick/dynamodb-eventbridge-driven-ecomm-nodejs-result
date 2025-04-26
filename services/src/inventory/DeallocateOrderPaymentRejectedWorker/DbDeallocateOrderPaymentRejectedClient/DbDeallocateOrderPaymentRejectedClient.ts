@@ -14,15 +14,18 @@ export interface IDbDeallocateOrderPaymentRejectedClient {
   >
 }
 
+/**
+ *
+ */
 export class DbDeallocateOrderPaymentRejectedClient implements IDbDeallocateOrderPaymentRejectedClient {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly ddbDocClient: DynamoDBDocumentClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async deallocateOrderStock(
     deallocateOrderPaymentRejectedCommand: DeallocateOrderPaymentRejectedCommand,
   ): Promise<
@@ -55,9 +58,9 @@ export class DbDeallocateOrderPaymentRejectedClient implements IDbDeallocateOrde
     return sendDdbCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(
     deallocateOrderPaymentRejectedCommand: DeallocateOrderPaymentRejectedCommand,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
@@ -73,9 +76,9 @@ export class DbDeallocateOrderPaymentRejectedClient implements IDbDeallocateOrde
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildDdbCommand(
     deallocateOrderPaymentRejectedCommand: DeallocateOrderPaymentRejectedCommand,
   ): Success<TransactWriteCommand> | Failure<'InvalidArgumentsError'> {
@@ -160,9 +163,9 @@ export class DbDeallocateOrderPaymentRejectedClient implements IDbDeallocateOrde
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async sendDdbCommand(
     ddbCommand: TransactWriteCommand,
   ): Promise<Success<void> | Failure<'InvalidStockDeallocationError'> | Failure<'UnrecognizedError'>> {

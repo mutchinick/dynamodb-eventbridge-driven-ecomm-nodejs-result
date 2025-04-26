@@ -17,7 +17,7 @@ const mockUserId = 'mockUserId'
 const mockCreatedAt = mockDate
 const mockUpdatedAt = mockDate
 
-function buildMockIncomingOrderEvent() {
+function buildMockIncomingOrderEvent(): TypeUtilsMutable<IncomingOrderEvent> {
   const mockValidEvent: TypeUtilsMutable<IncomingOrderEvent> = {
     eventName: mockEventName,
     eventData: {
@@ -33,7 +33,7 @@ function buildMockIncomingOrderEvent() {
   return mockValidEvent
 }
 
-function buildMockCreateOrderCommandInput() {
+function buildMockCreateOrderCommandInput(): TypeUtilsMutable<CreateOrderCommandInput> {
   const mockValidInput: TypeUtilsMutable<CreateOrderCommandInput> = {
     incomingOrderEvent: buildMockIncomingOrderEvent(),
   }

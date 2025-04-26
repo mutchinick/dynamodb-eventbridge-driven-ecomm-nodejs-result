@@ -5,6 +5,9 @@ import { EsRaiseSkuRestockedEventClient } from '../RestockSkuApi/EsRaiseSkuResto
 import { RestockSkuApiController } from '../RestockSkuApi/RestockSkuApiController/RestockSkuApiController'
 import { RestockSkuApiService } from '../RestockSkuApi/RestockSkuApiService/RestockSkuApiService'
 
+/**
+ *
+ */
 function createHandler(): (apiEvent: APIGatewayProxyEventV2) => Promise<APIGatewayProxyStructuredResultV2> {
   const ddbClient = new DynamoDBClient({})
   const ddbDocClient = DynamoDBDocumentClient.from(ddbClient)

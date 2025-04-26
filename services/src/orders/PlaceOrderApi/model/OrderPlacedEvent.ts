@@ -12,10 +12,13 @@ type OrderPlacedEventData = TypeUtilsPretty<Pick<OrderData, 'orderId' | 'sku' | 
 
 type OrderPlacedEventProps = OrderEvent<OrderEventName.ORDER_PLACED_EVENT, OrderPlacedEventData>
 
+/**
+ *
+ */
 export class OrderPlacedEvent implements OrderPlacedEventProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly eventName: OrderEventName.ORDER_PLACED_EVENT,
     public readonly eventData: OrderPlacedEventData,
@@ -23,9 +26,9 @@ export class OrderPlacedEvent implements OrderPlacedEventProps {
     public readonly updatedAt: string,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     orderPlacedEventInput: OrderPlacedEventInput,
   ): Success<OrderPlacedEvent> | Failure<'InvalidArgumentsError'> {
@@ -45,9 +48,9 @@ export class OrderPlacedEvent implements OrderPlacedEventProps {
     return orderPlacedEventResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     orderPlacedEventInput: OrderPlacedEventInput,
   ): Success<OrderPlacedEventProps> | Failure<'InvalidArgumentsError'> {
@@ -67,9 +70,9 @@ export class OrderPlacedEvent implements OrderPlacedEventProps {
     return Result.makeSuccess(orderPlacedEventProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     orderPlacedEventInput: OrderPlacedEventData,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

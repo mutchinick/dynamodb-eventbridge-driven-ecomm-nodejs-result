@@ -10,10 +10,13 @@ export type IncomingPlaceOrderRequestInput = TypeUtilsPretty<
 
 type IncomingPlaceOrderRequestProps = TypeUtilsPretty<Pick<OrderData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>>
 
+/**
+ *
+ */
 export class IncomingPlaceOrderRequest implements IncomingPlaceOrderRequestProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly orderId: string,
     public readonly sku: string,
@@ -22,9 +25,9 @@ export class IncomingPlaceOrderRequest implements IncomingPlaceOrderRequestProps
     public readonly userId: string,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     incomingPlaceOrderRequestInput: IncomingPlaceOrderRequestInput,
   ): Success<IncomingPlaceOrderRequest> | Failure<'InvalidArgumentsError'> {
@@ -44,9 +47,9 @@ export class IncomingPlaceOrderRequest implements IncomingPlaceOrderRequestProps
     return incomingPlaceOrderRequestResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     incomingPlaceOrderRequestInput: IncomingPlaceOrderRequestInput,
   ): Success<IncomingPlaceOrderRequestProps> | Failure<'InvalidArgumentsError'> {
@@ -66,9 +69,9 @@ export class IncomingPlaceOrderRequest implements IncomingPlaceOrderRequestProps
     return Result.makeSuccess(incomingPlaceOrderRequestProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     incomingPlaceOrderRequestInput: IncomingPlaceOrderRequestInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

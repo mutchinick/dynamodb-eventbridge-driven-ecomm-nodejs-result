@@ -14,15 +14,18 @@ export interface IEsRaiseSkuRestockedEventClient {
   >
 }
 
+/**
+ *
+ */
 export class EsRaiseSkuRestockedEventClient implements IEsRaiseSkuRestockedEventClient {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly ddbDocClient: DynamoDBDocumentClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async raiseSkuRestockedEvent(
     skuRestockedEvent: SkuRestockedEvent,
   ): Promise<
@@ -55,9 +58,9 @@ export class EsRaiseSkuRestockedEventClient implements IEsRaiseSkuRestockedEvent
     return sendCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(skuRestockedEvent: SkuRestockedEvent): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'EsRaiseSkuRestockedEventClient.validateInput'
 
@@ -71,9 +74,9 @@ export class EsRaiseSkuRestockedEventClient implements IEsRaiseSkuRestockedEvent
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildDdbCommand(
     skuRestockedEvent: SkuRestockedEvent,
   ): Success<PutCommand> | Failure<'InvalidArgumentsError'> {
@@ -123,9 +126,9 @@ export class EsRaiseSkuRestockedEventClient implements IEsRaiseSkuRestockedEvent
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async sendDdbCommand(
     ddbCommand: PutCommand,
   ): Promise<Success<void> | Failure<'DuplicateEventRaisedError'> | Failure<'UnrecognizedError'>> {

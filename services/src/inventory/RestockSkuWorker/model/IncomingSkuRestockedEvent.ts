@@ -29,10 +29,13 @@ type IncomingSkuRestockedEventProps = InventoryEvent<
   IncomingSkuRestockedEventData
 >
 
+/**
+ *
+ */
 export class IncomingSkuRestockedEvent implements IncomingSkuRestockedEventProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     readonly eventName: InventoryEventName.SKU_RESTOCKED_EVENT,
     readonly eventData: IncomingSkuRestockedEventData,
@@ -40,9 +43,9 @@ export class IncomingSkuRestockedEvent implements IncomingSkuRestockedEventProps
     readonly updatedAt: string,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     incomingSkuRestockedEventInput: IncomingSkuRestockedEventInput,
   ): Success<IncomingSkuRestockedEvent> | Failure<'InvalidArgumentsError'> {
@@ -62,9 +65,9 @@ export class IncomingSkuRestockedEvent implements IncomingSkuRestockedEventProps
     return incomingSkuRestockedEventResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     incomingSkuRestockedEventInput: IncomingSkuRestockedEventInput,
   ): Success<IncomingSkuRestockedEventProps> | Failure<'InvalidArgumentsError'> {
@@ -85,9 +88,9 @@ export class IncomingSkuRestockedEvent implements IncomingSkuRestockedEventProps
     return Result.makeSuccess(incomingSkuRestockedEventProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static parseValidateInput(
     incomingSkuRestockedEventInput: IncomingSkuRestockedEventInput,
   ): Success<IncomingSkuRestockedEventProps> | Failure<'InvalidArgumentsError'> {

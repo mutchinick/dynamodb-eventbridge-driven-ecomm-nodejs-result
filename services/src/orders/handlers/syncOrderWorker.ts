@@ -8,6 +8,9 @@ import { EsRaiseOrderCreatedEventClient } from '../SyncOrderWorker/EsRaiseOrderC
 import { SyncOrderWorkerController } from '../SyncOrderWorker/SyncOrderWorkerController/SyncOrderWorkerController'
 import { SyncOrderWorkerService } from '../SyncOrderWorker/SyncOrderWorkerService/SyncOrderWorkerService'
 
+/**
+ *
+ */
 function createHandler(): (sqsEvent: SQSEvent) => Promise<SQSBatchResponse> {
   const ddbClient = new DynamoDBClient({})
   const ddbDocClient = DynamoDBDocumentClient.from(ddbClient)

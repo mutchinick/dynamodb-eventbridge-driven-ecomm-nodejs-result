@@ -15,18 +15,21 @@ type RestockSkuCommandProps = {
   readonly options?: Record<string, unknown>
 }
 
+/**
+ *
+ */
 export class RestockSkuCommand implements RestockSkuCommandProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly commandData: RestockSkuCommandData,
     public readonly options?: Record<string, unknown>,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     restockSkuCommandInput: RestockSkuCommandInput,
   ): Success<RestockSkuCommand> | Failure<'InvalidArgumentsError'> {
@@ -46,9 +49,9 @@ export class RestockSkuCommand implements RestockSkuCommandProps {
     return restockSkuCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     restockSkuCommandInput: RestockSkuCommandInput,
   ): Success<RestockSkuCommandProps> | Failure<'InvalidArgumentsError'> {
@@ -73,9 +76,9 @@ export class RestockSkuCommand implements RestockSkuCommandProps {
     return Result.makeSuccess(restockSkuCommandProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     restockSkuCommandInput: RestockSkuCommandInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

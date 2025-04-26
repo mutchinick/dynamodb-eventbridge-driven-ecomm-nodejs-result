@@ -8,17 +8,20 @@ export interface IListSkusApiController {
   listSkus: (apiEvent: APIGatewayProxyEventV2) => Promise<APIGatewayProxyStructuredResultV2>
 }
 
+/**
+ *
+ */
 export class ListSkusApiController implements IListSkusApiController {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly listSkusApiService: IListSkusApiService) {
     this.listSkus = this.listSkus.bind(this)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async listSkus(apiEvent: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> {
     const logContext = 'ListSkusApiController.listSkus'
     console.info(`${logContext} init:`, { apiEvent })
@@ -42,9 +45,9 @@ export class ListSkusApiController implements IListSkusApiController {
     return internalServerError
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async listSkusSafe(
     apiEvent: APIGatewayProxyEventV2,
   ): Promise<Success<ListSkusApiServiceOutput> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -73,9 +76,9 @@ export class ListSkusApiController implements IListSkusApiController {
     return listSkusResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private parseInputRequest(apiEvent: APIGatewayProxyEventV2): Success<unknown> | Failure<'InvalidArgumentsError'> {
     const logContext = 'ListSkusApiController.parseInputRequest'
 

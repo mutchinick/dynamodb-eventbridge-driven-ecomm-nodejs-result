@@ -9,19 +9,22 @@ export type IncomingListSkusRequestInput = TypeUtilsPretty<Partial<Pick<RestockS
 
 type IncomingListSkusRequestProps = TypeUtilsPretty<Partial<Pick<RestockSkuData, 'sku'> & SortParams>>
 
+/**
+ *
+ */
 export class IncomingListSkusRequest implements IncomingListSkusRequestProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly sku?: string,
     public readonly sortDirection?: 'asc' | 'desc',
     public readonly limit?: number,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     incomingListSkusRequestInput: IncomingListSkusRequestInput,
   ): Success<IncomingListSkusRequest> | Failure<'InvalidArgumentsError'> {
@@ -41,9 +44,9 @@ export class IncomingListSkusRequest implements IncomingListSkusRequestProps {
     return incomingListSkusRequestResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     incomingListSkusRequestInput: IncomingListSkusRequestInput,
   ): Success<IncomingListSkusRequestProps> | Failure<'InvalidArgumentsError'> {
@@ -61,9 +64,9 @@ export class IncomingListSkusRequest implements IncomingListSkusRequestProps {
     return Result.makeSuccess(incomingListSkusRequestProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     incomingListSkusRequestInput: IncomingListSkusRequestInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

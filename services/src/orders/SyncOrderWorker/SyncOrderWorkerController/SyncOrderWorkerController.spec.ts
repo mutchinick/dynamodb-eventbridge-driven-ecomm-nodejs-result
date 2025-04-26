@@ -27,7 +27,7 @@ function buildMockIncomingOrderEvent(id: string): TypeUtilsMutable<IncomingOrder
   return incomingOrderEvent
 }
 
-function buildMockIncomingOrderEvents(ids: string[]) {
+function buildMockIncomingOrderEvents(ids: string[]): TypeUtilsMutable<IncomingOrderEvent>[] {
   return ids.map((id) => buildMockIncomingOrderEvent(id))
 }
 
@@ -43,7 +43,10 @@ type MockEventDetail = {
 }
 
 // COMBAK: Work a simpler way to build/wrap/unwrap these EventBrideEvents (maybe some abstraction util?)
-function buildMockEventBrideEvent(id: string, incomingOrderEvent: IncomingOrderEvent) {
+function buildMockEventBrideEvent(
+  id: string,
+  incomingOrderEvent: IncomingOrderEvent,
+): EventBridgeEvent<string, MockEventDetail> {
   const mockEventBridgeEvent: EventBridgeEvent<string, MockEventDetail> = {
     'detail-type': 'mockDetailType',
     account: 'mockAccount',
@@ -68,7 +71,10 @@ function buildMockEventBrideEvent(id: string, incomingOrderEvent: IncomingOrderE
   return mockEventBridgeEvent
 }
 
-function buildMockEventBrideEvents(ids: string[], incomingOrderEvents: IncomingOrderEvent[]) {
+function buildMockEventBrideEvents(
+  ids: string[],
+  incomingOrderEvents: IncomingOrderEvent[],
+): EventBridgeEvent<string, MockEventDetail>[] {
   return ids.map((id, index) => buildMockEventBrideEvent(id, incomingOrderEvents[index]))
 }
 
@@ -79,7 +85,10 @@ function buildMockSqsRecord(id: string, eventBridgeEvent: EventBridgeEvent<strin
   } as unknown as SQSRecord
 }
 
-function buildMockSqsRecords(ids: string[], eventBridgeEvents: EventBridgeEvent<string, MockEventDetail>[]) {
+function buildMockSqsRecords(
+  ids: string[],
+  eventBridgeEvents: EventBridgeEvent<string, MockEventDetail>[],
+): SQSRecord[] {
   return ids.map((id, index) => buildMockSqsRecord(id, eventBridgeEvents[index]))
 }
 
@@ -87,7 +96,12 @@ function buildMockSqsEvent(sqsRecords: SQSRecord[]): SQSEvent {
   return { Records: sqsRecords }
 }
 
-function buildMockTestObjects(ids: string[]) {
+function buildMockTestObjects(ids: string[]): {
+  mockIncomingOrderEvents: TypeUtilsMutable<IncomingOrderEvent>[]
+  mockEventBrideEvents: EventBridgeEvent<string, MockEventDetail>[]
+  mockSqsRecords: SQSRecord[]
+  mockSqsEvent: SQSEvent
+} {
   const mockIncomingOrderEvents = buildMockIncomingOrderEvents(ids)
   const mockEventBrideEvents = buildMockEventBrideEvents(ids, mockIncomingOrderEvents)
   const mockSqsRecords = buildMockSqsRecords(ids, mockEventBrideEvents)

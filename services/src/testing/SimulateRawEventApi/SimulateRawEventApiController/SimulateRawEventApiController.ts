@@ -11,17 +11,20 @@ export interface ISimulateRawEventApiController {
   simulateRawEvent: (apiEvent: APIGatewayProxyEventV2) => Promise<APIGatewayProxyStructuredResultV2>
 }
 
+/**
+ *
+ */
 export class SimulateRawEventApiController implements ISimulateRawEventApiController {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly simulateRawEventApiService: ISimulateRawEventApiService) {
     this.simulateRawEvent = this.simulateRawEvent.bind(this)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async simulateRawEvent(apiEvent: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> {
     const logContext = 'SimulateRawEventApiController.simulateRawEvent'
     console.info(`${logContext} init:`, { apiEvent })
@@ -45,9 +48,9 @@ export class SimulateRawEventApiController implements ISimulateRawEventApiContro
     return internalServerError
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async simulateRawEventSafe(
     apiEvent: APIGatewayProxyEventV2,
   ): Promise<
@@ -80,9 +83,9 @@ export class SimulateRawEventApiController implements ISimulateRawEventApiContro
     return simulateRawEventResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private parseInputRequest(apiEvent: APIGatewayProxyEventV2): Success<unknown> | Failure<'InvalidArgumentsError'> {
     const logContext = 'SimulateRawEventApiController.parseInputRequest'
 

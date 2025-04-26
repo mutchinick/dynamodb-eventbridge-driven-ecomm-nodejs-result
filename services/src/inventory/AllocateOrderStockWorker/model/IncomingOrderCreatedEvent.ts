@@ -31,10 +31,13 @@ type IncomingOrderCreatedEventProps = InventoryEvent<
   IncomingOrderCreatedEventData
 >
 
+/**
+ *
+ */
 export class IncomingOrderCreatedEvent implements IncomingOrderCreatedEventProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     readonly eventName: InventoryEventName.ORDER_CREATED_EVENT,
     readonly eventData: IncomingOrderCreatedEventData,
@@ -42,9 +45,9 @@ export class IncomingOrderCreatedEvent implements IncomingOrderCreatedEventProps
     readonly updatedAt: string,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     incomingOrderCreatedEventInput: IncomingOrderCreatedEventInput,
   ): Success<IncomingOrderCreatedEvent> | Failure<'InvalidArgumentsError'> {
@@ -64,9 +67,9 @@ export class IncomingOrderCreatedEvent implements IncomingOrderCreatedEventProps
     return incomingOrderCreatedEventResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     incomingOrderCreatedEventInput: IncomingOrderCreatedEventInput,
   ): Success<IncomingOrderCreatedEventProps> | Failure<'InvalidArgumentsError'> {
@@ -87,9 +90,9 @@ export class IncomingOrderCreatedEvent implements IncomingOrderCreatedEventProps
     return Result.makeSuccess(incomingOrderCreatedEventProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static parseValidateInput(
     incomingOrderCreatedEventInput: IncomingOrderCreatedEventInput,
   ): Success<IncomingOrderCreatedEventProps> | Failure<'InvalidArgumentsError'> {

@@ -14,18 +14,21 @@ type ListOrdersCommandProps = {
   readonly options?: Record<string, unknown>
 }
 
+/**
+ *
+ */
 export class ListOrdersCommand implements ListOrdersCommandProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly commandData: ListOrdersCommandData,
     public readonly options?: Record<string, unknown>,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     listOrdersCommandInput: ListOrdersCommandInput,
   ): Success<ListOrdersCommand> | Failure<'InvalidArgumentsError'> {
@@ -45,9 +48,9 @@ export class ListOrdersCommand implements ListOrdersCommandProps {
     return listOrdersCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     listOrdersCommandInput: ListOrdersCommandInput,
   ): Success<ListOrdersCommandProps> | Failure<'InvalidArgumentsError'> {
@@ -64,9 +67,9 @@ export class ListOrdersCommand implements ListOrdersCommandProps {
     return Result.makeSuccess(listOrdersCommandProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     listOrdersCommandInput: ListOrdersCommandData,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

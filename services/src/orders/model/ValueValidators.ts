@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { z } from 'zod'
 import { OrderEventName } from './OrderEventName'
 import { OrderStatus } from './OrderStatus'
 import { SortDirection } from './SortDirection'
 
+/**
+ *
+ */
 export class ValueValidators {
   public static validIncomingEventName = () => z.nativeEnum(OrderEventName)
 

@@ -94,7 +94,7 @@ function buildMockDbGetOrderClient_fails(
   return { getOrder: jest.fn().mockResolvedValue(mockFailure) }
 }
 
-function buildMockDbCreateOrderClient_succeeds() {
+function buildMockDbCreateOrderClient_succeeds(): IDbCreateOrderClient {
   const mockResult = Result.makeSuccess(mockOrderData)
   return { createOrder: jest.fn().mockResolvedValue(mockResult) }
 }

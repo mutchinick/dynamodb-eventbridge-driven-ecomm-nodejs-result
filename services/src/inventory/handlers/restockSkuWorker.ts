@@ -5,6 +5,9 @@ import { DbRestockSkuClient } from '../RestockSkuWorker/DbRestockSkuClient/DbRes
 import { RestockSkuWorkerController } from '../RestockSkuWorker/RestockSkuWorkerController/RestockSkuWorkerController'
 import { RestockSkuWorkerService } from '../RestockSkuWorker/RestockSkuWorkerService/RestockSkuWorkerService'
 
+/**
+ *
+ */
 function createHandler(): (sqsEvent: SQSEvent) => Promise<SQSBatchResponse> {
   const ddbClient = new DynamoDBClient({})
   const ddbDocClient = DynamoDBDocumentClient.from(ddbClient)

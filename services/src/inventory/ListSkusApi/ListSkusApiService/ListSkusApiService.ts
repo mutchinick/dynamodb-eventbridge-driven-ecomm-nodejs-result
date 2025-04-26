@@ -12,15 +12,18 @@ export interface IListSkusApiService {
 
 export type ListSkusApiServiceOutput = { skus: RestockSkuData[] }
 
+/**
+ *
+ */
 export class ListSkusApiService implements IListSkusApiService {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly dbListSkusClient: IDbListSkusClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async listSkus(
     incomingListSkusRequest: IncomingListSkusRequest,
   ): Promise<Success<ListSkusApiServiceOutput> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -46,9 +49,9 @@ export class ListSkusApiService implements IListSkusApiService {
     return serviceOutputResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(
     incomingListSkusRequest: IncomingListSkusRequest,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
@@ -65,9 +68,9 @@ export class ListSkusApiService implements IListSkusApiService {
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async querySkus(
     incomingListSkusRequest: IncomingListSkusRequest,
   ): Promise<Success<RestockSkuData[]> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {

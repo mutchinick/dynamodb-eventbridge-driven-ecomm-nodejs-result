@@ -10,18 +10,21 @@ export interface IDbListSkusClient {
   ) => Promise<Success<RestockSkuData[]> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>>
 }
 
+/**
+ *
+ */
 export class DbListSkusClient implements IDbListSkusClient {
   public static readonly DEFAULT_LIMIT = 50
   public static readonly DEFAULT_SORT_DIRECTION = SortDirection['asc']
 
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly ddbDocClient: DynamoDBDocumentClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async listSkus(
     listSkusCommand: ListSkusCommand,
   ): Promise<Success<RestockSkuData[]> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -49,9 +52,9 @@ export class DbListSkusClient implements IDbListSkusClient {
     return sendCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(listSkusCommand: ListSkusCommand): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'DbListSkusClient.validateInput'
 
@@ -65,9 +68,9 @@ export class DbListSkusClient implements IDbListSkusClient {
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildDdbCommand(listSkusCommand: ListSkusCommand): Success<QueryCommand> | Failure<'InvalidArgumentsError'> {
     const logContext = 'DbListSkusClient.buildDdbCommand'
 
@@ -125,9 +128,9 @@ export class DbListSkusClient implements IDbListSkusClient {
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async sendDdbCommand(
     ddbCommand: QueryCommand,
   ): Promise<Success<RestockSkuData[]> | Failure<'UnrecognizedError'>> {
@@ -155,9 +158,9 @@ export class DbListSkusClient implements IDbListSkusClient {
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildSkuData(items: Record<string, NativeAttributeValue>[]): RestockSkuData[] {
     const skus: RestockSkuData[] = items.map((item) => ({
       sku: item.sku,

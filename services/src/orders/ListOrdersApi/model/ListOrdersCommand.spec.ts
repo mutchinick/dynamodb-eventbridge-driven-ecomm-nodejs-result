@@ -5,7 +5,7 @@ const mockOrderId = 'mockOrderId'
 const mockSortDirection = 'asc'
 const mockLimit = 10
 
-function buildMockListOrdersCommandInput() {
+function buildMockListOrdersCommandInput(): ListOrdersCommandInput {
   const mockValidInput: ListOrdersCommandInput = {
     orderId: mockOrderId,
     sortDirection: mockSortDirection,

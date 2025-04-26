@@ -14,18 +14,21 @@ type ListSkusCommandProps = {
   readonly options?: Record<string, unknown>
 }
 
+/**
+ *
+ */
 export class ListSkusCommand implements ListSkusCommandProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly commandData: ListSkusCommandData,
     public readonly options?: Record<string, unknown>,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     listSkusCommandInput: ListSkusCommandInput,
   ): Success<ListSkusCommand> | Failure<'InvalidArgumentsError'> {
@@ -45,9 +48,9 @@ export class ListSkusCommand implements ListSkusCommandProps {
     return listSkusCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     listSkusCommandInput: ListSkusCommandInput,
   ): Success<ListSkusCommandProps> | Failure<'InvalidArgumentsError'> {
@@ -64,9 +67,9 @@ export class ListSkusCommand implements ListSkusCommandProps {
     return Result.makeSuccess(listSkusCommandProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     listSkusCommandInput: ListSkusCommandData,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

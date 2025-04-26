@@ -7,10 +7,13 @@ export type RawSimulatedEventInput = TypeUtilsPretty<RawEventProps>
 
 type RawSimulatedEventProps = TypeUtilsPretty<RawEventProps>
 
+/**
+ *
+ */
 export class RawSimulatedEvent implements RawSimulatedEventProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     readonly pk: string,
     readonly sk: string,
@@ -20,10 +23,12 @@ export class RawSimulatedEvent implements RawSimulatedEventProps {
     readonly updatedAt: string,
   ) {}
 
-  //
-  //
-  //
-  public static validateAndBuild(rawSimulatedEventInput: RawSimulatedEventInput) {
+  /**
+   *
+   */
+  public static validateAndBuild(
+    rawSimulatedEventInput: RawSimulatedEventInput,
+  ): Success<RawSimulatedEvent> | Failure<'InvalidArgumentsError'> {
     const logContext = 'RawSimulatedEvent.validateAndBuild'
     console.info(`${logContext} init:`, { rawSimulatedEventInput })
 
@@ -40,9 +45,9 @@ export class RawSimulatedEvent implements RawSimulatedEventProps {
     return rawSimulatedEventResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     rawSimulatedEventInput: RawSimulatedEventInput,
   ): Success<RawSimulatedEventProps> | Failure<'InvalidArgumentsError'> {
@@ -64,9 +69,9 @@ export class RawSimulatedEvent implements RawSimulatedEventProps {
     return Result.makeSuccess(rawSimulatedEventProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     rawSimulatedEventInput: RawSimulatedEventInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

@@ -20,21 +20,21 @@ export interface IDeallocateOrderPaymentRejectedWorkerService {
   >
 }
 
-//
-//
-//
+/**
+ *
+ */
 export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateOrderPaymentRejectedWorkerService {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(
     private readonly dbGetOrderAllocationClient: IDbGetOrderAllocationClient,
     private readonly dbDeallocateOrderPaymentRejectedClient: IDbDeallocateOrderPaymentRejectedClient,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async deallocateOrderStock(
     incomingOrderPaymentRejectedEvent: IncomingOrderPaymentRejectedEvent,
   ): Promise<
@@ -86,9 +86,9 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(
     incomingOrderPaymentRejectedEvent: IncomingOrderPaymentRejectedEvent,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
@@ -105,9 +105,9 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async getOrderAllocation(
     incomingOrderPaymentRejectedEvent: IncomingOrderPaymentRejectedEvent,
   ): Promise<Success<OrderAllocationData> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -131,9 +131,9 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
     return getOrderAllocationResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async deallocateOrder(
     existingOrderAllocationData: OrderAllocationData,
     incomingOrderPaymentRejectedEvent: IncomingOrderPaymentRejectedEvent,

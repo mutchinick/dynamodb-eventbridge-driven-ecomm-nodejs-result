@@ -21,18 +21,21 @@ type AllocateOrderStockCommandProps = {
   readonly options?: Record<string, unknown>
 }
 
+/**
+ *
+ */
 export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly commandData: AllocateOrderStockCommandData,
     public readonly options?: Record<string, unknown>,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     allocateOrderStockCommandInput: AllocateOrderStockCommandInput,
   ): Success<AllocateOrderStockCommand> | Failure<'InvalidArgumentsError'> {
@@ -52,9 +55,9 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
     return allocateOrderStockCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     allocateOrderStockCommandInput: AllocateOrderStockCommandInput,
   ): Success<AllocateOrderStockCommandProps> | Failure<'InvalidArgumentsError'> {
@@ -82,9 +85,9 @@ export class AllocateOrderStockCommand implements AllocateOrderStockCommandProps
     return Result.makeSuccess(allocateOrderStockCommandProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     allocateOrderStockCommandInput: AllocateOrderStockCommandInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

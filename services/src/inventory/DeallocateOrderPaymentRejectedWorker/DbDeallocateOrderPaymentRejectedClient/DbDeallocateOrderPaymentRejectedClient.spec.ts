@@ -229,7 +229,6 @@ describe(`Inventory Service DeallocateOrderPaymentRejectedWorker
     expect(mockDdbDocClient.send).toHaveBeenCalledWith(expect.objectContaining({ input: expectedDdbCommand.input }))
   })
 
-  //
   it(`returns a transient Failure of kind UnrecognizedError if
       DynamoDBDocumentClient.send throws an unrecognized Error`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_throws()

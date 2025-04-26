@@ -25,10 +25,13 @@ export interface ISyncOrderWorkerService {
   >
 }
 
+/**
+ *
+ */
 export class SyncOrderWorkerService implements ISyncOrderWorkerService {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(
     private readonly dbGetOrderClient: IDbGetOrderClient,
     private readonly dbCreateOrderClient: IDbCreateOrderClient,
@@ -36,9 +39,9 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     private readonly esRaiseOrderCreatedEventClient: IEsRaiseOrderCreatedEventClient,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async syncOrder(
     incomingOrderEvent: IncomingOrderEvent,
   ): Promise<
@@ -131,10 +134,10 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     return invalidOpsFailure
   }
 
-  //
-  //
-  //
-  private validateInput(incomingOrderEvent: IncomingOrderEvent) {
+  /**
+   *
+   */
+  private validateInput(incomingOrderEvent: IncomingOrderEvent): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'SyncOrderWorkerService.validateInput'
 
     if (
@@ -152,10 +155,12 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
-  private async getOrder(incomingOrderEvent: IncomingOrderEvent) {
+  /**
+   *
+   */
+  private async getOrder(
+    incomingOrderEvent: IncomingOrderEvent,
+  ): Promise<Success<OrderData> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
     const logContext = 'SyncOrderWorkerService.getOrder'
     console.info(`${logContext} init:`, { incomingOrderEvent })
 
@@ -176,9 +181,9 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     return getOrderResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async createOrder(
     incomingOrderEvent: IncomingOrderEvent,
   ): Promise<
@@ -206,9 +211,9 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     return createOrderResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async raiseOrderCreatedEvent(
     createdOrderData: OrderData,
   ): Promise<
@@ -237,9 +242,9 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     return raiseEventResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async updateOrder(
     existingOrderData: OrderData,
     incomingOrderEvent: IncomingOrderEvent,

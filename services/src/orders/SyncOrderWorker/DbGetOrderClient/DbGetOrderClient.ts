@@ -9,15 +9,18 @@ export interface IDbGetOrderClient {
   ) => Promise<Success<OrderData> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>>
 }
 
+/**
+ *
+ */
 export class DbGetOrderClient implements IDbGetOrderClient {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly ddbDocClient: DynamoDBDocumentClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async getOrder(
     getOrderCommand: GetOrderCommand,
   ): Promise<Success<OrderData> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -45,9 +48,9 @@ export class DbGetOrderClient implements IDbGetOrderClient {
     return sendCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(getOrderCommand: GetOrderCommand): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'DbGetOrderClient.validateInput'
 
@@ -61,9 +64,9 @@ export class DbGetOrderClient implements IDbGetOrderClient {
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildDdbCommand(getOrderCommand: GetOrderCommand): Success<GetCommand> | Failure<'InvalidArgumentsError'> {
     const logContext = 'DbGetOrderClient.buildDdbCommand'
 
@@ -89,10 +92,10 @@ export class DbGetOrderClient implements IDbGetOrderClient {
     }
   }
 
-  //
-  //
-  //
-  private async sendDdbCommand(ddbCommand: GetCommand) {
+  /**
+   *
+   */
+  private async sendDdbCommand(ddbCommand: GetCommand): Promise<Success<OrderData> | Failure<'UnrecognizedError'>> {
     const logContext = 'DbGetOrderClient.sendDdbCommand'
     console.info(`${logContext} init:`, { ddbCommand })
 
@@ -110,10 +113,10 @@ export class DbGetOrderClient implements IDbGetOrderClient {
     }
   }
 
-  //
-  //
-  //
-  private buildOrderData(attributes: Record<string, NativeAttributeValue>) {
+  /**
+   *
+   */
+  private buildOrderData(attributes: Record<string, NativeAttributeValue>): OrderData {
     const orderData: OrderData = {
       orderId: attributes.orderId,
       orderStatus: attributes.orderStatus,

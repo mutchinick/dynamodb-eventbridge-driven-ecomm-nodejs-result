@@ -11,15 +11,18 @@ export interface IDbUpdateOrderClient {
   ) => Promise<Success<OrderData> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>>
 }
 
+/**
+ *
+ */
 export class DbUpdateOrderClient implements IDbUpdateOrderClient {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly ddbDocClient: DynamoDBDocumentClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async updateOrder(
     updateOrderCommand: UpdateOrderCommand,
   ): Promise<Success<OrderData> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -47,9 +50,9 @@ export class DbUpdateOrderClient implements IDbUpdateOrderClient {
     return sendCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(updateOrderCommand: UpdateOrderCommand): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'DbUpdateOrderClient.validateInput'
 
@@ -63,10 +66,12 @@ export class DbUpdateOrderClient implements IDbUpdateOrderClient {
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
-  private buildDdbCommand(updateOrderCommand: UpdateOrderCommand) {
+  /**
+   *
+   */
+  private buildDdbCommand(
+    updateOrderCommand: UpdateOrderCommand,
+  ): Success<UpdateCommand> | Failure<'InvalidArgumentsError'> {
     const logContext = 'DbUpdateOrderClient.buildDdbCommand'
 
     try {
@@ -105,10 +110,10 @@ export class DbUpdateOrderClient implements IDbUpdateOrderClient {
     }
   }
 
-  //
-  //
-  //
-  private async sendDdbCommand(ddbCommand: UpdateCommand) {
+  /**
+   *
+   */
+  private async sendDdbCommand(ddbCommand: UpdateCommand): Promise<Success<OrderData> | Failure<'UnrecognizedError'>> {
     const logContext = 'DbUpdateOrderClient.sendDdbCommand'
     console.info(`${logContext} init:`, { ddbCommand })
 
@@ -136,10 +141,10 @@ export class DbUpdateOrderClient implements IDbUpdateOrderClient {
     }
   }
 
-  //
-  //
-  //
-  private buildOrderData(attributes: Record<string, NativeAttributeValue>) {
+  /**
+   *
+   */
+  private buildOrderData(attributes: Record<string, NativeAttributeValue>): OrderData {
     const orderData: OrderData = {
       orderId: attributes.orderId,
       orderStatus: attributes.orderStatus,

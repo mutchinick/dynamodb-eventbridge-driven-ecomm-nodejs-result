@@ -10,18 +10,21 @@ export interface IDbListOrdersClient {
   ) => Promise<Success<OrderData[]> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>>
 }
 
+/**
+ *
+ */
 export class DbListOrdersClient implements IDbListOrdersClient {
   public static readonly DEFAULT_LIMIT = 50
   public static readonly DEFAULT_SORT_DIRECTION = SortDirection['asc']
 
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly ddbDocClient: DynamoDBDocumentClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async listOrders(
     listOrdersCommand: ListOrdersCommand,
   ): Promise<Success<OrderData[]> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -49,9 +52,9 @@ export class DbListOrdersClient implements IDbListOrdersClient {
     return sendCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(listOrdersCommand: ListOrdersCommand): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'DbListOrdersClient.validateInput'
 
@@ -65,9 +68,9 @@ export class DbListOrdersClient implements IDbListOrdersClient {
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildDdbCommand(
     listOrdersCommand: ListOrdersCommand,
   ): Success<QueryCommand> | Failure<'InvalidArgumentsError'> {
@@ -127,9 +130,9 @@ export class DbListOrdersClient implements IDbListOrdersClient {
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async sendDdbCommand(ddbCommand: QueryCommand): Promise<Success<OrderData[]> | Failure<'UnrecognizedError'>> {
     const logContext = 'DbListOrdersClient.sendDdbCommand'
     console.info(`${logContext} init:`, { ddbCommand })
@@ -155,9 +158,9 @@ export class DbListOrdersClient implements IDbListOrdersClient {
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildOrderData(items: Record<string, NativeAttributeValue>[]): OrderData[] {
     const orders: OrderData[] = items.map((item) => ({
       orderId: item.orderId,

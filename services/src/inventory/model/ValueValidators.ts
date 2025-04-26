@@ -4,6 +4,9 @@ import { SortDirection } from './SortDirection'
 import { InventoryEventName } from './InventoryEventName'
 import { AllocationStatus, AllocationStatusMembers } from './AllocationStatus'
 
+/**
+ *
+ */
 export class ValueValidators {
   public static validSkuRestockedEventName = () => z.literal(InventoryEventName.SKU_RESTOCKED_EVENT)
 

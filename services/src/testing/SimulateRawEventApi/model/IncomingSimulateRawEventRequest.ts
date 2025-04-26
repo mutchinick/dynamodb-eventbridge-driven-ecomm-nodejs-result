@@ -7,10 +7,13 @@ export type IncomingSimulateRawEventRequestInput = TypeUtilsPretty<RawEventProps
 
 type IncomingSimulateRawEventRequestProps = TypeUtilsPretty<RawEventProps>
 
+/**
+ *
+ */
 export class IncomingSimulateRawEventRequest implements IncomingSimulateRawEventRequestProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     readonly pk: string,
     readonly sk: string,
@@ -20,9 +23,9 @@ export class IncomingSimulateRawEventRequest implements IncomingSimulateRawEvent
     readonly updatedAt: string,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     incomingSimulateRawEventRequestInput: IncomingSimulateRawEventRequestInput,
   ): Success<IncomingSimulateRawEventRequest> | Failure<'InvalidArgumentsError'> {
@@ -52,9 +55,9 @@ export class IncomingSimulateRawEventRequest implements IncomingSimulateRawEvent
     return incomingSimulateRawEventRequestResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     incomingSimulateRawEventRequestInput: IncomingSimulateRawEventRequestInput,
   ): Success<RawEventProps> | Failure<'InvalidArgumentsError'> {
@@ -75,9 +78,9 @@ export class IncomingSimulateRawEventRequest implements IncomingSimulateRawEvent
     return Result.makeSuccess(incomingSimulateRawEventRequestProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     incomingSimulateRawEventRequestInput: RawEventProps,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

@@ -8,6 +8,9 @@ import { DbGetOrderAllocationClient } from '../AllocateOrderStockWorker/DbGetOrd
 import { EsRaiseOrderStockAllocatedEventClient } from '../AllocateOrderStockWorker/EsRaiseOrderStockAllocatedEventClient/EsRaiseOrderStockAllocatedEventClient'
 import { EsRaiseOrderStockDepletedEventClient } from '../AllocateOrderStockWorker/EsRaiseOrderStockDepletedEventClient/EsRaiseOrderStockDepletedEventClient'
 
+/**
+ *
+ */
 function createHandler(): (sqsEvent: SQSEvent) => Promise<SQSBatchResponse> {
   const ddbClient = new DynamoDBClient({})
   const ddbDocClient = DynamoDBDocumentClient.from(ddbClient)

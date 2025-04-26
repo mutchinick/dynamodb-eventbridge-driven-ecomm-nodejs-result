@@ -12,15 +12,18 @@ export interface IRestockSkuApiService {
 
 export type RestockSkuApiServiceOutput = TypeUtilsPretty<IncomingRestockSkuRequest>
 
+/**
+ *
+ */
 export class RestockSkuApiService implements IRestockSkuApiService {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly esRaiseSkuRestockedEventClient: IEsRaiseSkuRestockedEventClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async restockSku(
     incomingRestockSkuRequest: IncomingRestockSkuRequest,
   ): Promise<Success<RestockSkuApiServiceOutput> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -56,9 +59,9 @@ export class RestockSkuApiService implements IRestockSkuApiService {
     return raiseEventResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(
     incomingRestockSkuRequest: IncomingRestockSkuRequest,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
@@ -75,9 +78,9 @@ export class RestockSkuApiService implements IRestockSkuApiService {
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async raiseSkuRestockedEvent(
     incomingRestockSkuRequest: IncomingRestockSkuRequest,
   ): Promise<

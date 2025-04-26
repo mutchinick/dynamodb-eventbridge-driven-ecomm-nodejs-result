@@ -14,15 +14,18 @@ export interface IRestockSkuWorkerService {
   >
 }
 
+/**
+ *
+ */
 export class RestockSkuWorkerService implements IRestockSkuWorkerService {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly dbRestockSkuClient: IDbRestockSkuClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async restockSku(
     incomingSkuRestockedEvent: IncomingSkuRestockedEvent,
   ): Promise<
@@ -56,9 +59,9 @@ export class RestockSkuWorkerService implements IRestockSkuWorkerService {
     return restockSkuResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(
     incomingSkuRestockedEvent: IncomingSkuRestockedEvent,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

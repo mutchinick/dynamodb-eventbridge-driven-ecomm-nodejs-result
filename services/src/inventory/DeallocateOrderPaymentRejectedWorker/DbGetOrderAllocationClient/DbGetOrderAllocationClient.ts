@@ -11,18 +11,18 @@ export interface IDbGetOrderAllocationClient {
   ) => Promise<Success<OrderAllocationData> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>>
 }
 
-//
-//
-//
+/**
+ *
+ */
 export class DbGetOrderAllocationClient implements IDbGetOrderAllocationClient {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly ddbDocClient: DynamoDBDocumentClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async getOrderAllocation(
     getOrderAllocationCommand: GetOrderAllocationCommand,
   ): Promise<Success<OrderAllocationData> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -50,9 +50,9 @@ export class DbGetOrderAllocationClient implements IDbGetOrderAllocationClient {
     return sendDdbCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(
     getOrderAllocationCommand: GetOrderAllocationCommand,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
@@ -68,9 +68,9 @@ export class DbGetOrderAllocationClient implements IDbGetOrderAllocationClient {
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildDdbCommand(
     getOrderAllocationCommand: GetOrderAllocationCommand,
   ): Success<GetCommand> | Failure<'InvalidArgumentsError'> {
@@ -100,9 +100,9 @@ export class DbGetOrderAllocationClient implements IDbGetOrderAllocationClient {
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async sendDdbCommand(
     ddbCommand: GetCommand,
   ): Promise<Success<OrderAllocationData> | Failure<'UnrecognizedError'>> {
@@ -130,9 +130,9 @@ export class DbGetOrderAllocationClient implements IDbGetOrderAllocationClient {
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildOrderAllocationData(ddbItem: Record<string, NativeAttributeValue>): OrderAllocationData {
     const orderAllocationData: OrderAllocationData = {
       orderId: ddbItem.orderId,

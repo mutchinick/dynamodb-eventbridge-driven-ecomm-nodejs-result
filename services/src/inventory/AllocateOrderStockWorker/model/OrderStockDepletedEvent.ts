@@ -19,10 +19,13 @@ type OrderStockDepletedEventProps = InventoryEvent<
   OrderStockDepletedEventData
 >
 
+/**
+ *
+ */
 export class OrderStockDepletedEvent implements OrderStockDepletedEventProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly eventName: InventoryEventName.ORDER_STOCK_DEPLETED_EVENT,
     public readonly eventData: OrderStockDepletedEventData,
@@ -30,9 +33,9 @@ export class OrderStockDepletedEvent implements OrderStockDepletedEventProps {
     public readonly updatedAt: string,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     orderStockDepletedEventInput: OrderStockDepletedEventInput,
   ): Success<OrderStockDepletedEvent> | Failure<'InvalidArgumentsError'> {
@@ -52,9 +55,9 @@ export class OrderStockDepletedEvent implements OrderStockDepletedEventProps {
     return orderStockDepletedEventResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     orderStockDepletedEventInput: OrderStockDepletedEventInput,
   ): Success<OrderStockDepletedEventProps> | Failure<'InvalidArgumentsError'> {
@@ -74,9 +77,9 @@ export class OrderStockDepletedEvent implements OrderStockDepletedEventProps {
     return Result.makeSuccess(orderStockDepletedEventProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     orderStockDepletedEventInput: OrderStockDepletedEventData,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

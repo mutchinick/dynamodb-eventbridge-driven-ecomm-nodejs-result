@@ -5,6 +5,9 @@ import { EsRaiseOrderPlacedEventClient } from '../PlaceOrderApi/EsRaiseOrderPlac
 import { PlaceOrderApiController } from '../PlaceOrderApi/PlaceOrderApiController/PlaceOrderApiController'
 import { PlaceOrderApiService } from '../PlaceOrderApi/PlaceOrderApiService/PlaceOrderApiService'
 
+/**
+ *
+ */
 function createHandler(): (apiEvent: APIGatewayProxyEventV2) => Promise<APIGatewayProxyStructuredResultV2> {
   const ddbClient = new DynamoDBClient({})
   const ddbDocClient = DynamoDBDocumentClient.from(ddbClient)

@@ -8,17 +8,20 @@ export interface IPlaceOrderApiController {
   placeOrder: (apiEvent: APIGatewayProxyEventV2) => Promise<APIGatewayProxyStructuredResultV2>
 }
 
+/**
+ *
+ */
 export class PlaceOrderApiController implements IPlaceOrderApiController {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly placeOrderApiService: IPlaceOrderApiService) {
     this.placeOrder = this.placeOrder.bind(this)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async placeOrder(apiEvent: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> {
     const logContext = 'PlaceOrderApiController.placeOrder'
     console.info(`${logContext} init:`, { apiEvent })
@@ -42,9 +45,9 @@ export class PlaceOrderApiController implements IPlaceOrderApiController {
     return internalServerError
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async placeOrderSafe(
     apiEvent: APIGatewayProxyEventV2,
   ): Promise<Success<IncomingPlaceOrderRequest> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -73,9 +76,9 @@ export class PlaceOrderApiController implements IPlaceOrderApiController {
     return placeOrderResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private parseInputRequest(apiEvent: APIGatewayProxyEventV2): Success<unknown> | Failure<'InvalidArgumentsError'> {
     const logContext = 'PlaceOrderApiController.parseInputRequest'
 

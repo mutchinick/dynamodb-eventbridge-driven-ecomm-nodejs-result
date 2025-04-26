@@ -13,15 +13,18 @@ export interface ISimulateRawEventApiService {
 
 export type SimulateRawEventApiServiceOutput = IncomingSimulateRawEventRequest
 
+/**
+ *
+ */
 export class SimulateRawEventApiService implements ISimulateRawEventApiService {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly esRaiseRawSimulatedEventClient: IEsRaiseRawSimulatedEventClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async simulateRawEvent(
     incomingSimulateRawEventRequest: IncomingSimulateRawEventRequest,
   ): Promise<
@@ -59,10 +62,12 @@ export class SimulateRawEventApiService implements ISimulateRawEventApiService {
     return raiseEventResult
   }
 
-  //
-  //
-  //
-  private validateInput(incomingSimulateRawEventRequest: IncomingSimulateRawEventRequest) {
+  /**
+   *
+   */
+  private validateInput(
+    incomingSimulateRawEventRequest: IncomingSimulateRawEventRequest,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'SimulateRawEventApiService.validateInput'
     console.info(`${logContext} init:`, { incomingSimulateRawEventRequest })
 
@@ -76,9 +81,9 @@ export class SimulateRawEventApiService implements ISimulateRawEventApiService {
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async raiseRawSimulatedEvent(
     incomingSimulateRawEventRequest: IncomingSimulateRawEventRequest,
   ): Promise<

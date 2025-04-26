@@ -1,6 +1,12 @@
 import { APIGatewayProxyStructuredResultV2 } from 'aws-lambda'
 
+/**
+ *
+ */
 export class HttpResponse {
+  /**
+   *
+   */
   public static OK(responseBody: object): APIGatewayProxyStructuredResultV2 {
     const response: APIGatewayProxyStructuredResultV2 = {
       statusCode: 200,
@@ -9,6 +15,9 @@ export class HttpResponse {
     return response
   }
 
+  /**
+   *
+   */
   public static Created(responseBody: object): APIGatewayProxyStructuredResultV2 {
     const response: APIGatewayProxyStructuredResultV2 = {
       statusCode: 201,
@@ -17,6 +26,9 @@ export class HttpResponse {
     return response
   }
 
+  /**
+   *
+   */
   public static Accepted(responseBody: object): APIGatewayProxyStructuredResultV2 {
     const response: APIGatewayProxyStructuredResultV2 = {
       statusCode: 202,
@@ -25,6 +37,9 @@ export class HttpResponse {
     return response
   }
 
+  /**
+   *
+   */
   public static InternalServerError(): APIGatewayProxyStructuredResultV2 {
     const response: APIGatewayProxyStructuredResultV2 = {
       statusCode: 500,
@@ -33,6 +48,9 @@ export class HttpResponse {
     return response
   }
 
+  /**
+   *
+   */
   public static BadRequestError(): APIGatewayProxyStructuredResultV2 {
     const response: APIGatewayProxyStructuredResultV2 = {
       statusCode: 400,

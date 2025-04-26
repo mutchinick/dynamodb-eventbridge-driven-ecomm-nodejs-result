@@ -15,18 +15,21 @@ type GetOrderAllocationCommandProps = {
   readonly options?: Record<string, unknown>
 }
 
+/**
+ *
+ */
 export class GetOrderAllocationCommand implements GetOrderAllocationCommandProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly commandData: GetOrderAllocationCommandData,
     public readonly options?: Record<string, unknown>,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     getOrderAllocationCommandInput: GetOrderAllocationCommandInput,
   ): Success<GetOrderAllocationCommand> | Failure<'InvalidArgumentsError'> {
@@ -46,9 +49,9 @@ export class GetOrderAllocationCommand implements GetOrderAllocationCommandProps
     return getOrderAllocationCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     getOrderAllocationCommandInput: GetOrderAllocationCommandInput,
   ): Success<GetOrderAllocationCommandProps> | Failure<'InvalidArgumentsError'> {
@@ -65,9 +68,9 @@ export class GetOrderAllocationCommand implements GetOrderAllocationCommandProps
     return Result.makeSuccess(getOrderAllocationCommandProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     getOrderAllocationCommandInput: GetOrderAllocationCommandInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

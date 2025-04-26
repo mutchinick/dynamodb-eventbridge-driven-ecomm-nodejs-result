@@ -16,7 +16,7 @@ const mockUnits = 4
 const mockPrice = 1432
 const mockUserId = 'mockUserId'
 
-function buildMockIncomingOrderEvent() {
+function buildMockIncomingOrderEvent(): TypeUtilsMutable<IncomingOrderEvent> {
   const incomingIncomingOrderEvent: TypeUtilsMutable<IncomingOrderEvent> = {
     eventName: mockEventName,
     eventData: {
@@ -44,7 +44,7 @@ type MockEventDetail = {
 }
 
 // COMBAK: Work a simpler way to build/wrap/unwrap these EventBrideEvents (maybe some abstraction util?)
-function buildMockEventBrideEvent(incomingOrderEvent: IncomingOrderEvent) {
+function buildMockEventBrideEvent(incomingOrderEvent: IncomingOrderEvent): EventBridgeEvent<string, MockEventDetail> {
   const mockEventBridgeEvent: EventBridgeEvent<string, MockEventDetail> = {
     'detail-type': 'mockDetailType',
     account: 'mockAccount',

@@ -12,10 +12,13 @@ type SkuRestockedEventData = TypeUtilsPretty<Pick<RestockSkuData, 'sku' | 'units
 
 type SkuRestockedEventProps = InventoryEvent<InventoryEventName.SKU_RESTOCKED_EVENT, SkuRestockedEventData>
 
+/**
+ *
+ */
 export class SkuRestockedEvent implements SkuRestockedEventProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly eventName: InventoryEventName.SKU_RESTOCKED_EVENT,
     public readonly eventData: SkuRestockedEventData,
@@ -23,9 +26,9 @@ export class SkuRestockedEvent implements SkuRestockedEventProps {
     public readonly updatedAt: string,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     skuRestockedEventInput: SkuRestockedEventInput,
   ): Success<SkuRestockedEvent> | Failure<'InvalidArgumentsError'> {
@@ -45,9 +48,9 @@ export class SkuRestockedEvent implements SkuRestockedEventProps {
     return skuRestockedEventResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     skuRestockedEventInput: SkuRestockedEventInput,
   ): Success<SkuRestockedEventProps> | Failure<'InvalidArgumentsError'> {
@@ -67,9 +70,9 @@ export class SkuRestockedEvent implements SkuRestockedEventProps {
     return Result.makeSuccess(skuRestockedEventProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     skuRestockedEventInput: SkuRestockedEventData,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

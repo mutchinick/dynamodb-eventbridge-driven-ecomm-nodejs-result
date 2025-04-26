@@ -26,13 +26,13 @@ type IncomingOrderEventData = TypeUtilsPretty<Pick<OrderData, 'orderId' | 'sku' 
 
 type IncomingOrderEventProps = OrderEvent<OrderEventName, IncomingOrderEventData>
 
-//
-//
-//
+/**
+ *
+ */
 export class IncomingOrderEvent implements IncomingOrderEventProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     readonly eventName: OrderEventName,
     readonly eventData: IncomingOrderEventData,
@@ -40,16 +40,16 @@ export class IncomingOrderEvent implements IncomingOrderEventProps {
     readonly updatedAt: string,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static isOrderPlacedEvent(incomingOrderEvent: IncomingOrderEvent): boolean {
     return incomingOrderEvent.eventName === OrderEventName.ORDER_PLACED_EVENT
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     incomingOrderEventInput: IncomingOrderEventInput,
   ): Success<IncomingOrderEvent> | Failure<'InvalidArgumentsError'> {
@@ -69,9 +69,9 @@ export class IncomingOrderEvent implements IncomingOrderEventProps {
     return incomingOrderEventResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     incomingOrderEventInput: IncomingOrderEventInput,
   ): Success<IncomingOrderEventProps> | Failure<'InvalidArgumentsError'> {
@@ -92,9 +92,9 @@ export class IncomingOrderEvent implements IncomingOrderEventProps {
     return Result.makeSuccess(incomingOrderEventProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static parseValidateInput(
     incomingOrderEventInput: IncomingOrderEventInput,
   ): Success<IncomingOrderEventProps> | Failure<'InvalidArgumentsError'> {

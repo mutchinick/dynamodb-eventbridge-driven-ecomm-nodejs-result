@@ -33,7 +33,7 @@ function buildMockOrderCreatedEvent(): TypeUtilsMutable<OrderCreatedEvent> {
 
 const mockOrderCreatedEvent = buildMockOrderCreatedEvent()
 
-function buildMockDdbCommand() {
+function buildMockDdbCommand(): PutCommand {
   const ddbCommand = new PutCommand({
     TableName: mockEventStoreTableName,
     Item: {

@@ -14,15 +14,18 @@ export interface IEsRaiseRawSimulatedEventClient {
   >
 }
 
+/**
+ *
+ */
 export class EsRaiseRawSimulatedEventClient implements IEsRaiseRawSimulatedEventClient {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly ddbDocClient: DynamoDBDocumentClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async raiseRawSimulatedEvent(
     rawSimulatedEvent: RawSimulatedEvent,
   ): Promise<
@@ -55,9 +58,9 @@ export class EsRaiseRawSimulatedEventClient implements IEsRaiseRawSimulatedEvent
     return sendDdbCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(rawSimulatedEvent: RawSimulatedEvent): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'EsRaiseRawSimulatedEventClient.validateInput'
 
@@ -71,9 +74,9 @@ export class EsRaiseRawSimulatedEventClient implements IEsRaiseRawSimulatedEvent
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildDdbCommand(
     rawSimulatedEvent: RawSimulatedEvent,
   ): Success<PutCommand> | Failure<'InvalidArgumentsError'> {
@@ -111,9 +114,9 @@ export class EsRaiseRawSimulatedEventClient implements IEsRaiseRawSimulatedEvent
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async sendDdbCommand(
     ddbCommand: PutCommand,
   ): Promise<Success<void> | Failure<'DuplicateEventRaisedError'> | Failure<'UnrecognizedError'>> {

@@ -6,6 +6,9 @@ import { DbGetOrderAllocationClient } from '../DeallocateOrderPaymentRejectedWor
 import { DeallocateOrderPaymentRejectedWorkerController } from '../DeallocateOrderPaymentRejectedWorker/DeallocateOrderPaymentRejectedWorkerController/DeallocateOrderPaymentRejectedWorkerController'
 import { DeallocateOrderPaymentRejectedWorkerService } from '../DeallocateOrderPaymentRejectedWorker/DeallocateOrderPaymentRejectedWorkerService/DeallocateOrderPaymentRejectedWorkerService'
 
+/**
+ *
+ */
 function createHandler(): (sqsEvent: SQSEvent) => Promise<SQSBatchResponse> {
   const ddbClient = new DynamoDBClient({})
   const ddbDocClient = DynamoDBDocumentClient.from(ddbClient)

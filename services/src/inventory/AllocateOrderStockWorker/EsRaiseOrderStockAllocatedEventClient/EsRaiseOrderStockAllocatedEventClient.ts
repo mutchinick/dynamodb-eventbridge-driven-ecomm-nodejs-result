@@ -14,15 +14,18 @@ export interface IEsRaiseOrderStockAllocatedEventClient {
   >
 }
 
+/**
+ *
+ */
 export class EsRaiseOrderStockAllocatedEventClient implements IEsRaiseOrderStockAllocatedEventClient {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly ddbDocClient: DynamoDBDocumentClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async raiseOrderStockAllocatedEvent(
     orderStockAllocatedEvent: OrderStockAllocatedEvent,
   ): Promise<
@@ -55,9 +58,9 @@ export class EsRaiseOrderStockAllocatedEventClient implements IEsRaiseOrderStock
     return sendCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(
     orderStockAllocatedEvent: OrderStockAllocatedEvent,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
@@ -73,9 +76,9 @@ export class EsRaiseOrderStockAllocatedEventClient implements IEsRaiseOrderStock
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildDdbCommand(
     orderStockAllocatedEvent: OrderStockAllocatedEvent,
   ): Success<PutCommand> | Failure<'InvalidArgumentsError'> {
@@ -127,9 +130,9 @@ export class EsRaiseOrderStockAllocatedEventClient implements IEsRaiseOrderStock
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async sendDdbCommand(
     ddbCommand: PutCommand,
   ): Promise<Success<void> | Failure<'UnrecognizedError'> | Failure<'DuplicateEventRaisedError'>> {

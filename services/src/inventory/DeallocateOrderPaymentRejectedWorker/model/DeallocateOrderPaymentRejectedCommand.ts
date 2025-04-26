@@ -24,21 +24,21 @@ type DeallocateOrderPaymentRejectedCommandProps = {
   readonly options?: Record<string, unknown>
 }
 
-//
-//
-//
+/**
+ *
+ */
 export class DeallocateOrderPaymentRejectedCommand implements DeallocateOrderPaymentRejectedCommandProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly commandData: DeallocateOrderPaymentRejectedCommandData,
     public readonly options?: Record<string, unknown>,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     deallocateOrderPaymentRejectedCommandInput: DeallocateOrderPaymentRejectedCommandInput,
   ): Success<DeallocateOrderPaymentRejectedCommand> | Failure<'InvalidArgumentsError'> {
@@ -58,9 +58,9 @@ export class DeallocateOrderPaymentRejectedCommand implements DeallocateOrderPay
     return deallocateOrderPaymentRejectedCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     deallocateOrderPaymentRejectedCommandInput: DeallocateOrderPaymentRejectedCommandInput,
   ): Success<DeallocateOrderPaymentRejectedCommandProps> | Failure<'InvalidArgumentsError'> {
@@ -86,9 +86,9 @@ export class DeallocateOrderPaymentRejectedCommand implements DeallocateOrderPay
     return Result.makeSuccess(deallocateOrderPaymentRejectedCommandProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     deallocateOrderPaymentRejectedCommandInput: DeallocateOrderPaymentRejectedCommandInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

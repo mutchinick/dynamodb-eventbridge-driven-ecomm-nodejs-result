@@ -14,15 +14,18 @@ export interface IDbRestockSkuClient {
   >
 }
 
+/**
+ *
+ */
 export class DbRestockSkuClient implements IDbRestockSkuClient {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly ddbDocClient: DynamoDBDocumentClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async restockSku(
     restockSkuCommand: RestockSkuCommand,
   ): Promise<
@@ -55,9 +58,9 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
     return sendCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(restockSkuCommand: RestockSkuCommand): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'DbRestockSkuClient.validateInput'
 
@@ -71,9 +74,9 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildDdbCommand(
     restockSkuCommand: RestockSkuCommand,
   ): Success<TransactWriteCommand> | Failure<'InvalidArgumentsError'> {
@@ -172,9 +175,9 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async sendDdbCommand(
     ddbCommand: TransactWriteCommand,
   ): Promise<Success<void> | Failure<'DuplicateRestockOperationError'> | Failure<'UnrecognizedError'>> {
@@ -204,9 +207,9 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private isDuplicateRestockOperationError(error: unknown): boolean {
     const errorCode = DynamoDbUtils.getTransactionCancellationCode(error, 0)
     return errorCode === DynamoDbUtils.CancellationReasons.ConditionalCheckFailed

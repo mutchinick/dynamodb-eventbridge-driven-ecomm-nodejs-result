@@ -7,17 +7,20 @@ export interface IAllocateOrderStockWorkerController {
   allocateOrdersStock: (sqsEvent: SQSEvent) => Promise<SQSBatchResponse>
 }
 
+/**
+ *
+ */
 export class AllocateOrderStockWorkerController implements IAllocateOrderStockWorkerController {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly allocateOrderStockWorkerService: IAllocateOrderStockWorkerService) {
     this.allocateOrdersStock = this.allocateOrdersStock.bind(this)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async allocateOrdersStock(sqsEvent: SQSEvent): Promise<SQSBatchResponse> {
     const logContext = 'AllocateOrderStockWorkerController.allocateOrdersStock'
     console.info(`${logContext} init:`, { sqsEvent })
@@ -34,7 +37,7 @@ export class AllocateOrderStockWorkerController implements IAllocateOrderStockWo
     for (const record of sqsEvent.Records) {
       // If the failure is transient then we add it to the batch errors to requeue and retry
       // If the failure is non-transient then we ignore it to remove it from the queue
-      const allocateOrderStockResult = await this.allocateSingleOrder(record)
+      const allocateOrderStockResult = await this.allocateOrderSafe(record)
       if (Result.isFailureTransient(allocateOrderStockResult)) {
         sqsBatchResponse.batchItemFailures.push({ itemIdentifier: record.messageId })
       }
@@ -44,10 +47,10 @@ export class AllocateOrderStockWorkerController implements IAllocateOrderStockWo
     return sqsBatchResponse
   }
 
-  //
-  //
-  //
-  private async allocateSingleOrder(
+  /**
+   *
+   */
+  private async allocateOrderSafe(
     sqsRecord: SQSRecord,
   ): Promise<
     | Success<void>
@@ -55,7 +58,7 @@ export class AllocateOrderStockWorkerController implements IAllocateOrderStockWo
     | Failure<'DuplicateEventRaisedError'>
     | Failure<'UnrecognizedError'>
   > {
-    const logContext = 'AllocateOrderStockWorkerController.allocateSingleOrder'
+    const logContext = 'AllocateOrderStockWorkerController.allocateOrderSafe'
     console.info(`${logContext} init:`, { sqsRecord })
 
     const parseInputEventResult = this.parseInputEvent(sqsRecord)
@@ -82,9 +85,9 @@ export class AllocateOrderStockWorkerController implements IAllocateOrderStockWo
     return allocateOrderStockResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private parseInputEvent(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
     const logContext = 'AllocateOrderStockWorkerController.parseInputEvent'
 

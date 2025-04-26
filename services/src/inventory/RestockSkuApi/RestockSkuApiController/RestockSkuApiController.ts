@@ -8,17 +8,20 @@ export interface IRestockSkuApiController {
   restockSku: (apiEvent: APIGatewayProxyEventV2) => Promise<APIGatewayProxyStructuredResultV2>
 }
 
+/**
+ *
+ */
 export class RestockSkuApiController implements IRestockSkuApiController {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly restockSkuApiService: IRestockSkuApiService) {
     this.restockSku = this.restockSku.bind(this)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async restockSku(apiEvent: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> {
     const logContext = 'RestockSkuApiController.restockSku'
     console.info(`${logContext} init:`, { apiEvent })
@@ -42,9 +45,9 @@ export class RestockSkuApiController implements IRestockSkuApiController {
     return internalServerError
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async restockSkuSafe(
     apiEvent: APIGatewayProxyEventV2,
   ): Promise<Success<IncomingRestockSkuRequest> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -73,9 +76,9 @@ export class RestockSkuApiController implements IRestockSkuApiController {
     return restockSkuResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private parseInputRequest(apiEvent: APIGatewayProxyEventV2): Success<unknown> | Failure<'InvalidArgumentsError'> {
     const logContext = 'RestockSkuApiController.parseInputRequest'
 

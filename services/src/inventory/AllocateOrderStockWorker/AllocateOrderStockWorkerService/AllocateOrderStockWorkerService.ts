@@ -21,10 +21,13 @@ export interface IAllocateOrderStockWorkerService {
   >
 }
 
+/**
+ *
+ */
 export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorkerService {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(
     private readonly dbGetOrderAllocationClient: IDbGetOrderAllocationClient,
     private readonly dbAllocateOrderStockClient: IDbAllocateOrderStockClient,
@@ -32,9 +35,9 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
     private readonly esRaiseOrderStockDepletedEventClient: IEsRaiseOrderStockDepletedEventClient,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async allocateOrderStock(
     incomingOrderCreatedEvent: IncomingOrderCreatedEvent,
   ): Promise<
@@ -130,9 +133,9 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
     return allocateOrderResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(
     incomingOrderCreatedEvent: IncomingOrderCreatedEvent,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
@@ -149,9 +152,9 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async getOrderAllocation(
     incomingOrderCreatedEvent: IncomingOrderCreatedEvent,
   ): Promise<Success<OrderAllocationData> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -175,9 +178,9 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
     return getOrderAllocationResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async allocateOrder(
     incomingOrderCreatedEvent: IncomingOrderCreatedEvent,
   ): Promise<
@@ -206,9 +209,9 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
     return allocateOrderStockResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async raiseAllocatedEvent(
     incomingOrderCreatedEvent: IncomingOrderCreatedEvent,
   ): Promise<
@@ -238,9 +241,9 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
     return raiseEventResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async raiseDepletedEvent(
     incomingOrderCreatedEvent: IncomingOrderCreatedEvent,
   ): Promise<

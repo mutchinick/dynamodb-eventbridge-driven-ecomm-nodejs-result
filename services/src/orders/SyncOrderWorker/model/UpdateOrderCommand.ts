@@ -19,18 +19,21 @@ type UpdateOrderCommandProps = {
   readonly options?: Record<string, unknown>
 }
 
+/**
+ *
+ */
 export class UpdateOrderCommand implements UpdateOrderCommandProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly commandData: UpdateOrderCommandData,
     public readonly options?: Record<string, unknown>,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     updateOrderCommandInput: UpdateOrderCommandInput,
   ): TypeUtilsWrapper<
@@ -57,9 +60,9 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
     return updateOrderCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     updateOrderCommandInput: UpdateOrderCommandInput,
   ): TypeUtilsWrapper<
@@ -97,10 +100,12 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
     return Result.makeSuccess(updateOrderCommandProps)
   }
 
-  //
-  //
-  //
-  private static validateInput(updateOrderCommandInput: UpdateOrderCommandInput) {
+  /**
+   *
+   */
+  private static validateInput(
+    updateOrderCommandInput: UpdateOrderCommandInput,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'UpdateOrderCommand.validateInput'
 
     // COMBAK: Maybe some schemas can be converted to shared models at some point.
@@ -146,9 +151,9 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static computeNewOrderStatus({
     existingOrderStatus,
     incomingEventName,
@@ -164,7 +169,6 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
   > {
     const logContext = 'UpdateOrderCommand.computeNewOrderStatus'
 
-    //
     const forbiddenFailure = Result.makeFailure(
       'ForbiddenOrderStatusTransitionError',
       'Order status transition is forbidden (non-transient error, cannot retry)',

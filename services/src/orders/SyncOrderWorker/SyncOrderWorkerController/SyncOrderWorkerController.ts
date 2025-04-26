@@ -7,17 +7,20 @@ export interface ISyncOrderWorkerController {
   syncOrders: (sqsEvent: SQSEvent) => Promise<SQSBatchResponse>
 }
 
+/**
+ *
+ */
 export class SyncOrderWorkerController implements ISyncOrderWorkerController {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly syncOrderWorkerService: ISyncOrderWorkerService) {
     this.syncOrders = this.syncOrders.bind(this)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async syncOrders(sqsEvent: SQSEvent): Promise<SQSBatchResponse> {
     const logContext = 'SyncOrderWorkerController.syncOrders'
     console.info(`${logContext} init:`, { sqsEvent })
@@ -34,7 +37,7 @@ export class SyncOrderWorkerController implements ISyncOrderWorkerController {
     for (const record of sqsEvent.Records) {
       // If the failure is transient then we add it to the batch errors to requeue and retry
       // If the failure is non-transient then we ignore it to remove it from the queue
-      const restockSkuResult = await this.syncSingleOrderSafe(record)
+      const restockSkuResult = await this.syncOrderSafe(record)
       if (Result.isFailureTransient(restockSkuResult)) {
         sqsBatchResponse.batchItemFailures.push({ itemIdentifier: record.messageId })
       }
@@ -44,11 +47,22 @@ export class SyncOrderWorkerController implements ISyncOrderWorkerController {
     return sqsBatchResponse
   }
 
-  //
-  //
-  //
-  private async syncSingleOrderSafe(sqsRecord: SQSRecord) {
-    const logContext = 'SyncOrderWorkerController.syncSingleOrderSafe'
+  /**
+   *
+   */
+  private async syncOrderSafe(
+    sqsRecord: SQSRecord,
+  ): Promise<
+    | Success<void>
+    | Failure<'InvalidArgumentsError'>
+    | Failure<'UnrecognizedError'>
+    | Failure<'DuplicateEventRaisedError'>
+    | Failure<'InvalidOperationError'>
+    | Failure<'ForbiddenOrderStatusTransitionError'>
+    | Failure<'NotReadyOrderStatusTransitionError'>
+    | Failure<'RedundantOrderStatusTransitionError'>
+  > {
+    const logContext = 'SyncOrderWorkerController.syncOrderSafe'
     console.info(`${logContext} init:`, { sqsRecord })
 
     const parseInputEventResult = this.parseInputEvent(sqsRecord)
@@ -73,9 +87,9 @@ export class SyncOrderWorkerController implements ISyncOrderWorkerController {
     return restockSkuResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private parseInputEvent(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
     const logContext = 'SyncOrderWorkerController.parseInputEvent'
 

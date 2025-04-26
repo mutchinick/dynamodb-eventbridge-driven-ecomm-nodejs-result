@@ -11,15 +11,18 @@ export interface IPlaceOrderApiService {
 
 export type PlaceOrderApiServiceOutput = IncomingPlaceOrderRequest
 
+/**
+ *
+ */
 export class PlaceOrderApiService implements IPlaceOrderApiService {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly esRaiseOrderPlacedEventClient: IEsRaiseOrderPlacedEventClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async placeOrder(
     incomingPlaceOrderRequest: IncomingPlaceOrderRequest,
   ): Promise<Success<IncomingPlaceOrderRequest> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -55,10 +58,12 @@ export class PlaceOrderApiService implements IPlaceOrderApiService {
     return raiseEventResult
   }
 
-  //
-  //
-  //
-  private validateInput(incomingPlaceOrderRequest: IncomingPlaceOrderRequest) {
+  /**
+   *
+   */
+  private validateInput(
+    incomingPlaceOrderRequest: IncomingPlaceOrderRequest,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'PlaceOrderApiService.validateInput'
     console.info(`${logContext} init:`, { incomingPlaceOrderRequest })
 
@@ -72,9 +77,9 @@ export class PlaceOrderApiService implements IPlaceOrderApiService {
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async raiseOrderPlacedEvent(
     incomingPlaceOrderRequest: IncomingPlaceOrderRequest,
   ): Promise<

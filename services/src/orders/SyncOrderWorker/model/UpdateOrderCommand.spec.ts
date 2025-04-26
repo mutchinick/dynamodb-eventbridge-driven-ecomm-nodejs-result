@@ -35,7 +35,7 @@ function buildMockIncomingOrderEvent(): TypeUtilsMutable<IncomingOrderEvent> {
   return mockValidOrderEvent
 }
 
-function buildMockOrderData() {
+function buildMockOrderData(): OrderData {
   const mockValidOrderData: OrderData = {
     orderId: mockOrderId,
     sku: mockSku,
@@ -49,7 +49,7 @@ function buildMockOrderData() {
   return mockValidOrderData
 }
 
-function buildMockUpdateOrderCommandInput() {
+function buildMockUpdateOrderCommandInput(): TypeUtilsMutable<UpdateOrderCommandInput> {
   const mockValidInput: TypeUtilsMutable<UpdateOrderCommandInput> = {
     existingOrderData: buildMockOrderData(),
     incomingOrderEvent: buildMockIncomingOrderEvent(),
@@ -970,7 +970,6 @@ describe(`Orders Service SyncOrderWorker UpdateOrderCommand tests`, () => {
    ************************************************************
    * Test order status transition errors
    ************************************************************/
-  //
   it(`returns a non-transient Failure of kind ForbiddenOrderStatusTransitionError
       error if the input existingOrderData.orderStatus is not valid for transition`, () => {
     const mockUpdateOrderCommandInput = buildMockUpdateOrderCommandInput()

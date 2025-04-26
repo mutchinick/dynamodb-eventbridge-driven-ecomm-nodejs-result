@@ -11,7 +11,7 @@ const mockEventData = 'mockEventData'
 const mockCreatedAt = mockDate
 const mockUpdatedAt = mockDate
 
-function buildMockRawSimulatedEventInput() {
+function buildMockRawSimulatedEventInput(): RawSimulatedEventInput {
   const mockValidInput: RawSimulatedEventInput = {
     pk: mockPk,
     sk: mockSk,

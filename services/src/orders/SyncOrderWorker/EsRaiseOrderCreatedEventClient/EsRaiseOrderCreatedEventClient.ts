@@ -14,15 +14,18 @@ export interface IEsRaiseOrderCreatedEventClient {
   >
 }
 
+/**
+ *
+ */
 export class EsRaiseOrderCreatedEventClient implements IEsRaiseOrderCreatedEventClient {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly ddbDocClient: DynamoDBDocumentClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async raiseOrderCreatedEvent(
     orderCreatedEvent: OrderCreatedEvent,
   ): Promise<
@@ -55,9 +58,9 @@ export class EsRaiseOrderCreatedEventClient implements IEsRaiseOrderCreatedEvent
     return sendCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(orderCreatedEvent: OrderCreatedEvent): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'EsRaiseOrderCreatedEventClient.validateInput'
 
@@ -71,9 +74,9 @@ export class EsRaiseOrderCreatedEventClient implements IEsRaiseOrderCreatedEvent
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildDdbCommand(
     orderCreatedEvent: OrderCreatedEvent,
   ): Success<PutCommand> | Failure<'InvalidArgumentsError'> {
@@ -125,9 +128,9 @@ export class EsRaiseOrderCreatedEventClient implements IEsRaiseOrderCreatedEvent
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async sendDdbCommand(
     ddbCommand: PutCommand,
   ): Promise<Success<void> | Failure<'DuplicateEventRaisedError'> | Failure<'UnrecognizedError'>> {

@@ -8,17 +8,20 @@ export interface IListOrdersApiController {
   listOrders: (apiEvent: APIGatewayProxyEventV2) => Promise<APIGatewayProxyStructuredResultV2>
 }
 
+/**
+ *
+ */
 export class ListOrdersApiController implements IListOrdersApiController {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly listOrdersApiService: IListOrdersApiService) {
     this.listOrders = this.listOrders.bind(this)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async listOrders(apiEvent: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> {
     const logContext = 'ListOrdersApiController.listOrders'
     console.info(`${logContext} init:`, { apiEvent })
@@ -42,9 +45,9 @@ export class ListOrdersApiController implements IListOrdersApiController {
     return internalServerError
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async listOrdersSafe(
     apiEvent: APIGatewayProxyEventV2,
   ): Promise<Success<ListOrdersApiServiceOutput> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -73,9 +76,9 @@ export class ListOrdersApiController implements IListOrdersApiController {
     return listOrdersResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private parseInputRequest(apiEvent: APIGatewayProxyEventV2): Success<unknown> | Failure<'InvalidArgumentsError'> {
     const logContext = 'ListOrdersApiController.parseInputRequest'
 

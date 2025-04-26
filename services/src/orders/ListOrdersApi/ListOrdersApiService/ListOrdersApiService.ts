@@ -12,15 +12,18 @@ export interface IListOrdersApiService {
 
 export type ListOrdersApiServiceOutput = { orders: OrderData[] }
 
+/**
+ *
+ */
 export class ListOrdersApiService implements IListOrdersApiService {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly dbListOrdersClient: IDbListOrdersClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async listOrders(
     incomingListOrdersRequest: IncomingListOrdersRequest,
   ): Promise<Success<ListOrdersApiServiceOutput> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
@@ -46,10 +49,12 @@ export class ListOrdersApiService implements IListOrdersApiService {
     return serviceOutputResult
   }
 
-  //
-  //
-  //
-  private validateInput(incomingListOrdersRequest: IncomingListOrdersRequest) {
+  /**
+   *
+   */
+  private validateInput(
+    incomingListOrdersRequest: IncomingListOrdersRequest,
+  ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'ListOrdersApiService.validateInput'
     console.info(`${logContext} init:`, { incomingListOrdersRequest })
 
@@ -63,9 +68,9 @@ export class ListOrdersApiService implements IListOrdersApiService {
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async queryOrders(
     incomingListOrdersRequest: IncomingListOrdersRequest,
   ): Promise<Success<OrderData[]> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {

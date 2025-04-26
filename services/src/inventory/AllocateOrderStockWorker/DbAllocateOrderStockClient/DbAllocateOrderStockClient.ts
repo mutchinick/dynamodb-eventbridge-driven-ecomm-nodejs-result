@@ -15,15 +15,18 @@ export interface IDbAllocateOrderStockClient {
   >
 }
 
+/**
+ *
+ */
 export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
-  //
-  //
-  //
+  /**
+   *
+   */
   constructor(private readonly ddbDocClient: DynamoDBDocumentClient) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public async allocateOrderStock(
     allocateOrderStockCommand: AllocateOrderStockCommand,
   ): Promise<
@@ -57,9 +60,9 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
     return sendCommandResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private validateInput(
     allocateOrderStockCommand: AllocateOrderStockCommand,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
@@ -75,9 +78,9 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
     return Result.makeSuccess()
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private buildDdbCommand(
     allocateOrderStockCommand: AllocateOrderStockCommand,
   ): Success<TransactWriteCommand> | Failure<'InvalidArgumentsError'> {
@@ -156,9 +159,9 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private async sendDdbCommand(
     ddbCommand: TransactWriteCommand,
   ): Promise<
@@ -199,17 +202,17 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
     }
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private isDuplicateStockAllocationError(error: unknown): boolean {
     const errorCode = DynamoDbUtils.getTransactionCancellationCode(error, 0)
     return errorCode === DynamoDbUtils.CancellationReasons.ConditionalCheckFailed
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private isDepletedStockAllocationError(error: unknown): boolean {
     const errorCode = DynamoDbUtils.getTransactionCancellationCode(error, 1)
     return errorCode === DynamoDbUtils.CancellationReasons.ConditionalCheckFailed

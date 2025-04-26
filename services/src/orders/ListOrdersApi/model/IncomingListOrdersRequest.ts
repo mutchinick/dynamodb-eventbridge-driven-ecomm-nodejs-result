@@ -9,19 +9,22 @@ export type IncomingListOrdersRequestInput = TypeUtilsPretty<Partial<Pick<OrderD
 
 type IncomingListOrdersRequestProps = TypeUtilsPretty<Partial<Pick<OrderData, 'orderId'> & SortParams>>
 
+/**
+ *
+ */
 export class IncomingListOrdersRequest implements IncomingListOrdersRequestProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly orderId?: string,
     public readonly sortDirection?: 'asc' | 'desc',
     public readonly limit?: number,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     incomingListOrdersRequestInput: IncomingListOrdersRequestInput,
   ): Success<IncomingListOrdersRequest> | Failure<'InvalidArgumentsError'> {
@@ -41,9 +44,9 @@ export class IncomingListOrdersRequest implements IncomingListOrdersRequestProps
     return incomingListOrdersRequestResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     incomingListOrdersRequestInput: IncomingListOrdersRequestInput,
   ): Success<IncomingListOrdersRequestProps> | Failure<'InvalidArgumentsError'> {
@@ -61,9 +64,9 @@ export class IncomingListOrdersRequest implements IncomingListOrdersRequestProps
     return Result.makeSuccess(incomingListOrdersRequestProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     incomingListOrdersRequestInput: IncomingListOrdersRequestInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

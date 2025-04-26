@@ -8,22 +8,22 @@ export type IncomingRestockSkuRequestInput = TypeUtilsPretty<Pick<RestockSkuData
 
 type IncomingRestockSkuRequestProps = TypeUtilsPretty<Pick<RestockSkuData, 'sku' | 'units' | 'lotId'>>
 
-//
-//
-//
+/**
+ *
+ */
 export class IncomingRestockSkuRequest implements IncomingRestockSkuRequestProps {
-  //
-  //
-  //
+  /**
+   *
+   */
   private constructor(
     public readonly sku: string,
     public readonly units: number,
     public readonly lotId: string,
   ) {}
 
-  //
-  //
-  //
+  /**
+   *
+   */
   public static validateAndBuild(
     incomingRestockSkuRequestInput: IncomingRestockSkuRequestInput,
   ): Success<IncomingRestockSkuRequest> | Failure<'InvalidArgumentsError'> {
@@ -43,9 +43,9 @@ export class IncomingRestockSkuRequest implements IncomingRestockSkuRequestProps
     return incomingRestockSkuRequestResult
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static buildProps(
     incomingRestockSkuRequestInput: IncomingRestockSkuRequestInput,
   ): Success<IncomingRestockSkuRequestProps> | Failure<'InvalidArgumentsError'> {
@@ -63,9 +63,9 @@ export class IncomingRestockSkuRequest implements IncomingRestockSkuRequestProps
     return Result.makeSuccess(incomingRestockSkuRequestProps)
   }
 
-  //
-  //
-  //
+  /**
+   *
+   */
   private static validateInput(
     incomingRestockSkuRequestInput: IncomingRestockSkuRequestInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {

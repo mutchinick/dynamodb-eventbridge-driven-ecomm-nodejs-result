@@ -11,7 +11,7 @@ const mockUnits = 2
 const mockPrice = 23.45
 const mockUserId = 'mockUserId'
 
-function buildMockOrderPlacedEventInput() {
+function buildMockOrderPlacedEventInput(): OrderPlacedEventInput {
   const mockValidInput: OrderPlacedEventInput = {
     orderId: mockOrderId,
     sku: mockSku,
