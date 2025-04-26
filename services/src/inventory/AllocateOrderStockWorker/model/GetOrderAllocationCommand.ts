@@ -1,4 +1,4 @@
-// FIXME: This component is duplicated in AllocateOrderStockWorker.
+// FIXME: This component is duplicated in DeallocateOrderPaymentRejectedWorker.
 // It should be moved to a common place. Will do soon.
 import { z } from 'zod'
 import { Failure, Result, Success } from '../../errors/Result'

@@ -1,8 +1,11 @@
+import { IDbGetOrderAllocationClient } from '../../AllocateOrderStockWorker/DbGetOrderAllocationClient/DbGetOrderAllocationClient'
 import { Failure, Result, Success } from '../../errors/Result'
+import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { IDbAllocateOrderStockClient } from '../DbAllocateOrderStockClient/DbAllocateOrderStockClient'
 import { IEsRaiseOrderStockAllocatedEventClient } from '../EsRaiseOrderStockAllocatedEventClient/EsRaiseOrderStockAllocatedEventClient'
 import { IEsRaiseOrderStockDepletedEventClient } from '../EsRaiseOrderStockDepletedEventClient/EsRaiseOrderStockDepletedEventClient'
 import { AllocateOrderStockCommand, AllocateOrderStockCommandInput } from '../model/AllocateOrderStockCommand'
+import { GetOrderAllocationCommand, GetOrderAllocationCommandInput } from '../model/GetOrderAllocationCommand'
 import { IncomingOrderCreatedEvent } from '../model/IncomingOrderCreatedEvent'
 import { OrderStockAllocatedEvent, OrderStockAllocatedEventInput } from '../model/OrderStockAllocatedEvent'
 import { OrderStockDepletedEvent, OrderStockDepletedEventInput } from '../model/OrderStockDepletedEvent'
@@ -23,6 +26,7 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
   //
   //
   constructor(
+    private readonly dbGetOrderAllocationClient: IDbGetOrderAllocationClient,
     private readonly dbAllocateOrderStockClient: IDbAllocateOrderStockClient,
     private readonly esRaiseOrderStockAllocatedEventClient: IEsRaiseOrderStockAllocatedEventClient,
     private readonly esRaiseOrderStockDepletedEventClient: IEsRaiseOrderStockDepletedEventClient,
@@ -42,10 +46,10 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
     const logContext = 'AllocateOrderStockWorkerService.allocateOrderStock'
     console.info(`${logContext} init:`, { incomingOrderCreatedEvent })
 
-    // This is one of those methods that is long and not pretty, but decomposing it will not be of much help,
-    // because for one, it would add some indirection and deviate from the process flow making it even harder to
-    // understand, also the error handling mechanism is safe but verbose, and on top of that we are very, very
-    // log-happy everywhere, so we just live with it.
+    // This is one of those methods that is long and ugly, I have explored some ways to make it more readable,
+    // and have liked some of them, but for now I have decided to keep it as is: verbose with naming, verbose
+    // with error handling and verbose with logging. Also not a big fan of the comments =).
+    // At some point I come back to it and shorten contextualized names, use helpers to clean up logging, etc.
 
     const inputValidationResult = this.validateInput(incomingOrderCreatedEvent)
     if (Result.isFailure(inputValidationResult)) {
@@ -53,11 +57,30 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
       return inputValidationResult
     }
 
-    // When it creates the Allocation, this can result in some errors that we want to handle with some specific
-    // logic, like DuplicateEventRaisedError or DepletedStockAllocationError.
+    // When it reads the Allocation from the database
+    const getOrderAllocationResult = await this.getOrderAllocation(incomingOrderCreatedEvent)
+    if (Result.isFailure(getOrderAllocationResult)) {
+      console.error(`${logContext} exit failure:`, { getOrderAllocationResult, incomingOrderCreatedEvent })
+      return getOrderAllocationResult
+    }
+    const existingOrderAllocationData = getOrderAllocationResult.value
+
+    // When the Allocation DOES exist and it only raises the Allocated event
+    if (existingOrderAllocationData) {
+      const raiseAllocatedEventResult = await this.raiseAllocatedEvent(incomingOrderCreatedEvent)
+      if (Result.isFailure(raiseAllocatedEventResult)) {
+        console.error(`${logContext} exit failure:`, { raiseAllocatedEventResult, incomingOrderCreatedEvent })
+        return raiseAllocatedEventResult
+      }
+      console.info(`${logContext} exit success: skipped:`, { raiseAllocatedEventResult, incomingOrderCreatedEvent })
+      return Result.makeSuccess()
+    }
+
+    // When it creates the Allocation in the database
     const allocateOrderResult = await this.allocateOrder(incomingOrderCreatedEvent)
 
-    // When the Allocation DID NOT exist and is created successfully, we try to the raise the Allocation event.
+    // When the Allocation DOES NOT exist and it creates it and raises the Allocated event,
+    // it is successful and it raises the Allocated event.
     if (Result.isSuccess(allocateOrderResult)) {
       const raiseAllocatedEventResult = await this.raiseAllocatedEvent(incomingOrderCreatedEvent)
       if (Result.isFailure(raiseAllocatedEventResult)) {
@@ -68,8 +91,9 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
       return Result.makeSuccess()
     }
 
-    // When the Allocation DID already exist we are facing a DuplicateStockAllocationError, if so then we still try
-    // to the raise the event because we don't know if the event was raised successfully when first allocated.
+    // When the Allocation DOES NOT exist WHEN READ but was created by another instance/race condition,
+    // it encounters a DuplicateStockAllocationError and it tries to the raise the Allocated event
+    // because it doesn't know if the Allocated event was raised successfully when first allocated.
     if (Result.isFailureOfKind(allocateOrderResult, 'DuplicateStockAllocationError')) {
       const raiseAllocatedEventResult = await this.raiseAllocatedEvent(incomingOrderCreatedEvent)
       if (Result.isFailure(raiseAllocatedEventResult)) {
@@ -84,8 +108,8 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
       return Result.makeSuccess()
     }
 
-    // When the stock for the Allocation is not enough or depleted we are facing a DepletedStockAllocationError,
-    // if so then we try to raise an Order Depleted Event.
+    // When the Allocation DOES NOT exist and there is not enough stock and it raises the Depleted event,
+    // it encounters a DepletedStockAllocationError and it tries to the raise the Depleted event.
     if (Result.isFailureOfKind(allocateOrderResult, 'DepletedStockAllocationError')) {
       const raiseDepletedEventResult = await this.raiseDepletedEvent(incomingOrderCreatedEvent)
       if (Result.isFailure(raiseDepletedEventResult)) {
@@ -100,8 +124,8 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
       return Result.makeSuccess()
     }
 
-    // If we get to this point it means we have an error we did not or do not want to account for here,
-    // in which case we log the error and return it.
+    // If it gets to this point it means there is an error it did not or do not want to account for here,
+    // in which case it logs the error and returns it.
     console.error(`${logContext} exit failure:`, { allocateOrderResult, incomingOrderCreatedEvent })
     return allocateOrderResult
   }
@@ -123,6 +147,32 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
     }
 
     return Result.makeSuccess()
+  }
+
+  //
+  //
+  //
+  private async getOrderAllocation(
+    incomingOrderCreatedEvent: IncomingOrderCreatedEvent,
+  ): Promise<Success<OrderAllocationData> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
+    const logContext = 'AllocateOrderStockWorkerService.getOrderAllocation'
+    console.info(`${logContext} init:`, { incomingOrderCreatedEvent })
+
+    const { orderId, sku } = incomingOrderCreatedEvent.eventData
+    const getOrderAllocationCommandInput: GetOrderAllocationCommandInput = { orderId, sku }
+    const getOrderAllocationCommandResult = GetOrderAllocationCommand.validateAndBuild(getOrderAllocationCommandInput)
+    if (Result.isFailure(getOrderAllocationCommandResult)) {
+      console.error(`${logContext} exit failure:`, { getOrderAllocationCommandResult, getOrderAllocationCommandInput })
+      return getOrderAllocationCommandResult
+    }
+
+    const getOrderAllocationCommand = getOrderAllocationCommandResult.value
+    const getOrderAllocationResult = await this.dbGetOrderAllocationClient.getOrderAllocation(getOrderAllocationCommand)
+    Result.isFailure(getOrderAllocationResult)
+      ? console.error(`${logContext} exit failure:`, { getOrderAllocationResult, getOrderAllocationCommand })
+      : console.info(`${logContext} exit success:`, { getOrderAllocationResult, getOrderAllocationCommand })
+
+    return getOrderAllocationResult
   }
 
   //

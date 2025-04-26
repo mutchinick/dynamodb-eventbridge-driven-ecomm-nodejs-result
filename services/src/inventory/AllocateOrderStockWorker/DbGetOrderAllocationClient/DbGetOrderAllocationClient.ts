@@ -1,4 +1,4 @@
-// FIXME: This component is duplicated in AllocateOrderStockWorker.
+// FIXME: This component is duplicated in DeallocateOrderPaymentRejectedWorker.
 // It should be moved to a common place. Will do soon.
 import { DynamoDBDocumentClient, GetCommand, NativeAttributeValue } from '@aws-sdk/lib-dynamodb'
 import { Failure, Result, Success } from '../../errors/Result'
