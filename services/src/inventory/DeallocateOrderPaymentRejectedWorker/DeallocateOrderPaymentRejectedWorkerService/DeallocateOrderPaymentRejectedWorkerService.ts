@@ -52,35 +52,37 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
       return inputValidationResult
     }
 
+    // When it reads the Allocation from the database
     const getOrderAllocationResult = await this.getOrderAllocation(incomingOrderPaymentRejectedEvent)
     if (Result.isFailure(getOrderAllocationResult)) {
       console.error(`${logContext} exit failure:`, { getOrderAllocationResult, incomingOrderPaymentRejectedEvent })
       return getOrderAllocationResult
     }
+    const orderAllocationData = getOrderAllocationResult.value
 
-    // FIXME: If the Allocation DOES NOT exist there in no sense in going further.
-    // Still the Deallocation Command will result in an error, so it's "handled", but is better
-    // to handle it cleanly here first.
-    const existingOrderAllocationData = getOrderAllocationResult.value
-    const deallocateOrderResult = await this.deallocateOrder(
-      existingOrderAllocationData,
-      incomingOrderPaymentRejectedEvent,
-    )
+    // When the Allocation DOES exist and it deallocates it
+    if (orderAllocationData) {
+      const deallocateOrderResult = await this.deallocateOrder(orderAllocationData, incomingOrderPaymentRejectedEvent)
 
-    if (Result.isFailure(deallocateOrderResult)) {
-      console.error(`${logContext} exit failure:`, {
+      if (Result.isFailure(deallocateOrderResult)) {
+        console.error(`${logContext} exit failure:`, {
+          deallocateOrderResult,
+          orderAllocationData,
+          incomingOrderPaymentRejectedEvent,
+        })
+        return deallocateOrderResult
+      }
+
+      console.info(`${logContext} exit success:`, {
         deallocateOrderResult,
-        existingOrderAllocationData,
+        orderAllocationData,
         incomingOrderPaymentRejectedEvent,
       })
-      return deallocateOrderResult
+      return Result.makeSuccess()
     }
 
-    console.info(`${logContext} exit success:`, {
-      deallocateOrderResult,
-      existingOrderAllocationData,
-      incomingOrderPaymentRejectedEvent,
-    })
+    // When the Allocation DOES NOT exist and it skips the deallocation
+    console.info(`${logContext} exit success: skipped:`, { orderAllocationData, incomingOrderPaymentRejectedEvent })
     return Result.makeSuccess()
   }
 
