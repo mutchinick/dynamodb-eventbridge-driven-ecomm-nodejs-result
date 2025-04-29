@@ -16,7 +16,7 @@ const args = process.argv.slice(2)
 const pattern = args.find((arg) => !arg.startsWith('--')) ?? 'src/**/*.{ts,tsx}'
 const dryRun = args.includes('--dry-run')
 const shouldFixQuotes = args.includes('--fix-quotes')
-const unwrap = args.includes('--unwrap')
+const collapse = args.includes('--collapse')
 
 /**
  * Breaks a string into multiple lines based on the max line length,
@@ -38,6 +38,14 @@ function wrapText(text: string, indent: string): string {
 
   lines.push(currentLine.trim())
   return lines.map((line, i) => (i === 0 ? line : indent + line)).join('\n')
+}
+
+/**
+ * Collapses multiple spaces into a single space and trims the text.
+ * This is used to clean up the text before wrapping it.
+ */
+function collapseText(text: string): string {
+  return text.replace(/\s+/g, ' ').trim()
 }
 
 /**
@@ -100,13 +108,7 @@ async function processFile(filePath: string): Promise<boolean> {
 
     // Extract the inner string and decide if it should be re-wrapped
     const rawText = getRawText(firstArg)
-    const stringStartColumn = firstArg.getStart() - firstArg.getStartLinePos()
-    const shouldWrap = !unwrap && stringStartColumn + rawText.length >= MAX_LINE_LENGTH
-    const formatted = unwrap
-      ? rawText.replace(/\s+/g, ' ').trim()
-      : shouldWrap
-        ? wrapText(rawText, indentation)
-        : rawText
+    const formatted = collapse ? collapseText(rawText) : wrapText(rawText, indentation)
 
     // Conditions to replace the string literal with formatted backticks
     const shouldReplace =
