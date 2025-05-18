@@ -43,6 +43,7 @@ export class EsRaiseRawSimulatedEventClient implements IEsRaiseRawSimulatedEvent
       return inputValidationResult
     }
 
+    // NOTE: Unreachable with current tests because of guards, but helps make the system fundamentally safe.
     const ddbCommandResult = this.buildDdbCommand(rawSimulatedEvent)
     if (Result.isFailure(ddbCommandResult)) {
       console.error(`${logContext} exit error:`, { ddbCommandResult, rawSimulatedEvent })
@@ -107,6 +108,7 @@ export class EsRaiseRawSimulatedEventClient implements IEsRaiseRawSimulatedEvent
       })
       return Result.makeSuccess(ddbCommand)
     } catch (error) {
+      // NOTE: Unreachable with current tests because of guards, but helps make the system fundamentally safe.
       console.error(`${logContext} error caught:`, { error, rawSimulatedEvent })
       const invalidArgsFailure = Result.makeFailure('InvalidArgumentsError', error, false)
       console.error(`${logContext} exit error:`, { invalidArgsFailure, rawSimulatedEvent })
