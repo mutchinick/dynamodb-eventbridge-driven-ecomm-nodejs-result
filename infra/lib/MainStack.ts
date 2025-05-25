@@ -4,17 +4,19 @@ import { EventBus } from 'aws-cdk-lib/aws-events'
 import { Construct } from 'constructs'
 import { DynamoDbConstruct } from './common/DynamoDbConstruct'
 import { EventBusConstruct } from './common/EventBusConstruct'
+import { AllocateOrderStockWorkerConstruct } from './inventory/AllocateOrderStockWorkerConstruct'
+import { DeallocateOrderPaymentRejectedWorkerConstruct } from './inventory/DeallocateOrderPaymentRejectedWorkerConstruct'
+import { InventoryApiConstruct } from './inventory/InventoryApiConstruct'
+import { ListSkusApiLambdaConstruct } from './inventory/ListSkusApiLambdaConstruct'
+import { RestockSkuApiLambdaConstruct } from './inventory/RestockSkuApiLambdaConstruct'
+import { RestockSkuWorkerConstruct } from './inventory/RestockSkuWorkerConstruct'
 import { ListOrdersApiLambdaConstruct } from './orders/ListOrdersApiLambdaConstruct'
 import { OrdersApiConstruct } from './orders/OrdersApiConstruct'
 import { PlaceOrderApiLambdaConstruct } from './orders/PlaceOrderApiLambdaConstruct'
 import { SyncOrderWorkerConstruct } from './orders/SyncOrderWorkerConstruct'
+import { ProcessOrderPaymentWorkerConstruct } from './payments/ProcessOrderPaymentWorkerConstruct'
 import { SimulateRawEventApiLambdaConstruct } from './testing/SimulateRawEventApiLambdaConstruct'
 import { TestingApiConstruct } from './testing/TestingApiConstruct'
-import { AllocateOrderStockWorkerConstruct } from './inventory/AllocateOrderStockWorkerConstruct'
-import { DeallocateOrderPaymentRejectedWorkerConstruct } from './inventory/DeallocateOrderPaymentRejectedWorkerConstruct'
-import { ListSkusApiLambdaConstruct } from './inventory/ListSkusApiLambdaConstruct'
-import { RestockSkuApiLambdaConstruct } from './inventory/RestockSkuApiLambdaConstruct'
-import { RestockSkuWorkerConstruct } from './inventory/RestockSkuWorkerConstruct'
 
 export interface IMainStackProps extends StackProps {
   config: {
@@ -43,6 +45,9 @@ export class MainStack extends Stack {
 
     // Inventory
     this.createInventoryService(id, dynamoDbTable, eventBus)
+
+    // Payments
+    this.createPaymentsService(id, dynamoDbTable, eventBus)
   }
 
   /**
@@ -118,7 +123,7 @@ export class MainStack extends Stack {
     const serviceId = `${id}-Inventory`
 
     const inventoryApiConstructName = `${serviceId}-Api`
-    const { httpApi } = new TestingApiConstruct(this, inventoryApiConstructName)
+    const { httpApi } = new InventoryApiConstruct(this, inventoryApiConstructName)
 
     const restockSkuApiConstructName = `${serviceId}-RestockSkuApi`
     new RestockSkuApiLambdaConstruct(this, restockSkuApiConstructName, {
@@ -148,6 +153,19 @@ export class MainStack extends Stack {
     new ListSkusApiLambdaConstruct(this, listSkusApiConstructName, {
       httpApi,
       dynamoDbTable,
+    })
+  }
+
+  /**
+   *
+   */
+  private createPaymentsService(id: string, dynamoDbTable: Table, eventBus: EventBus): void {
+    const serviceId = `${id}-Payments`
+
+    const processOrderPaymentWorkerConstructName = `${serviceId}-ProcessOrderPaymentWorker`
+    new ProcessOrderPaymentWorkerConstruct(this, processOrderPaymentWorkerConstructName, {
+      dynamoDbTable,
+      eventBus,
     })
   }
 }
