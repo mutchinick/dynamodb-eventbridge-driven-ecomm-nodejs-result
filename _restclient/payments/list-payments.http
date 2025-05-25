@@ -1,0 +1,32 @@
+@paymentsApiBaseUrl = {{$dotenv PAYMENTS_API_BASE_URL}}
+
+### LIST BY ORDER_ID
+### POST ###
+POST {{paymentsApiBaseUrl}}/api/v1/payments/listOrderPayments
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "orderId": "ABC001"
+}
+
+### LIST MANY
+### POST ###
+POST {{paymentsApiBaseUrl}}/api/v1/payments/listOrderPayments
+Origin: https://localhost
+Content-Type: application/json
+
+{
+  "limit": 100,
+  "sortDirection": "desc"
+}
+
+### LIST DEFAULT
+### POST ###
+POST {{paymentsApiBaseUrl}}/api/v1/payments/listOrderPayments
+Origin: https://localhost
+Content-Type: application/json
+
+{
+}
+

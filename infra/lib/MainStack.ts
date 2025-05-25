@@ -14,9 +14,11 @@ import { ListOrdersApiLambdaConstruct } from './orders/ListOrdersApiLambdaConstr
 import { OrdersApiConstruct } from './orders/OrdersApiConstruct'
 import { PlaceOrderApiLambdaConstruct } from './orders/PlaceOrderApiLambdaConstruct'
 import { SyncOrderWorkerConstruct } from './orders/SyncOrderWorkerConstruct'
+import { PaymentsApiConstruct } from './payments/PaymentsApiConstruct'
 import { ProcessOrderPaymentWorkerConstruct } from './payments/ProcessOrderPaymentWorkerConstruct'
 import { SimulateRawEventApiLambdaConstruct } from './testing/SimulateRawEventApiLambdaConstruct'
 import { TestingApiConstruct } from './testing/TestingApiConstruct'
+import { ListOrderPaymentsApiLambdaConstruct } from './payments/ListOrderPaymentsApiLambdaConstruct'
 
 export interface IMainStackProps extends StackProps {
   config: {
@@ -78,6 +80,7 @@ export class MainStack extends Stack {
   private createOrdersService(id: string, dynamoDbTable: Table, eventBus: EventBus): void {
     const serviceId = `${id}-Orders`
 
+    // API
     const ordersApiConstructName = `${serviceId}-Api`
     const { httpApi } = new OrdersApiConstruct(this, ordersApiConstructName)
 
@@ -87,16 +90,17 @@ export class MainStack extends Stack {
       dynamoDbTable,
     })
 
-    const syncOrderWorkerConstructName = `${serviceId}-SyncOrderWorker`
-    new SyncOrderWorkerConstruct(this, syncOrderWorkerConstructName, {
-      dynamoDbTable,
-      eventBus,
-    })
-
     const listOrdersApiLambdaName = `${serviceId}-ListOrdersApi`
     new ListOrdersApiLambdaConstruct(this, listOrdersApiLambdaName, {
       httpApi,
       dynamoDbTable,
+    })
+
+    // Workers
+    const syncOrderWorkerConstructName = `${serviceId}-SyncOrderWorker`
+    new SyncOrderWorkerConstruct(this, syncOrderWorkerConstructName, {
+      dynamoDbTable,
+      eventBus,
     })
   }
 
@@ -106,6 +110,7 @@ export class MainStack extends Stack {
   private createTestingService(id: string, dynamoDbTable: Table): void {
     const serviceId = `${id}-Testing`
 
+    // API
     const testingApiConstructName = `${serviceId}-Api`
     const { httpApi } = new TestingApiConstruct(this, testingApiConstructName)
 
@@ -122,6 +127,7 @@ export class MainStack extends Stack {
   private createInventoryService(id: string, dynamoDbTable: Table, eventBus: EventBus): void {
     const serviceId = `${id}-Inventory`
 
+    // API
     const inventoryApiConstructName = `${serviceId}-Api`
     const { httpApi } = new InventoryApiConstruct(this, inventoryApiConstructName)
 
@@ -131,6 +137,13 @@ export class MainStack extends Stack {
       dynamoDbTable,
     })
 
+    const listSkusApiConstructName = `${serviceId}-ListSkusApi`
+    new ListSkusApiLambdaConstruct(this, listSkusApiConstructName, {
+      httpApi,
+      dynamoDbTable,
+    })
+
+    // Workers
     const restockSkuWorkerConstructName = `${serviceId}-RestockSkuWorker`
     new RestockSkuWorkerConstruct(this, restockSkuWorkerConstructName, {
       dynamoDbTable,
@@ -148,12 +161,6 @@ export class MainStack extends Stack {
       dynamoDbTable,
       eventBus,
     })
-
-    const listSkusApiConstructName = `${serviceId}-ListSkusApi`
-    new ListSkusApiLambdaConstruct(this, listSkusApiConstructName, {
-      httpApi,
-      dynamoDbTable,
-    })
   }
 
   /**
@@ -162,6 +169,17 @@ export class MainStack extends Stack {
   private createPaymentsService(id: string, dynamoDbTable: Table, eventBus: EventBus): void {
     const serviceId = `${id}-Payments`
 
+    // API
+    const paymentsApiConstructName = `${serviceId}-Api`
+    const { httpApi } = new PaymentsApiConstruct(this, paymentsApiConstructName)
+
+    const listOrderPaymentsApiConstructName = `${serviceId}-ListOrderPaymentsApi`
+    new ListOrderPaymentsApiLambdaConstruct(this, listOrderPaymentsApiConstructName, {
+      httpApi,
+      dynamoDbTable,
+    })
+
+    // Workers
     const processOrderPaymentWorkerConstructName = `${serviceId}-ProcessOrderPaymentWorker`
     new ProcessOrderPaymentWorkerConstruct(this, processOrderPaymentWorkerConstructName, {
       dynamoDbTable,

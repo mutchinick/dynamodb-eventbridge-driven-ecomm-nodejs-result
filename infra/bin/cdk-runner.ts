@@ -127,6 +127,11 @@ function writeOutputsToEnvFiles(outputsFilePath: string, deploymentPrefix: strin
       envFilePath: '../_restclient/inventory/.env',
       envVarName: 'INVENTORY_API_BASE_URL',
     },
+    {
+      cdkOutputName: `${outputPrefix}PaymentsApiHttpApiUrl`,
+      envFilePath: '../_restclient/payments/.env',
+      envVarName: 'PAYMENTS_API_BASE_URL',
+    },
   ]
 
   console.info('')
