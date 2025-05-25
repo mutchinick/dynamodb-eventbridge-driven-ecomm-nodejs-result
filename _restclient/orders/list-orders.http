@@ -17,7 +17,7 @@ Origin: https://localhost
 Content-Type: application/json
 
 {
-  "limit": 10,
+  "limit": 100,
   "sortDirection": "desc"
 }
 
