@@ -65,7 +65,7 @@ export class RestockSkuApiService implements IRestockSkuApiService {
   private validateInput(
     incomingRestockSkuRequest: IncomingRestockSkuRequest,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'IncomingRestockSkuRequest.validateInput'
+    const logContext = 'RestockSkuApiService.validateInput'
     console.info(`${logContext} init:`, { incomingRestockSkuRequest })
 
     if (incomingRestockSkuRequest instanceof IncomingRestockSkuRequest === false) {

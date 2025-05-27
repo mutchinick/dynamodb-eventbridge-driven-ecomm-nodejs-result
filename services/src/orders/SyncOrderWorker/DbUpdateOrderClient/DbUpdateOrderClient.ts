@@ -74,6 +74,8 @@ export class DbUpdateOrderClient implements IDbUpdateOrderClient {
   ): Success<UpdateCommand> | Failure<'InvalidArgumentsError'> {
     const logContext = 'DbUpdateOrderClient.buildDdbCommand'
 
+    // Perhaps we can prevent all errors by validating the arguments, but UpdateCommand
+    // is an external dependency and we don't know what happens internally, so we try-catch
     try {
       const tableName = process.env.ORDERS_TABLE_NAME
 

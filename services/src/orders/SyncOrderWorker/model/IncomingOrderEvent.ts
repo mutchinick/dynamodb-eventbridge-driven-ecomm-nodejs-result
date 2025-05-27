@@ -16,7 +16,7 @@ type EventDetail = {
   eventVersion: string
   awsRegion: string
   dynamodb: {
-    NewImage: AttributeValue | Record<string, AttributeValue>
+    NewImage: Record<string, AttributeValue>
   }
 }
 
@@ -102,7 +102,7 @@ export class IncomingOrderEvent implements IncomingOrderEventProps {
 
     // COMBAK: Maybe some schemas can be converted to shared models at some point
     const schema = z.object({
-      eventName: ValueValidators.validIncomingEventName(),
+      eventName: ValueValidators.validOrderEventName(),
       eventData: z.object({
         orderId: ValueValidators.validOrderId(),
         sku: ValueValidators.validSku(),

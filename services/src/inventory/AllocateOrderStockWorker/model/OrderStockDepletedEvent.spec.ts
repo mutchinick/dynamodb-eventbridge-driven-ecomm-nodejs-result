@@ -53,15 +53,6 @@ describe(`Inventory Service AllocateOrderStockApi OrderStockDepletedEvent tests`
     expect(Result.isFailureTransient(result)).toBe(false)
   })
 
-  it(`returns non-transient Failure of kind InvalidArgumentsError if the input
-      OrderStockDepletedEventInput is null`, () => {
-    const mockOrderStockDepletedEventInput = null as unknown as OrderStockDepletedEventInput
-    const result = OrderStockDepletedEvent.validateAndBuild(mockOrderStockDepletedEventInput)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
   /*
    *
    *

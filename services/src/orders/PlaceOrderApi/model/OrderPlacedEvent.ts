@@ -74,7 +74,7 @@ export class OrderPlacedEvent implements OrderPlacedEventProps {
    *
    */
   private static validateInput(
-    orderPlacedEventInput: OrderPlacedEventData,
+    orderPlacedEventInput: OrderPlacedEventInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'OrderPlacedEvent.validateInput'
 

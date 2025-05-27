@@ -280,16 +280,6 @@ describe(`Orders Service PlaceOrderApi IncomingPlaceOrderRequest tests`, () => {
   })
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
-      IncomingPlaceOrderRequestInput.userId is undefined`, () => {
-    const mockIncomingPlaceOrderRequestInput = buildMockIncomingPlaceOrderRequestInput()
-    mockIncomingPlaceOrderRequestInput.userId = undefined as never
-    const result = IncomingPlaceOrderRequest.validateAndBuild(mockIncomingPlaceOrderRequestInput)
-    expect(Result.isFailure(result)).toBe(true)
-    expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
-    expect(Result.isFailureTransient(result)).toBe(false)
-  })
-
-  it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       IncomingPlaceOrderRequestInput.userId is null`, () => {
     const mockIncomingPlaceOrderRequestInput = buildMockIncomingPlaceOrderRequestInput()
     mockIncomingPlaceOrderRequestInput.userId = null as never

@@ -58,11 +58,11 @@ describe(`Inventory Service RestockSkuApi RestockSkuApiController tests`, () => 
    * Test APIGatewayProxyEventV2 edge cases
    ************************************************************/
   it(`does not throw if the input APIGatewayProxyEventV2 is valid`, async () => {
-    const mockListOrdersApiService = buildMockRestockSkuApiService_succeeds()
-    const listOrdersApiController = new RestockSkuApiController(mockListOrdersApiService)
+    const mockRestockSkuApiService = buildMockRestockSkuApiService_succeeds()
+    const restockSkuApiController = new RestockSkuApiController(mockRestockSkuApiService)
     const mockApiEventBody = buildMockApiEventBody()
     const mockApiEvent = buildMockApiEvent(mockApiEventBody)
-    await expect(listOrdersApiController.restockSku(mockApiEvent)).resolves.not.toThrow()
+    await expect(restockSkuApiController.restockSku(mockApiEvent)).resolves.not.toThrow()
   })
 
   it(`fails to call RestockSkuApiService if the input APIGatewayProxyEventV2 is
@@ -107,7 +107,7 @@ describe(`Inventory Service RestockSkuApi RestockSkuApiController tests`, () => 
    ************************************************************
    * Test APIGatewayProxyEventV2.body edge cases
    ************************************************************/
-  it(`fails to call ListSkusApiService.listSkus if the input
+  it(`fails to call RestockSkuApiService.restockSku if the input
       APIGatewayProxyEventV2.body is undefined`, async () => {
     const mockRestockSkuApiService = buildMockRestockSkuApiService_succeeds()
     const restockSkuApiController = new RestockSkuApiController(mockRestockSkuApiService)
@@ -126,7 +126,7 @@ describe(`Inventory Service RestockSkuApi RestockSkuApiController tests`, () => 
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call ListSkusApiService.listSkus if the input
+  it(`fails to call RestockSkuApiService.restockSku if the input
       APIGatewayProxyEventV2.body is null`, async () => {
     const mockRestockSkuApiService = buildMockRestockSkuApiService_succeeds()
     const restockSkuApiController = new RestockSkuApiController(mockRestockSkuApiService)
@@ -144,7 +144,7 @@ describe(`Inventory Service RestockSkuApi RestockSkuApiController tests`, () => 
     expect(response).toStrictEqual(expectedResponse)
   })
 
-  it(`fails to call ListSkusApiService.listSkus if the input
+  it(`fails to call RestockSkuApiService.restockSku if the input
       APIGatewayProxyEventV2.body is not a valid JSON`, async () => {
     const mockRestockSkuApiService = buildMockRestockSkuApiService_succeeds()
     const restockSkuApiController = new RestockSkuApiController(mockRestockSkuApiService)

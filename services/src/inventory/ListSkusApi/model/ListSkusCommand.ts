@@ -71,7 +71,7 @@ export class ListSkusCommand implements ListSkusCommandProps {
    *
    */
   private static validateInput(
-    listSkusCommandInput: ListSkusCommandData,
+    listSkusCommandInput: ListSkusCommandInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'ListSkusCommand.validateInput'
 

@@ -25,7 +25,7 @@ function createHandler(): (sqsEvent: SQSEvent) => Promise<SQSBatchResponse> {
     esRaiseOrderStockDepletedEventClient,
   )
   const allocateOrderStockWorkerController = new AllocateOrderStockWorkerController(allocateOrderStockWorkerService)
-  return allocateOrderStockWorkerController.allocateOrdersStock
+  return allocateOrderStockWorkerController.allocateOrderStock
 }
 
 export const handler = createHandler()

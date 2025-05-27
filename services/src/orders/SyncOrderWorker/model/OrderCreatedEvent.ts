@@ -10,7 +10,7 @@ export type OrderCreatedEventInput = TypeUtilsPretty<Pick<OrderData, 'orderId' |
 
 type OrderCreatedEventData = TypeUtilsPretty<Pick<OrderData, 'orderId' | 'sku' | 'units' | 'price' | 'userId'>>
 
-type OrderCreatedEventProps = OrderEvent<string, OrderCreatedEventData>
+type OrderCreatedEventProps = OrderEvent<OrderEventName.ORDER_CREATED_EVENT, OrderCreatedEventData>
 
 /**
  *
@@ -20,7 +20,7 @@ export class OrderCreatedEvent implements OrderCreatedEventProps {
    *
    */
   private constructor(
-    public readonly eventName: string,
+    public readonly eventName: OrderEventName.ORDER_CREATED_EVENT,
     public readonly eventData: OrderCreatedEventData,
     public readonly createdAt: string,
     public readonly updatedAt: string,

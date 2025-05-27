@@ -28,7 +28,7 @@ const mockListSkusCommand = buildMockListSkusCommand({})
  *
  *
  ************************************************************
- * By Sku Id
+ * By Sku
  ************************************************************/
 function buildMockDdbCommand_BySku(sku: string): QueryCommand {
   const skuListPk = `INVENTORY#SKU#${sku}`

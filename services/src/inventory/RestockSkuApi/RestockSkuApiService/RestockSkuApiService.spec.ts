@@ -109,14 +109,14 @@ describe(`Inventory Service RestockSkuApi RestockSkuApiService tests`, () => {
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it(`calls EsRaiseSkuRestockedEventClient.restockSku a single time`, async () => {
+  it(`calls EsRaiseSkuRestockedEventClient.raiseSkuRestockedEvent a single time`, async () => {
     const mockEsRaiseSkuRestockedEventClient = buildMockEsRaiseSkuRestockedEventClient_succeeds()
     const restockSkuApiService = new RestockSkuApiService(mockEsRaiseSkuRestockedEventClient)
     await restockSkuApiService.restockSku(mockIncomingRestockSkuRequest)
     expect(mockEsRaiseSkuRestockedEventClient.raiseSkuRestockedEvent).toHaveBeenCalledTimes(1)
   })
 
-  it(`calls EsRaiseSkuRestockedEventClient.restockSku with the expected input`, async () => {
+  it(`calls EsRaiseSkuRestockedEventClient.raiseSkuRestockedEvent with the expected input`, async () => {
     const mockEsRaiseSkuRestockedEventClient = buildMockEsRaiseSkuRestockedEventClient_succeeds()
     const restockSkuApiService = new RestockSkuApiService(mockEsRaiseSkuRestockedEventClient)
     await restockSkuApiService.restockSku(mockIncomingRestockSkuRequest)
@@ -126,7 +126,7 @@ describe(`Inventory Service RestockSkuApi RestockSkuApiService tests`, () => {
     expect(mockEsRaiseSkuRestockedEventClient.raiseSkuRestockedEvent).toHaveBeenCalledWith(expectedSkuRestockedEvent)
   })
 
-  it(`returns the same Failure if EsRaiseSkuRestockedEventClient.restockSku returns a
+  it(`returns the same Failure if EsRaiseSkuRestockedEventClient.raiseSkuRestockedEvent returns a
       Failure`, async () => {
     const mockFailureKind = 'mockFailureKind' as never
     const mockError = 'mockError'
@@ -150,7 +150,7 @@ describe(`Inventory Service RestockSkuApi RestockSkuApiService tests`, () => {
    * Test expected results
    ************************************************************/
   it(`returns the expected Success<RestockSkuApiServiceOutput> if
-      EsRaiseSkuRestockedEventClient.restockSku returns a Failure of kind
+      EsRaiseSkuRestockedEventClient.raiseSkuRestockedEvent returns a Failure of kind
       DuplicateEventRaisedError`, async () => {
     const mockEsRaiseSkuRestockedEventClient =
       buildMockEsRaiseSkuRestockedEventClient_fails('DuplicateEventRaisedError')

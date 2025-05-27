@@ -58,7 +58,7 @@ export class RestockSkuWorkerController implements IRestockSkuWorkerController {
     | Failure<'DuplicateRestockOperationError'>
     | Failure<'UnrecognizedError'>
   > {
-    const logContext = 'RestockSkuApiController.restockSkuSafe'
+    const logContext = 'RestockSkuWorkerController.restockSkuSafe'
     console.info(`${logContext} init:`, { sqsRecord })
 
     const parseInputEventResult = this.parseInputEvent(sqsRecord)
@@ -87,7 +87,7 @@ export class RestockSkuWorkerController implements IRestockSkuWorkerController {
    *
    */
   private parseInputEvent(sqsRecord: SQSRecord): Success<unknown> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'RestockSkuApiController.parseInputEvent'
+    const logContext = 'RestockSkuWorkerController.parseInputEvent'
 
     try {
       const unverifiedEvent = JSON.parse(sqsRecord.body)

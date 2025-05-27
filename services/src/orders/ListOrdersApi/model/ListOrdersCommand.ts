@@ -71,7 +71,7 @@ export class ListOrdersCommand implements ListOrdersCommandProps {
    *
    */
   private static validateInput(
-    listOrdersCommandInput: ListOrdersCommandData,
+    listOrdersCommandInput: ListOrdersCommandInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'ListOrdersCommand.validateInput'
 

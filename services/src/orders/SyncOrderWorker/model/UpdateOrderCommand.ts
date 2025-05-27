@@ -122,7 +122,7 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
 
     // COMBAK: Maybe some schemas can be converted to shared models at some point.
     const incomingOrderEventSchema = z.object({
-      eventName: ValueValidators.validIncomingEventName(),
+      eventName: ValueValidators.validOrderEventName(),
       eventData: z.object({
         orderId: ValueValidators.validOrderId(),
         sku: ValueValidators.validSku(),

@@ -36,7 +36,7 @@ export class RecordOrderPaymentCommand implements RecordOrderPaymentCommandProps
   public static validateAndBuild(
     recordOrderPaymentCommandInput: RecordOrderPaymentCommandInput,
   ): TypeUtilsWrapper<
-    | Success<RecordOrderPaymentCommandProps>
+    | Success<RecordOrderPaymentCommand>
     | Failure<'InvalidArgumentsError'>
     | Failure<'PaymentAlreadyRejectedError'>
     | Failure<'PaymentAlreadyAcceptedError'>

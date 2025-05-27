@@ -1,10 +1,10 @@
 import { z } from 'zod'
 import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
-import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { AllocationStatus } from '../../model/AllocationStatus'
-import { ValueValidators } from '../../model/ValueValidators'
 import { InventoryEventName } from '../../model/InventoryEventName'
+import { OrderAllocationData } from '../../model/OrderAllocationData'
+import { ValueValidators } from '../../model/ValueValidators'
 import { IncomingOrderPaymentRejectedEvent } from './IncomingOrderPaymentRejectedEvent'
 
 export type DeallocateOrderPaymentRejectedCommandInput = {
@@ -103,12 +103,12 @@ export class DeallocateOrderPaymentRejectedCommand implements DeallocateOrderPay
       userId: ValueValidators.validUserId(),
       createdAt: ValueValidators.validCreatedAt(),
       updatedAt: ValueValidators.validUpdatedAt(),
-      allocationStatus: ValueValidators.validAllocationStatus('ALLOCATED'),
+      allocationStatus: ValueValidators.validAllocationStatus().and(z.literal('ALLOCATED')),
     })
 
     // COMBAK: Maybe some schemas can be converted to shared models at some point
     const incomingOrderPaymentRejectedEventSchema = z.object({
-      eventName: ValueValidators.validOrderEventNameGroup([InventoryEventName.ORDER_PAYMENT_REJECTED_EVENT]),
+      eventName: ValueValidators.validInventoryEventNameLiteral(InventoryEventName.ORDER_PAYMENT_REJECTED_EVENT),
       eventData: z.object({
         orderId: ValueValidators.validOrderId(),
         sku: ValueValidators.validSku(),

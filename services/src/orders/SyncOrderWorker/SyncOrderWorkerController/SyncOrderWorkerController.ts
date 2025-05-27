@@ -37,8 +37,8 @@ export class SyncOrderWorkerController implements ISyncOrderWorkerController {
     for (const record of sqsEvent.Records) {
       // If the failure is transient then we add it to the batch errors to requeue and retry
       // If the failure is non-transient then we ignore it to remove it from the queue
-      const restockSkuResult = await this.syncOrderSafe(record)
-      if (Result.isFailureTransient(restockSkuResult)) {
+      const syncOrderResult = await this.syncOrderSafe(record)
+      if (Result.isFailureTransient(syncOrderResult)) {
         sqsBatchResponse.batchItemFailures.push({ itemIdentifier: record.messageId })
       }
     }
@@ -72,19 +72,19 @@ export class SyncOrderWorkerController implements ISyncOrderWorkerController {
     }
 
     const unverifiedEvent = parseInputEventResult.value as IncomingOrderEventInput
-    const incomingRestockSkuEventResult = IncomingOrderEvent.validateAndBuild(unverifiedEvent)
-    if (Result.isFailure(incomingRestockSkuEventResult)) {
-      console.error(`${logContext} failure exit:`, { incomingRestockSkuEventResult, unverifiedEvent })
-      return incomingRestockSkuEventResult
+    const incomingOrderEventResult = IncomingOrderEvent.validateAndBuild(unverifiedEvent)
+    if (Result.isFailure(incomingOrderEventResult)) {
+      console.error(`${logContext} failure exit:`, { incomingOrderEventResult, unverifiedEvent })
+      return incomingOrderEventResult
     }
 
-    const incomingRestockSkuEvent = incomingRestockSkuEventResult.value
-    const restockSkuResult = await this.syncOrderWorkerService.syncOrder(incomingRestockSkuEvent)
-    Result.isFailure(restockSkuResult)
-      ? console.error(`${logContext} exit failure:`, { restockSkuResult, incomingRestockSkuEvent })
-      : console.info(`${logContext} exit success:`, { restockSkuResult, incomingRestockSkuEvent })
+    const incomingOrderEvent = incomingOrderEventResult.value
+    const syncOrderResult = await this.syncOrderWorkerService.syncOrder(incomingOrderEvent)
+    Result.isFailure(syncOrderResult)
+      ? console.error(`${logContext} exit failure:`, { syncOrderResult, incomingOrderEvent })
+      : console.info(`${logContext} exit success:`, { syncOrderResult, incomingOrderEvent })
 
-    return restockSkuResult
+    return syncOrderResult
   }
 
   /**

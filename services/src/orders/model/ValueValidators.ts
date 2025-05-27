@@ -8,9 +8,13 @@ import { SortDirection } from './SortDirection'
  *
  */
 export class ValueValidators {
-  public static validIncomingEventName = () => z.nativeEnum(OrderEventName)
+  public static validOrderEventName = () => z.nativeEnum(OrderEventName)
 
-  public static validOrderPlacedEventName = () => z.literal(OrderEventName.ORDER_PLACED_EVENT)
+  public static validOrderEventNameLiteral = (eventName: OrderEventName) =>
+    z.nativeEnum(OrderEventName).and(z.literal(eventName))
+
+  public static validOrderEventNameGroup = (eventGroup: OrderEventName[]) =>
+    z.nativeEnum(OrderEventName).and(z.enum(eventGroup as unknown as [OrderEventName, ...OrderEventName[]]))
 
   public static validOrderId = () => z.string().trim().min(4)
 
@@ -28,7 +32,7 @@ export class ValueValidators {
 
   public static validUpdatedAt = () => z.string().trim().min(4)
 
-  public static validSortDirection = () => z.enum(Object.values(SortDirection) as [string, ...string[]])
+  public static validSortDirection = () => z.nativeEnum(SortDirection)
 
   public static validLimit = () => z.number().int().min(1).max(1000)
 }

@@ -18,7 +18,7 @@ function buildMockSkuRestockedEventInput(): SkuRestockedEventInput {
   return mockValidInput
 }
 
-describe(`Orders Service RestockSkuApi cEvent tests`, () => {
+describe(`Inventory Service RestockSkuApi SkuRestockedEvent tests`, () => {
   /*
    *
    *

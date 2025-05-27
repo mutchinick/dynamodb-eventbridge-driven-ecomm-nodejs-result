@@ -84,10 +84,13 @@ export class EsRaiseOrderStockAllocatedEventClient implements IEsRaiseOrderStock
   ): Success<PutCommand> | Failure<'InvalidArgumentsError'> {
     const logContext = 'EsRaiseOrderStockAllocatedEventClient.buildDdbCommand'
 
-    // Perhaps we can prevent all errors by validating the arguments, but TransactWriteCommand
+    // Perhaps we can prevent all errors by validating the arguments, but PutCommand
     // is an external dependency and we don't know what happens internally, so we try-catch
     try {
       const tableName = process.env.EVENT_STORE_TABLE_NAME
+      if (!tableName) {
+        throw new Error('EVENT_STORE_TABLE_NAME environment variable is not set')
+      }
 
       const { eventName, eventData, createdAt, updatedAt } = orderStockAllocatedEvent
       const { orderId, sku, units, price, userId } = eventData

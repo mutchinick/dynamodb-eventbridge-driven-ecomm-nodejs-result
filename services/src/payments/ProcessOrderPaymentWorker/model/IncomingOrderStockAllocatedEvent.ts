@@ -16,7 +16,7 @@ type EventDetail = {
   eventVersion: string
   awsRegion: string
   dynamodb: {
-    NewImage: AttributeValue | Record<string, AttributeValue>
+    NewImage: Record<string, AttributeValue>
   }
 }
 

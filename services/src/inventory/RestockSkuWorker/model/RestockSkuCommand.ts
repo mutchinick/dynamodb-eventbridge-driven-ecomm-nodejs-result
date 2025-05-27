@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { Failure, Result, Success } from '../../errors/Result'
+import { InventoryEventName } from '../../model/InventoryEventName'
 import { RestockSkuData } from '../../model/RestockSkuData'
 import { ValueValidators } from '../../model/ValueValidators'
 import { IncomingSkuRestockedEvent } from './IncomingSkuRestockedEvent'
@@ -87,7 +88,7 @@ export class RestockSkuCommand implements RestockSkuCommandProps {
     // COMBAK: Maybe some schemas can be converted to shared models at some point
     const schema = z.object({
       incomingSkuRestockedEvent: z.object({
-        eventName: ValueValidators.validSkuRestockedEventName(),
+        eventName: ValueValidators.validInventoryEventNameLiteral(InventoryEventName.SKU_RESTOCKED_EVENT),
         eventData: z.object({
           sku: ValueValidators.validSku(),
           units: ValueValidators.validUnits(),

@@ -71,7 +71,7 @@ export class ListOrderPaymentsCommand implements ListOrderPaymentsCommandProps {
    *
    */
   private static validateInput(
-    listOrderPaymentsCommandInput: ListOrderPaymentsCommandData,
+    listOrderPaymentsCommandInput: ListOrderPaymentsCommandInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'ListOrderPaymentsCommand.validateInput'
 

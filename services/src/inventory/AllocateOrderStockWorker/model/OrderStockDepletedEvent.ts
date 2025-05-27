@@ -81,7 +81,7 @@ export class OrderStockDepletedEvent implements OrderStockDepletedEventProps {
    *
    */
   private static validateInput(
-    orderStockDepletedEventInput: OrderStockDepletedEventData,
+    orderStockDepletedEventInput: OrderStockDepletedEventInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'OrderStockDepletedEvent.validateInput'
 

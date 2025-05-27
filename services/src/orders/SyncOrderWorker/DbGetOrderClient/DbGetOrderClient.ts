@@ -70,6 +70,8 @@ export class DbGetOrderClient implements IDbGetOrderClient {
   private buildDdbCommand(getOrderCommand: GetOrderCommand): Success<GetCommand> | Failure<'InvalidArgumentsError'> {
     const logContext = 'DbGetOrderClient.buildDdbCommand'
 
+    // Perhaps we can prevent all errors by validating the arguments, but GetCommand
+    // is an external dependency and we don't know what happens internally, so we try-catch
     try {
       const tableName = process.env.ORDERS_TABLE_NAME
 

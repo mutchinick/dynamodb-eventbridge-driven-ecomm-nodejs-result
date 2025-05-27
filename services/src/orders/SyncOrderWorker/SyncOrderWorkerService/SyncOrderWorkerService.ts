@@ -129,7 +129,7 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
 
     // When IT IS NOT an OrderPlacedEvent and the OrderData DOES NOT exist in the database.
     // This means it reached an invalid operation somehow, so it must return an error.
-    const invalidOpsFailure = Result.makeFailure('InvalidOperationError', 'Order to update does not exists', false)
+    const invalidOpsFailure = Result.makeFailure('InvalidOperationError', 'Order to update does not exist', false)
     console.error(`${logContext} exit failure:`, { invalidOpsFailure, existingOrderData, incomingOrderEvent })
     return invalidOpsFailure
   }

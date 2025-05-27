@@ -117,7 +117,7 @@ describe(`Orders Service SyncOrderWorker UpdateOrderCommand tests`, () => {
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       UpdateOrderCommandInput.existingOrderData.orderId is empty`, () => {
     const mockUpdateOrderCommandInput = buildMockUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.existingOrderData.orderId = '' as OrderStatus
+    mockUpdateOrderCommandInput.existingOrderData.orderId = ''
     const result = UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -127,7 +127,7 @@ describe(`Orders Service SyncOrderWorker UpdateOrderCommand tests`, () => {
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       UpdateOrderCommandInput.existingOrderData.orderId is blank`, () => {
     const mockUpdateOrderCommandInput = buildMockUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.existingOrderData.orderId = '      ' as OrderStatus
+    mockUpdateOrderCommandInput.existingOrderData.orderId = '      '
     const result = UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -137,7 +137,7 @@ describe(`Orders Service SyncOrderWorker UpdateOrderCommand tests`, () => {
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       UpdateOrderCommandInput.existingOrderData.orderId length < 4`, () => {
     const mockUpdateOrderCommandInput = buildMockUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.existingOrderData.orderId = 'ABC' as OrderStatus
+    mockUpdateOrderCommandInput.existingOrderData.orderId = '123'
     const result = UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -229,7 +229,7 @@ describe(`Orders Service SyncOrderWorker UpdateOrderCommand tests`, () => {
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       UpdateOrderCommandInput.existingOrderData.sku is empty`, () => {
     const mockUpdateOrderCommandInput = buildMockUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.existingOrderData.sku = '' as OrderStatus
+    mockUpdateOrderCommandInput.existingOrderData.sku = ''
     const result = UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -239,7 +239,7 @@ describe(`Orders Service SyncOrderWorker UpdateOrderCommand tests`, () => {
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       UpdateOrderCommandInput.existingOrderData.sku is blank`, () => {
     const mockUpdateOrderCommandInput = buildMockUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.existingOrderData.sku = '      ' as OrderStatus
+    mockUpdateOrderCommandInput.existingOrderData.sku = '      '
     const result = UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -249,7 +249,7 @@ describe(`Orders Service SyncOrderWorker UpdateOrderCommand tests`, () => {
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       UpdateOrderCommandInput.existingOrderData.sku length < 4`, () => {
     const mockUpdateOrderCommandInput = buildMockUpdateOrderCommandInput()
-    mockUpdateOrderCommandInput.existingOrderData.sku = '      ' as OrderStatus
+    mockUpdateOrderCommandInput.existingOrderData.sku = '123'
     const result = UpdateOrderCommand.validateAndBuild(mockUpdateOrderCommandInput)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)

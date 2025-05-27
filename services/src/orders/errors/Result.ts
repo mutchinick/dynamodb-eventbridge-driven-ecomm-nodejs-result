@@ -55,7 +55,7 @@ export class Result {
    *
    */
   public static isFailure<T, K extends FailureKind>(result: Success<T> | Failure<K>): result is Failure<K> {
-    return result && typeof result === 'object' && 'error' in result
+    return result && typeof result === 'object' && 'error' in result && 'failureKind' in result
   }
 
   /**
@@ -85,7 +85,6 @@ export class Result {
       return result.value
     }
 
-    const error = new Error('Result could not be asserted to be a Success')
-    throw error
+    throw new Error(`Result is a Failure: [${result.failureKind}] ${result.error.message}`)
   }
 }

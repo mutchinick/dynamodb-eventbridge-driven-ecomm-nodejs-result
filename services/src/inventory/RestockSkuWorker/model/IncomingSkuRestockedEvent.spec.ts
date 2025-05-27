@@ -37,12 +37,12 @@ type MockEventDetail = {
   eventSource: 'aws:dynamodb'
   eventVersion: string
   dynamodb: {
-    NewImage: AttributeValue | Record<string, AttributeValue>
+    NewImage: Record<string, AttributeValue>
   }
 }
 
-// COMBAK: Work a simpler way to build/wrap/unwrap these EventBrideEvents (maybe some abstraction util?)
-function buildMockEventBrideEvent(
+// COMBAK: Work a simpler way to build/wrap/unwrap these EventBridgeEvents (maybe some abstraction util?)
+function buildMockEventBridgeEvent(
   incomingSkuRestockedEvent: IncomingSkuRestockedEvent,
 ): EventBridgeEvent<string, MockEventDetail> {
   const mockEventBridgeEvent: EventBridgeEvent<string, MockEventDetail> = {
@@ -78,7 +78,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
    ************************************************************/
   it(`does not return a Failure if the input EventBridgeEvent is valid`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(false)
   })
@@ -110,7 +110,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       EventBridgeEvent.detail is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     mockEventBridgeEvent.detail = undefined as never
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
@@ -121,7 +121,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       EventBridgeEvent.detail is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     mockEventBridgeEvent.detail = null as never
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
@@ -138,7 +138,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       EventBridgeEvent.detail.dynamodb is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     mockEventBridgeEvent.detail.dynamodb = undefined as never
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
@@ -149,7 +149,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       EventBridgeEvent.detail.dynamodb is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     mockEventBridgeEvent.detail.dynamodb = null as never
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
@@ -167,7 +167,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       EventBridgeEvent.detail.dynamodb.newImage (IncomingSkuRestockedEvent) is
       undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     mockEventBridgeEvent.detail.dynamodb.NewImage = undefined as never
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
@@ -178,7 +178,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       EventBridgeEvent.detail.dynamodb.newImage (IncomingSkuRestockedEvent) is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     mockEventBridgeEvent.detail.dynamodb.NewImage = null as never
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
@@ -196,7 +196,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventName is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventName = undefined
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -207,7 +207,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventName is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventName = null
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -218,7 +218,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventName is empty`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventName = '' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -229,7 +229,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventName is blank`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventName = '      ' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -240,7 +240,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventName is not an InventoryEventName`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventName = 'mockEventName' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -257,7 +257,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.createdAt is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.createdAt = undefined as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -268,7 +268,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.createdAt is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.createdAt = null as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -279,7 +279,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.createdAt is empty`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.createdAt = '' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -290,7 +290,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.createdAt is blank`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.createdAt = '      ' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -301,7 +301,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.createdAt length < 4`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.createdAt = '123' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -318,7 +318,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.updatedAt is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.updatedAt = undefined as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -329,7 +329,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.updatedAt is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.updatedAt = null as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -340,7 +340,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.updatedAt is empty`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.updatedAt = '' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -351,7 +351,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.updatedAt is blank`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.updatedAt = '      ' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -362,7 +362,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.updatedAt length < 4`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.updatedAt = '123' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -379,7 +379,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData = undefined as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -390,7 +390,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData = null as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -401,7 +401,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData is empty`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData = {} as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -412,7 +412,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData invalid`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData = 'mockInvalidValue' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -429,7 +429,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.sku is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.sku = undefined as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -440,7 +440,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.sku is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.sku = null as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -451,7 +451,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.sku is empty`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.sku = '' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -462,7 +462,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.sku is blank`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.sku = '      ' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -473,7 +473,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.sku length < 4`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.sku = '123' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -490,7 +490,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.units is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.units = undefined as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -501,7 +501,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.units is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.units = null as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -512,7 +512,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.units < 1`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.units = 0
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -523,7 +523,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.units is not an integer`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.units = 3.45
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -534,7 +534,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.units is not a number`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.units = '1' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -551,7 +551,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.lotId is undefined`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.lotId = undefined as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -562,7 +562,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.lotId is null`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.lotId = null as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -573,7 +573,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.lotId is empty`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.lotId = '' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -584,7 +584,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.lotId is blank`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.lotId = '      ' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -595,7 +595,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
       IncomingSkuRestockedEvent.eventData.lotId length < 4`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
     mockIncomingSkuRestockedEvent.eventData.lotId = '123' as never
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
@@ -611,7 +611,7 @@ describe(`Inventory Service RestockSkuWorker IncomingSkuRestockedEvent tests`, (
   it(`returns the expected Success<IncomingSkuRestockedEvent> if the execution path is
       successful`, () => {
     const mockIncomingSkuRestockedEvent = buildMockIncomingSkuRestockedEvent()
-    const mockEventBridgeEvent = buildMockEventBrideEvent(mockIncomingSkuRestockedEvent)
+    const mockEventBridgeEvent = buildMockEventBridgeEvent(mockIncomingSkuRestockedEvent)
     const result = IncomingSkuRestockedEvent.validateAndBuild(mockEventBridgeEvent)
     const expectedEvent: IncomingSkuRestockedEvent = {
       eventName: mockIncomingSkuRestockedEvent.eventName,

@@ -200,7 +200,7 @@ describe(`Orders Service SyncOrderWorker DbUpdateOrderClient tests`, () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves()
     const dbUpdateOrderClient = new DbUpdateOrderClient(mockDdbDocClient)
     const mockTestCommand = buildMockUpdateOrderCommand()
-    mockTestCommand.commandData = undefined
+    mockTestCommand.commandData = null
     const result = await dbUpdateOrderClient.updateOrder(mockTestCommand)
     expect(Result.isFailure(result)).toBe(true)
     expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)

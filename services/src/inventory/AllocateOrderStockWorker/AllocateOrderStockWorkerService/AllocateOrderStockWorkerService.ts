@@ -82,8 +82,7 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
     // When it creates the Allocation in the database
     const allocateOrderResult = await this.allocateOrder(incomingOrderCreatedEvent)
 
-    // When the Allocation DOES NOT exist and it creates it and raises the Allocated event,
-    // it is successful and it raises the Allocated event.
+    // When the Allocation DOES NOT exist and it creates it and raises the Allocated event
     if (Result.isSuccess(allocateOrderResult)) {
       const raiseAllocatedEventResult = await this.raiseAllocatedEvent(incomingOrderCreatedEvent)
       if (Result.isFailure(raiseAllocatedEventResult)) {
@@ -103,7 +102,7 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
         console.error(`${logContext} exit failure:`, { raiseAllocatedEventResult, incomingOrderCreatedEvent })
         return raiseAllocatedEventResult
       }
-      console.info(`${logContext} exit success: form-error:`, {
+      console.info(`${logContext} exit success: from-error:`, {
         allocateOrderResult,
         raiseAllocatedEventResult,
         incomingOrderCreatedEvent,
@@ -119,7 +118,7 @@ export class AllocateOrderStockWorkerService implements IAllocateOrderStockWorke
         console.error(`${logContext} exit failure:`, { raiseDepletedEventResult, incomingOrderCreatedEvent })
         return raiseDepletedEventResult
       }
-      console.info(`${logContext} exit success: form-error:`, {
+      console.info(`${logContext} exit success: from-error:`, {
         allocateOrderResult,
         raiseDepletedEventResult,
         incomingOrderCreatedEvent,

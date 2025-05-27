@@ -7,7 +7,7 @@ import {
 } from '../model/IncomingOrderPaymentRejectedEvent'
 
 export interface IDeallocateOrderPaymentRejectedWorkerController {
-  deallocateOrdersStock: (sqsEvent: SQSEvent) => Promise<SQSBatchResponse>
+  deallocateOrderStock: (sqsEvent: SQSEvent) => Promise<SQSBatchResponse>
 }
 
 /**
@@ -20,14 +20,14 @@ export class DeallocateOrderPaymentRejectedWorkerController implements IDealloca
   constructor(
     private readonly deallocateOrderPaymentRejectedWorkerService: IDeallocateOrderPaymentRejectedWorkerService,
   ) {
-    this.deallocateOrdersStock = this.deallocateOrdersStock.bind(this)
+    this.deallocateOrderStock = this.deallocateOrderStock.bind(this)
   }
 
   /**
    *
    */
-  public async deallocateOrdersStock(sqsEvent: SQSEvent): Promise<SQSBatchResponse> {
-    const logContext = 'DeallocateOrderPaymentRejectedWorkerController.deallocateOrdersStock'
+  public async deallocateOrderStock(sqsEvent: SQSEvent): Promise<SQSBatchResponse> {
+    const logContext = 'DeallocateOrderPaymentRejectedWorkerController.deallocateOrderStock'
     console.info(`${logContext} init:`, { sqsEvent })
 
     const sqsBatchResponse: SQSBatchResponse = { batchItemFailures: [] }

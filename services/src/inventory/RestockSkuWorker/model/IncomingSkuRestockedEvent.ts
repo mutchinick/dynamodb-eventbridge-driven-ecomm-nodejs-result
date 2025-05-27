@@ -4,10 +4,10 @@ import { EventBridgeEvent } from 'aws-lambda'
 import { z } from 'zod'
 import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
-import { RestockSkuData } from '../../model/RestockSkuData'
-import { ValueValidators } from '../../model/ValueValidators'
 import { InventoryEvent } from '../../model/InventoryEvent'
 import { InventoryEventName } from '../../model/InventoryEventName'
+import { RestockSkuData } from '../../model/RestockSkuData'
+import { ValueValidators } from '../../model/ValueValidators'
 
 type EventDetail = {
   eventName: 'INSERT'
@@ -16,7 +16,7 @@ type EventDetail = {
   eventVersion: string
   awsRegion: string
   dynamodb: {
-    NewImage: AttributeValue | Record<string, AttributeValue>
+    NewImage: Record<string, AttributeValue>
   }
 }
 
@@ -98,7 +98,7 @@ export class IncomingSkuRestockedEvent implements IncomingSkuRestockedEventProps
 
     // COMBAK: Maybe some schemas can be converted to shared models at some point
     const schema = z.object({
-      eventName: ValueValidators.validSkuRestockedEventName(),
+      eventName: ValueValidators.validInventoryEventNameLiteral(InventoryEventName.SKU_RESTOCKED_EVENT),
       eventData: z.object({
         sku: ValueValidators.validSku(),
         units: ValueValidators.validUnits(),

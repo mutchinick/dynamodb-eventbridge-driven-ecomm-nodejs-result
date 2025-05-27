@@ -59,7 +59,7 @@ function buildMockIncomingOrderPaymentRejectedEvent(): IncomingOrderPaymentRejec
     updatedAt: mockDate,
   }
 
-  // COMBAK: Work a simpler way to build/wrap/unwrap these EventBrideEvents (maybe some abstraction util?)
+  // COMBAK: Work a simpler way to build/wrap/unwrap these EventBridgeEvents (maybe some abstraction util?)
   const mockClass = IncomingOrderPaymentRejectedEvent.validateAndBuild({
     'detail-type': 'mockDetailType',
     account: 'mockAccount',

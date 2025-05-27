@@ -81,7 +81,7 @@ export class OrderStockAllocatedEvent implements OrderStockAllocatedEventProps {
    *
    */
   private static validateInput(
-    orderStockAllocatedEventInput: OrderStockAllocatedEventData,
+    orderStockAllocatedEventInput: OrderStockAllocatedEventInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'OrderStockAllocatedEvent.validateInput'
 

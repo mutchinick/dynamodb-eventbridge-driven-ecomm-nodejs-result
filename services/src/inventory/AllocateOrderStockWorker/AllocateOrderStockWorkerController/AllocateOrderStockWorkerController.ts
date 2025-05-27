@@ -4,7 +4,7 @@ import { IAllocateOrderStockWorkerService } from '../AllocateOrderStockWorkerSer
 import { IncomingOrderCreatedEvent, IncomingOrderCreatedEventInput } from '../model/IncomingOrderCreatedEvent'
 
 export interface IAllocateOrderStockWorkerController {
-  allocateOrdersStock: (sqsEvent: SQSEvent) => Promise<SQSBatchResponse>
+  allocateOrderStock: (sqsEvent: SQSEvent) => Promise<SQSBatchResponse>
 }
 
 /**
@@ -15,14 +15,14 @@ export class AllocateOrderStockWorkerController implements IAllocateOrderStockWo
    *
    */
   constructor(private readonly allocateOrderStockWorkerService: IAllocateOrderStockWorkerService) {
-    this.allocateOrdersStock = this.allocateOrdersStock.bind(this)
+    this.allocateOrderStock = this.allocateOrderStock.bind(this)
   }
 
   /**
    *
    */
-  public async allocateOrdersStock(sqsEvent: SQSEvent): Promise<SQSBatchResponse> {
-    const logContext = 'AllocateOrderStockWorkerController.allocateOrdersStock'
+  public async allocateOrderStock(sqsEvent: SQSEvent): Promise<SQSBatchResponse> {
+    const logContext = 'AllocateOrderStockWorkerController.allocateOrderStock'
     console.info(`${logContext} init:`, { sqsEvent })
 
     const sqsBatchResponse: SQSBatchResponse = { batchItemFailures: [] }

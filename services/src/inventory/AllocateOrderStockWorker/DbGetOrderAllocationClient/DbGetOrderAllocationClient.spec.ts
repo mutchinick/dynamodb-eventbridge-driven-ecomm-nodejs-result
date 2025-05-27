@@ -74,10 +74,10 @@ function buildMockDdbDocClient_resolves_nullItem(): DynamoDBDocumentClient {
 }
 
 function buildMockDdbDocClient_throws(error?: unknown): DynamoDBDocumentClient {
-  return { syncOrder: jest.fn().mockRejectedValue(error ?? new Error()) } as unknown as DynamoDBDocumentClient
+  return { send: jest.fn().mockRejectedValue(error ?? new Error()) } as unknown as DynamoDBDocumentClient
 }
 
-describe(`Inventory Service DeallocateOrderPaymentRejectedWorker
+describe(`Inventory Service AllocateOrderStockWorker
           DbGetOrderAllocationClient tests`, () => {
   /*
    *

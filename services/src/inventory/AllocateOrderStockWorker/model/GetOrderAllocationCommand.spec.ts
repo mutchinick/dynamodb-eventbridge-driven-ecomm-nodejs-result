@@ -14,7 +14,7 @@ function buildMockGetOrderAllocationCommandInput(): GetOrderAllocationCommandInp
   return mockValidInput
 }
 
-describe(`Inventory Service DeallocateOrderPaymentRejectedWorker GetOrderAllocationCommand
+describe(`Inventory Service AllocateOrderStockWorker GetOrderAllocationCommand
           tests`, () => {
   /*
    *

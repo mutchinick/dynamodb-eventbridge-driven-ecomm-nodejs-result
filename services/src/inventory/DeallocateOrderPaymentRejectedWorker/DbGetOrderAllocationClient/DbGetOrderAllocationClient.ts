@@ -76,6 +76,8 @@ export class DbGetOrderAllocationClient implements IDbGetOrderAllocationClient {
   ): Success<GetCommand> | Failure<'InvalidArgumentsError'> {
     const logContext = 'DbGetOrderAllocationClient.buildDdbCommand'
 
+    // Perhaps we can prevent all errors by validating the arguments, but GetCommand
+    // is an external dependency and we don't know what happens internally, so we try-catch
     try {
       const tableName = process.env.INVENTORY_TABLE_NAME
 
@@ -114,7 +116,7 @@ export class DbGetOrderAllocationClient implements IDbGetOrderAllocationClient {
       if (!ddbOutput.Item) {
         const orderAllocationData: OrderAllocationData = null
         const sendDdbCommandResult = Result.makeSuccess(orderAllocationData)
-        console.info(`${logContext} exit success: exit success: null-Item:`, { sendDdbCommandResult })
+        console.info(`${logContext} exit success: null-Item:`, { sendDdbCommandResult })
         return sendDdbCommandResult
       } else {
         const orderAllocationData = this.buildOrderAllocationData(ddbOutput.Item)

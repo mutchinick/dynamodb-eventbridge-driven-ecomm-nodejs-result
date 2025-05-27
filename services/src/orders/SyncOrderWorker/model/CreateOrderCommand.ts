@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { Failure, Result, Success } from '../../errors/Result'
 import { OrderData } from '../../model/OrderData'
+import { OrderEventName } from '../../model/OrderEventName'
 import { OrderStatus } from '../../model/OrderStatus'
 import { ValueValidators } from '../../model/ValueValidators'
 import { IncomingOrderEvent } from './IncomingOrderEvent'
@@ -91,7 +92,7 @@ export class CreateOrderCommand implements CreateOrderCommandProps {
     // COMBAK: Maybe some schemas can be converted to shared models at some point
     const schema = z.object({
       incomingOrderEvent: z.object({
-        eventName: ValueValidators.validOrderPlacedEventName(),
+        eventName: ValueValidators.validOrderEventNameLiteral(OrderEventName.ORDER_PLACED_EVENT),
         eventData: z.object({
           orderId: ValueValidators.validOrderId(),
           sku: ValueValidators.validSku(),

@@ -125,14 +125,14 @@ describe(`Inventory Service ListSkusApi ListSkusApiService tests`, () => {
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it(`calls DbListSkusClient.raiseListSkusCommand a single time`, async () => {
+  it(`calls DbListSkusClient.listSkus a single time`, async () => {
     const mockDbListSkusClient = buildMockDbListSkusClient_succeeds()
     const listSkusApiService = new ListSkusApiService(mockDbListSkusClient)
     await listSkusApiService.listSkus(mockIncomingListSkusRequest)
     expect(mockDbListSkusClient.listSkus).toHaveBeenCalledTimes(1)
   })
 
-  it(`calls DbListSkusClient.raiseListSkusCommand with the expected input`, async () => {
+  it(`calls DbListSkusClient.listSkus with the expected input`, async () => {
     const mockDbListSkusClient = buildMockDbListSkusClient_succeeds()
     const listSkusApiService = new ListSkusApiService(mockDbListSkusClient)
     await listSkusApiService.listSkus(mockIncomingListSkusRequest)
@@ -142,7 +142,7 @@ describe(`Inventory Service ListSkusApi ListSkusApiService tests`, () => {
     expect(mockDbListSkusClient.listSkus).toHaveBeenCalledWith(expectedListSkusCommand)
   })
 
-  it(`returns the same Failure if DbListSkusClient.raiseListSkusCommand returns a
+  it(`returns the same Failure if DbListSkusClient.listSkus returns a
       Failure`, async () => {
     const mockFailureKind = 'mockFailureKind' as never
     const mockError = 'mockError'

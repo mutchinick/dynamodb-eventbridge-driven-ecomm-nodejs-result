@@ -65,7 +65,7 @@ export class RestockSkuWorkerService implements IRestockSkuWorkerService {
   private validateInput(
     incomingSkuRestockedEvent: IncomingSkuRestockedEvent,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'IncomingSkuRestockedEvent.validateInput'
+    const logContext = 'RestockSkuWorkerService.validateInput'
     console.info(`${logContext} init:`, { incomingSkuRestockedEvent })
 
     if (incomingSkuRestockedEvent instanceof IncomingSkuRestockedEvent === false) {

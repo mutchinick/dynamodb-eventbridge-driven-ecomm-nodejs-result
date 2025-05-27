@@ -3,17 +3,69 @@ import { PaymentStatus } from './PaymentStatus'
 import { ValueValidators } from './ValueValidators'
 
 describe(`Payments Service ValueValidators tests`, () => {
+  /*
+   *
+   *
+   ************************************************************
+   * Test validPaymentsEventName
+   ************************************************************/
+  describe(`validPaymentsEventName tests`, () => {
+    it(`throws if the input eventName is undefined`, () => {
+      const testInput = undefined as never
+      expect(() => ValueValidators.validPaymentsEventName().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input eventName is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validPaymentsEventName().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input eventName is empty`, () => {
+      const testInput = ''
+      expect(() => ValueValidators.validPaymentsEventName().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input eventName is not a PaymentsEventName`, () => {
+      const testInput = 'mockInvalidValue'
+      expect(() => ValueValidators.validPaymentsEventName().parse(testInput)).toThrow()
+    })
+
+    it(`is valid if the input eventName is a PaymentsEventName like ORDER_STOCK_ALLOCATED_EVENT`, () => {
+      const testInput: PaymentsEventName = PaymentsEventName.ORDER_STOCK_ALLOCATED_EVENT
+      expect(() => ValueValidators.validPaymentsEventName().parse(testInput)).not.toThrow()
+    })
+
+    it(`is valid if the input eventName is a PaymentsEventName like ORDER_CANCELED_EVENT`, () => {
+      const testInput: PaymentsEventName = PaymentsEventName.ORDER_CANCELED_EVENT
+      expect(() => ValueValidators.validPaymentsEventName().parse(testInput)).not.toThrow()
+    })
+  })
+
+  /*
+   *
+   *
+   ************************************************************
+   * Test validPaymentsEventNameLiteral
+   ************************************************************/
   describe(`validPaymentsEventNameLiteral tests`, () => {
     it(`throws if the input eventName is undefined`, () => {
       const testInput = undefined as never
-      const expectedEventName = PaymentsEventName.ORDER_CANCELED_EVENT
-      expect(() => ValueValidators.validPaymentsEventNameLiteral(expectedEventName).parse(testInput)).toThrow()
+      expect(() => ValueValidators.validPaymentsEventNameLiteral(testInput).parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input eventName is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validPaymentsEventNameLiteral(testInput).parse(testInput)).toThrow()
     })
 
     it(`throws if the input eventName is empty`, () => {
       const testInput = '' as never
-      const expectedEventName = PaymentsEventName.ORDER_CANCELED_EVENT
-      expect(() => ValueValidators.validPaymentsEventNameLiteral(expectedEventName).parse(testInput)).toThrow()
+      expect(() => ValueValidators.validPaymentsEventNameLiteral(testInput).parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input eventName is not a PaymentsEventName`, () => {
+      const testInput = 'mockInvalidValue' as never
+      expect(() => ValueValidators.validPaymentsEventNameLiteral(testInput).parse(testInput)).toThrow()
     })
 
     it(`throws if the input eventName is not the expected PaymentsEventName`, () => {
@@ -22,13 +74,19 @@ describe(`Payments Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validPaymentsEventNameLiteral(expectedEventName).parse(testInput)).toThrow()
     })
 
-    it(`is valid if the input eventName is the expected eventName`, () => {
+    it(`is valid if the input eventName is the expected PaymentsEventName`, () => {
       const testInput = PaymentsEventName.ORDER_CANCELED_EVENT
       const expectedEventName = PaymentsEventName.ORDER_CANCELED_EVENT
       expect(() => ValueValidators.validPaymentsEventNameLiteral(expectedEventName).parse(testInput)).not.toThrow()
     })
   })
 
+  /*
+   *
+   *
+   ************************************************************
+   * Test validPaymentsEventNameGroup
+   ************************************************************/
   describe(`validPaymentsEventNameGroup tests`, () => {
     const testEventGroup: PaymentsEventName[] = [
       PaymentsEventName.ORDER_CANCELED_EVENT,
@@ -39,6 +97,21 @@ describe(`Payments Service ValueValidators tests`, () => {
     it(`throws if the input eventName is undefined`, () => {
       const testInput = undefined as never
       expect(() => ValueValidators.validPaymentsEventNameGroup(testEventGroup).parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input eventName is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validPaymentsEventNameGroup(testEventGroup).parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input eventName is empty`, () => {
+      const testInput = '' as never
+      expect(() => ValueValidators.validPaymentsEventNameGroup(testEventGroup).parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input eventName is not a PaymentsEventName`, () => {
+      const testInput = 'mockInvalidValue' as never
+      expect(() => ValueValidators.validPaymentsEventNameGroup([testInput]).parse(testInput)).toThrow()
     })
 
     it(`throws if the input event group is empty`, () => {
@@ -56,15 +129,36 @@ describe(`Payments Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validPaymentsEventNameGroup(testEventGroup).parse(testInput)).not.toThrow()
     })
 
-    it(`is valid if the input eventName exists in an event group with a single eventName`, () => {
+    it(`is valid if the input eventName exists in an event group with a single event name`, () => {
       const testInput = PaymentsEventName.ORDER_PAYMENT_ACCEPTED_EVENT
       expect(() => ValueValidators.validPaymentsEventNameGroup([testInput]).parse(testInput)).not.toThrow()
     })
   })
 
+  /*
+   *
+   *
+   ************************************************************
+   * Test validOrderId
+   ************************************************************/
   describe(`validOrderId tests`, () => {
     it(`throws if the input orderId is undefined`, () => {
-      const testInput = undefined as string
+      const testInput = undefined as never
+      expect(() => ValueValidators.validOrderId().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input orderId is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validOrderId().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input orderId is empty`, () => {
+      const testInput = ''
+      expect(() => ValueValidators.validOrderId().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input orderId is blank`, () => {
+      const testInput = '      '
       expect(() => ValueValidators.validOrderId().parse(testInput)).toThrow()
     })
 
@@ -79,9 +173,30 @@ describe(`Payments Service ValueValidators tests`, () => {
     })
   })
 
+  /*
+   *
+   *
+   ************************************************************
+   * Test validSku
+   ************************************************************/
   describe(`validSku tests`, () => {
     it(`throws if the input sku is undefined`, () => {
-      const testInput = undefined as string
+      const testInput = undefined as never
+      expect(() => ValueValidators.validSku().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input sku is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validSku().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input sku is empty`, () => {
+      const testInput = ''
+      expect(() => ValueValidators.validSku().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input sku is blank`, () => {
+      const testInput = '      '
       expect(() => ValueValidators.validSku().parse(testInput)).toThrow()
     })
 
@@ -96,13 +211,34 @@ describe(`Payments Service ValueValidators tests`, () => {
     })
   })
 
+  /*
+   *
+   *
+   ************************************************************
+   * Test validUnits
+   ************************************************************/
   describe(`validUnits tests`, () => {
     it(`throws if the input units is undefined`, () => {
-      const testInput = undefined as string
+      const testInput = undefined as never
       expect(() => ValueValidators.validUnits().parse(testInput)).toThrow()
     })
 
-    it(`throws if the input units = 0`, () => {
+    it(`throws if the input units is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validUnits().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input units is not a number`, () => {
+      const testInput = '1' as never
+      expect(() => ValueValidators.validUnits().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input units is not an integer`, () => {
+      const testInput = 2.34
+      expect(() => ValueValidators.validUnits().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input units === 0`, () => {
       const testInput = 0
       expect(() => ValueValidators.validUnits().parse(testInput)).toThrow()
     })
@@ -112,20 +248,31 @@ describe(`Payments Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validUnits().parse(testInput)).toThrow()
     })
 
-    it(`throws if the input units is not an integer`, () => {
-      const testInput = 2.34
-      expect(() => ValueValidators.validUnits().parse(testInput)).toThrow()
-    })
-
     it(`is valid if the input units >= 1`, () => {
       const testInput = 1
       expect(() => ValueValidators.validUnits().parse(testInput)).not.toThrow()
     })
   })
 
+  /*
+   *
+   *
+   ************************************************************
+   * Test validPrice
+   ************************************************************/
   describe(`validPrice tests`, () => {
     it(`throws if the input price is undefined`, () => {
-      const testInput = undefined as string
+      const testInput = undefined as never
+      expect(() => ValueValidators.validPrice().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input price is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validPrice().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input price is not a number`, () => {
+      const testInput = '1' as never
       expect(() => ValueValidators.validPrice().parse(testInput)).toThrow()
     })
 
@@ -134,7 +281,7 @@ describe(`Payments Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validPrice().parse(testInput)).toThrow()
     })
 
-    it(`is valid if the input price == 0`, () => {
+    it(`is valid if the input price === 0`, () => {
       const testInput = 0
       expect(() => ValueValidators.validPrice().parse(testInput)).not.toThrow()
     })
@@ -145,9 +292,30 @@ describe(`Payments Service ValueValidators tests`, () => {
     })
   })
 
+  /*
+   *
+   *
+   ************************************************************
+   * Test validUserId
+   ************************************************************/
   describe(`validUserId tests`, () => {
     it(`throws if the input userId is undefined`, () => {
-      const testInput = undefined as string
+      const testInput = undefined as never
+      expect(() => ValueValidators.validUserId().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input userId is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validUserId().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input userId is empty`, () => {
+      const testInput = ''
+      expect(() => ValueValidators.validUserId().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input userId is blank`, () => {
+      const testInput = '      '
       expect(() => ValueValidators.validUserId().parse(testInput)).toThrow()
     })
 
@@ -162,9 +330,30 @@ describe(`Payments Service ValueValidators tests`, () => {
     })
   })
 
+  /*
+   *
+   *
+   ************************************************************
+   * Test validCreatedAt
+   ************************************************************/
   describe(`validCreatedAt tests`, () => {
     it(`throws if the input createdAt is undefined`, () => {
-      const testInput = undefined as string
+      const testInput = undefined as never
+      expect(() => ValueValidators.validCreatedAt().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input createdAt is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validCreatedAt().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input createdAt is empty`, () => {
+      const testInput = ''
+      expect(() => ValueValidators.validCreatedAt().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input createdAt is blank`, () => {
+      const testInput = '      '
       expect(() => ValueValidators.validCreatedAt().parse(testInput)).toThrow()
     })
 
@@ -179,9 +368,30 @@ describe(`Payments Service ValueValidators tests`, () => {
     })
   })
 
+  /*
+   *
+   *
+   ************************************************************
+   * Test validUpdatedAt
+   ************************************************************/
   describe(`validUpdatedAt tests`, () => {
     it(`throws if the input updatedAt is undefined`, () => {
-      const testInput = undefined as string
+      const testInput = undefined as never
+      expect(() => ValueValidators.validUpdatedAt().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input updatedAt is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validUpdatedAt().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input updatedAt is empty`, () => {
+      const testInput = ''
+      expect(() => ValueValidators.validUpdatedAt().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input updatedAt is blank`, () => {
+      const testInput = '      '
       expect(() => ValueValidators.validUpdatedAt().parse(testInput)).toThrow()
     })
 
@@ -196,14 +406,30 @@ describe(`Payments Service ValueValidators tests`, () => {
     })
   })
 
+  /*
+   *
+   *
+   ************************************************************
+   * Test validSortDirection
+   ************************************************************/
   describe(`validSortDirection tests`, () => {
     it(`throws if the input sortDirection is undefined`, () => {
-      const testInput = undefined as string
+      const testInput = undefined as never
       expect(() => ValueValidators.validSortDirection().parse(testInput)).toThrow()
     })
 
-    it(`throws if the input sortDirection a random string`, () => {
-      const testInput = 'xyz'
+    it(`throws if the input sortDirection is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validSortDirection().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input sortDirection is empty`, () => {
+      const testInput = ''
+      expect(() => ValueValidators.validSortDirection().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input sortDirection is not a SortDirection`, () => {
+      const testInput = 'mockInvalidValue'
       expect(() => ValueValidators.validSortDirection().parse(testInput)).toThrow()
     })
 
@@ -218,13 +444,34 @@ describe(`Payments Service ValueValidators tests`, () => {
     })
   })
 
+  /*
+   *
+   *
+   ************************************************************
+   * Test validLimit
+   ************************************************************/
   describe(`validLimit tests`, () => {
     it(`throws if the input limit is undefined`, () => {
-      const testInput = undefined as string
+      const testInput = undefined as never
       expect(() => ValueValidators.validLimit().parse(testInput)).toThrow()
     })
 
-    it(`throws if the input limit = 0`, () => {
+    it(`throws if the input limit is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validLimit().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input limit is not a number`, () => {
+      const testInput = '2' as never
+      expect(() => ValueValidators.validLimit().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input limit is not an integer`, () => {
+      const testInput = 3.45
+      expect(() => ValueValidators.validLimit().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input limit === 0`, () => {
       const testInput = 0
       expect(() => ValueValidators.validLimit().parse(testInput)).toThrow()
     })
@@ -239,11 +486,6 @@ describe(`Payments Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validLimit().parse(testInput)).toThrow()
     })
 
-    it(`throws if the input limit is not an integer`, () => {
-      const testInput = 3.45
-      expect(() => ValueValidators.validLimit().parse(testInput)).toThrow()
-    })
-
     it(`is valid if the input limit >= 1 <= 1000`, () => {
       const testInputFor1 = 1
       const testInputFor1000 = 1000
@@ -252,75 +494,30 @@ describe(`Payments Service ValueValidators tests`, () => {
     })
   })
 
-  describe(`validPaymentStatus tests`, () => {
-    it(`throws if the input paymentStatus is undefined`, () => {
-      const testInput = undefined as never
-      expect(() => ValueValidators.validPaymentStatus().parse(testInput)).toThrow()
-    })
-
-    it(`throws if the input paymentStatus a random string and not an PaymentStatus`, () => {
-      const testInput = 'xyz'
-      expect(() => ValueValidators.validPaymentStatus().parse(testInput)).toThrow()
-    })
-
-    it(`throws if the input paymentStatus is not the literal expectedPaymentStatus`, () => {
-      const expectedPaymentStatus: PaymentStatus = 'PAYMENT_ACCEPTED'
-      const testInput: PaymentStatus = 'PAYMENT_REJECTED'
-      expect(() => ValueValidators.validPaymentStatus(expectedPaymentStatus).parse(testInput)).toThrow()
-    })
-
-    it(`is valid if the input paymentStatus === 'PAYMENT_ACCEPTED'`, () => {
-      const testInput: PaymentStatus = 'PAYMENT_ACCEPTED'
-      expect(() => ValueValidators.validPaymentStatus().parse(testInput)).not.toThrow()
-    })
-
-    it(`is valid if the input paymentStatus === 'PAYMENT_FAILED'`, () => {
-      const testInput: PaymentStatus = 'PAYMENT_FAILED'
-      expect(() => ValueValidators.validPaymentStatus().parse(testInput)).not.toThrow()
-    })
-
-    it(`is valid if the input paymentStatus === 'PAYMENT_REJECTED'`, () => {
-      const testInput: PaymentStatus = 'PAYMENT_REJECTED'
-      expect(() => ValueValidators.validPaymentStatus().parse(testInput)).not.toThrow()
-    })
-
-    it(`is valid if the input paymentStatus is the literal expectedPaymentStatus`, () => {
-      const expectedPaymentStatus: PaymentStatus = 'PAYMENT_ACCEPTED'
-      const testInput: PaymentStatus = 'PAYMENT_ACCEPTED'
-      expect(() => ValueValidators.validPaymentStatus(expectedPaymentStatus).parse(testInput)).not.toThrow()
-    })
-  })
-
-  describe(`validPaymentRetries tests`, () => {
-    it(`throws if the input paymentRetries is undefined`, () => {
-      const testInput = undefined as string
-      expect(() => ValueValidators.validPaymentRetries().parse(testInput)).toThrow()
-    })
-
-    it(`throws if the input paymentRetries < 0`, () => {
-      const testInput = -1
-      expect(() => ValueValidators.validPaymentRetries().parse(testInput)).toThrow()
-    })
-
-    it(`throws if the input paymentRetries is not an integer`, () => {
-      const testInput = 3.45
-      expect(() => ValueValidators.validPaymentRetries().parse(testInput)).toThrow()
-    })
-
-    it(`is valid if the input paymentRetries == 0`, () => {
-      const testInput = 0
-      expect(() => ValueValidators.validPaymentRetries().parse(testInput)).not.toThrow()
-    })
-
-    it(`is valid if the input paymentRetries > 0`, () => {
-      const testInput = 1
-      expect(() => ValueValidators.validPaymentRetries().parse(testInput)).not.toThrow()
-    })
-  })
-
+  /*
+   *
+   *
+   ************************************************************
+   * Test validPaymentId
+   ************************************************************/
   describe(`validPaymentId tests`, () => {
     it(`throws if the input paymentId is undefined`, () => {
-      const testInput = undefined as string
+      const testInput = undefined as never
+      expect(() => ValueValidators.validPaymentId().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input paymentId is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validPaymentId().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input paymentId is empty`, () => {
+      const testInput = ''
+      expect(() => ValueValidators.validPaymentId().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input paymentId is blank`, () => {
+      const testInput = '      '
       expect(() => ValueValidators.validPaymentId().parse(testInput)).toThrow()
     })
 
@@ -332,6 +529,87 @@ describe(`Payments Service ValueValidators tests`, () => {
     it(`is valid if the input paymentId length >= 4`, () => {
       const testInput = '1234'
       expect(() => ValueValidators.validPaymentId().parse(testInput)).not.toThrow()
+    })
+  })
+
+  /*
+   *
+   *
+   ************************************************************
+   * Test validPaymentStatus
+   ************************************************************/
+  describe(`validPaymentStatus tests`, () => {
+    it(`throws if the input paymentStatus is undefined`, () => {
+      const testInput = undefined as never
+      expect(() => ValueValidators.validPaymentStatus().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input paymentStatus is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validPaymentStatus().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input paymentStatus is empty`, () => {
+      const testInput = ''
+      expect(() => ValueValidators.validPaymentStatus().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input paymentStatus is not a PaymentStatus`, () => {
+      const testInput = 'mockInvalidValue'
+      expect(() => ValueValidators.validPaymentStatus().parse(testInput)).toThrow()
+    })
+
+    it(`is valid if the input paymentStatus is a PaymentStatus like PAYMENT_REJECTED`, () => {
+      const testInput: PaymentStatus = 'PAYMENT_REJECTED'
+      expect(() => ValueValidators.validPaymentStatus().parse(testInput)).not.toThrow()
+    })
+
+    it(`is valid if the input paymentStatus is a PaymentStatus like PAYMENT_ACCEPTED`, () => {
+      const testInput: PaymentStatus = 'PAYMENT_ACCEPTED'
+      expect(() => ValueValidators.validPaymentStatus().parse(testInput)).not.toThrow()
+    })
+  })
+
+  /*
+   *
+   *
+   ************************************************************
+   * Test validPaymentRetries
+   ************************************************************/
+  describe(`validPaymentRetries tests`, () => {
+    it(`throws if the input paymentRetries is undefined`, () => {
+      const testInput = undefined as never
+      expect(() => ValueValidators.validPaymentRetries().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input paymentRetries is null`, () => {
+      const testInput = null as never
+      expect(() => ValueValidators.validPaymentRetries().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input paymentRetries is not a number`, () => {
+      const testInput = '2'
+      expect(() => ValueValidators.validPaymentRetries().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input paymentRetries is not an integer`, () => {
+      const testInput = 3.45
+      expect(() => ValueValidators.validPaymentRetries().parse(testInput)).toThrow()
+    })
+
+    it(`throws if the input paymentRetries < 0`, () => {
+      const testInput = -1
+      expect(() => ValueValidators.validPaymentRetries().parse(testInput)).toThrow()
+    })
+
+    it(`is valid if the input paymentRetries === 0`, () => {
+      const testInput = 0
+      expect(() => ValueValidators.validPaymentRetries().parse(testInput)).not.toThrow()
+    })
+
+    it(`is valid if the input paymentRetries > 0`, () => {
+      const testInput = 1
+      expect(() => ValueValidators.validPaymentRetries().parse(testInput)).not.toThrow()
     })
   })
 })

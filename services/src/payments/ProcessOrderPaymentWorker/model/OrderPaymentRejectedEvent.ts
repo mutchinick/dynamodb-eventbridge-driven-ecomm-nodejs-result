@@ -81,7 +81,7 @@ export class OrderPaymentRejectedEvent implements OrderPaymentRejectedEventProps
    *
    */
   private static validateInput(
-    orderPaymentRejectedEventInput: OrderPaymentRejectedEventData,
+    orderPaymentRejectedEventInput: OrderPaymentRejectedEventInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'OrderPaymentRejectedEvent.validateInput'
 

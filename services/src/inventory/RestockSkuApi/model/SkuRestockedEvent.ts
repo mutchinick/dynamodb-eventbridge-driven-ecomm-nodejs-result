@@ -74,7 +74,7 @@ export class SkuRestockedEvent implements SkuRestockedEventProps {
    *
    */
   private static validateInput(
-    skuRestockedEventInput: SkuRestockedEventData,
+    skuRestockedEventInput: SkuRestockedEventInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'SkuRestockedEvent.validateInput'
 

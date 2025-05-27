@@ -1,19 +1,20 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { z } from 'zod'
-import { SortDirection } from './SortDirection'
+import { AllocationStatusMembers } from './AllocationStatus'
 import { InventoryEventName } from './InventoryEventName'
-import { AllocationStatus, AllocationStatusMembers } from './AllocationStatus'
+import { SortDirection } from './SortDirection'
 
 /**
  *
  */
 export class ValueValidators {
-  public static validSkuRestockedEventName = () => z.literal(InventoryEventName.SKU_RESTOCKED_EVENT)
+  public static validInventoryEventName = () => z.nativeEnum(InventoryEventName)
 
-  public static validOrderCreatedEventName = () => z.literal(InventoryEventName.ORDER_CREATED_EVENT)
+  public static validInventoryEventNameLiteral = (eventName: InventoryEventName) =>
+    z.nativeEnum(InventoryEventName).and(z.literal(eventName))
 
-  public static validOrderEventNameGroup = (events: InventoryEventName[]) =>
-    z.enum(events as unknown as [InventoryEventName, ...InventoryEventName[]])
+  public static validInventoryEventNameGroup = (eventGroup: InventoryEventName[]) =>
+    z.nativeEnum(InventoryEventName).and(z.enum(eventGroup as unknown as [InventoryEventName, ...InventoryEventName[]]))
 
   public static validOrderId = () => z.string().trim().min(4)
 
@@ -31,12 +32,9 @@ export class ValueValidators {
 
   public static validLotId = () => z.string().trim().min(4)
 
-  public static validSortDirection = () => z.enum(Object.values(SortDirection) as [string, ...string[]])
+  public static validSortDirection = () => z.nativeEnum(SortDirection)
 
   public static validLimit = () => z.number().int().min(1).max(1000)
 
-  public static validAllocationStatus = (expectedAllocationStatus?: AllocationStatus) =>
-    expectedAllocationStatus !== undefined
-      ? z.enum(AllocationStatusMembers).and(z.literal(expectedAllocationStatus))
-      : z.enum(AllocationStatusMembers)
+  public static validAllocationStatus = () => z.enum(AllocationStatusMembers)
 }

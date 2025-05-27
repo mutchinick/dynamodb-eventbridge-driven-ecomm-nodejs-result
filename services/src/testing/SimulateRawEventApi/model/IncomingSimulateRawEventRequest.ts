@@ -60,7 +60,7 @@ export class IncomingSimulateRawEventRequest implements IncomingSimulateRawEvent
    */
   private static buildProps(
     incomingSimulateRawEventRequestInput: IncomingSimulateRawEventRequestInput,
-  ): Success<RawEventProps> | Failure<'InvalidArgumentsError'> {
+  ): Success<IncomingSimulateRawEventRequestProps> | Failure<'InvalidArgumentsError'> {
     const inputValidationResult = this.validateInput(incomingSimulateRawEventRequestInput)
     if (Result.isFailure(inputValidationResult)) {
       return inputValidationResult
@@ -82,7 +82,7 @@ export class IncomingSimulateRawEventRequest implements IncomingSimulateRawEvent
    *
    */
   private static validateInput(
-    incomingSimulateRawEventRequestInput: RawEventProps,
+    incomingSimulateRawEventRequestInput: IncomingSimulateRawEventRequestInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
     const logContext = 'IncomingSimulateRawEventRequest.validateInput'
 

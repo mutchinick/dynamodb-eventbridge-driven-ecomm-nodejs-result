@@ -1,5 +1,6 @@
+import { AttributeValue } from '@aws-sdk/client-dynamodb'
 import { marshall } from '@aws-sdk/util-dynamodb'
-import { AttributeValue, EventBridgeEvent, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda'
+import { EventBridgeEvent, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda'
 import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
 import { PaymentsEventName } from '../../model/PaymentsEventName'
@@ -40,7 +41,7 @@ type MockEventDetail = {
   eventSource: 'aws:dynamodb'
   eventVersion: string
   dynamodb: {
-    NewImage: AttributeValue | Record<string, AttributeValue>
+    NewImage: Record<string, AttributeValue>
   }
 }
 
@@ -157,7 +158,7 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerCo
    ************************************************************
    * Test SQSEvent edge cases
    ************************************************************/
-  it(`does not throw the input SQSEvent is valid`, async () => {
+  it(`does not throw if the input SQSEvent is valid`, async () => {
     const mockProcessOrderPaymentWorkerService = buildMockProcessOrderPaymentWorkerService_succeeds()
     const processOrderPaymentWorkerController = new ProcessOrderPaymentWorkerController(
       mockProcessOrderPaymentWorkerService,
@@ -184,9 +185,9 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerCo
       mockProcessOrderPaymentWorkerService,
     )
     const mockSqsEvent = undefined as never
-    const result = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
+    const response = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
     const expectedResponse: SQSBatchResponse = { batchItemFailures: [] }
-    expect(result).toStrictEqual(expectedResponse)
+    expect(response).toStrictEqual(expectedResponse)
   })
 
   it(`fails to call ProcessOrderPaymentWorkerService.processOrderPayment if the input
@@ -207,9 +208,9 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerCo
       mockProcessOrderPaymentWorkerService,
     )
     const mockSqsEvent = null as never
-    const result = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
+    const response = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
     const expectedResponse: SQSBatchResponse = { batchItemFailures: [] }
-    expect(result).toStrictEqual(expectedResponse)
+    expect(response).toStrictEqual(expectedResponse)
   })
 
   /*
@@ -236,9 +237,9 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerCo
       mockProcessOrderPaymentWorkerService,
     )
     const mockSqsEvent = {} as never
-    const result = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
+    const response = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
     const expectedResponse: SQSBatchResponse = { batchItemFailures: [] }
-    expect(result).toStrictEqual(expectedResponse)
+    expect(response).toStrictEqual(expectedResponse)
   })
 
   it(`fails to call ProcessOrderPaymentWorkerService.processOrderPayment if the input
@@ -259,9 +260,9 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerCo
       mockProcessOrderPaymentWorkerService,
     )
     const mockSqsEvent = buildMockSqsEvent(undefined)
-    const result = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
+    const response = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
     const expectedResponse: SQSBatchResponse = { batchItemFailures: [] }
-    expect(result).toStrictEqual(expectedResponse)
+    expect(response).toStrictEqual(expectedResponse)
   })
 
   it(`fails to call ProcessOrderPaymentWorkerService.processOrderPayment if the input
@@ -282,9 +283,9 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerCo
       mockProcessOrderPaymentWorkerService,
     )
     const mockSqsEvent = buildMockSqsEvent(null)
-    const result = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
+    const response = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
     const expectedResponse: SQSBatchResponse = { batchItemFailures: [] }
-    expect(result).toStrictEqual(expectedResponse)
+    expect(response).toStrictEqual(expectedResponse)
   })
 
   it(`fails to call ProcessOrderPaymentWorkerService.processOrderPayment if the input
@@ -305,9 +306,9 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerCo
       mockProcessOrderPaymentWorkerService,
     )
     const mockSqsEvent = buildMockSqsEvent([])
-    const result = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
+    const response = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
     const expectedResponse: SQSBatchResponse = { batchItemFailures: [] }
-    expect(result).toStrictEqual(expectedResponse)
+    expect(response).toStrictEqual(expectedResponse)
   })
 
   /*
@@ -336,9 +337,9 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerCo
     )
     const mockSqsRecord = { body: undefined } as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
-    const result = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
+    const response = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
     const expectedResponse: SQSBatchResponse = { batchItemFailures: [] }
-    expect(result).toStrictEqual(expectedResponse)
+    expect(response).toStrictEqual(expectedResponse)
   })
 
   it(`fails to call ProcessOrderPaymentWorkerService.processOrderPayment if the input
@@ -361,9 +362,9 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerCo
     )
     const mockSqsRecord = { body: null } as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
-    const result = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
+    const response = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
     const expectedResponse: SQSBatchResponse = { batchItemFailures: [] }
-    expect(result).toStrictEqual(expectedResponse)
+    expect(response).toStrictEqual(expectedResponse)
   })
 
   it(`fails to call ProcessOrderPaymentWorkerService.processOrderPayment if the input
@@ -388,9 +389,9 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerCo
     const mockSqsRecord = {} as unknown as SQSRecord
     const mockSqsEvent = buildMockSqsEvent([mockSqsRecord])
     mockSqsEvent.Records[0].body = 'mockInvalidValue'
-    const result = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
+    const response = await processOrderPaymentWorkerController.processOrderPayments(mockSqsEvent)
     const expectedResponse: SQSBatchResponse = { batchItemFailures: [] }
-    expect(result).toStrictEqual(expectedResponse)
+    expect(response).toStrictEqual(expectedResponse)
   })
 
   /*
