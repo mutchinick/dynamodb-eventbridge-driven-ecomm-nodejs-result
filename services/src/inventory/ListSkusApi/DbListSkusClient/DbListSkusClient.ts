@@ -1,13 +1,13 @@
 import { DynamoDBDocumentClient, NativeAttributeValue, QueryCommand, QueryCommandInput } from '@aws-sdk/lib-dynamodb'
 import { Failure, Result, Success } from '../../errors/Result'
-import { RestockSkuData } from '../../model/RestockSkuData'
+import { SkuData } from '../../model/SkuData'
 import { SortDirection } from '../../model/SortDirection'
 import { ListSkusCommand } from '../model/ListSkusCommand'
 
 export interface IDbListSkusClient {
   listSkus: (
     listSkusCommand: ListSkusCommand,
-  ) => Promise<Success<RestockSkuData[]> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>>
+  ) => Promise<Success<SkuData[]> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>>
 }
 
 /**
@@ -27,7 +27,7 @@ export class DbListSkusClient implements IDbListSkusClient {
    */
   public async listSkus(
     listSkusCommand: ListSkusCommand,
-  ): Promise<Success<RestockSkuData[]> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
+  ): Promise<Success<SkuData[]> | Failure<'InvalidArgumentsError'> | Failure<'UnrecognizedError'>> {
     const logContext = 'DbListSkusClient.listSkus'
     console.info(`${logContext} init:`, { listSkusCommand })
 
@@ -131,16 +131,14 @@ export class DbListSkusClient implements IDbListSkusClient {
   /**
    *
    */
-  private async sendDdbCommand(
-    ddbCommand: QueryCommand,
-  ): Promise<Success<RestockSkuData[]> | Failure<'UnrecognizedError'>> {
+  private async sendDdbCommand(ddbCommand: QueryCommand): Promise<Success<SkuData[]> | Failure<'UnrecognizedError'>> {
     const logContext = 'DbListSkusClient.sendDdbCommand'
     console.info(`${logContext} init:`, { ddbCommand })
 
     try {
       const ddbResult = await this.ddbDocClient.send(ddbCommand)
       if (!ddbResult.Items) {
-        const skus: RestockSkuData[] = []
+        const skus: SkuData[] = []
         const sendCommandResult = Result.makeSuccess(skus)
         console.info(`${logContext} exit success: null-Items:`, { sendCommandResult, ddbResult, ddbCommand })
         return sendCommandResult
@@ -161,11 +159,10 @@ export class DbListSkusClient implements IDbListSkusClient {
   /**
    *
    */
-  private buildSkuData(items: Record<string, NativeAttributeValue>[]): RestockSkuData[] {
-    const skus: RestockSkuData[] = items.map((item) => ({
+  private buildSkuData(items: Record<string, NativeAttributeValue>[]): SkuData[] {
+    const skus: SkuData[] = items.map((item) => ({
       sku: item.sku,
       units: item.units,
-      lotId: item.lotId,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
     }))

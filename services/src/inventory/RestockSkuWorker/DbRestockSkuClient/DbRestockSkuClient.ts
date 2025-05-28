@@ -91,9 +91,9 @@ export class DbRestockSkuClient implements IDbRestockSkuClient {
 
       const restockPk = `INVENTORY#SKU#${sku}`
       const restockSk = `LOT_ID#${lotId}`
-      const restockTn = `INVENTORY#RESTOCK`
+      const restockTn = `INVENTORY#RESTOCK_SKU`
       const restockSn = `INVENTORY`
-      const restockGsi1Pk = `INVENTORY#RESTOCK`
+      const restockGsi1Pk = `INVENTORY#RESTOCK_SKU`
       const restockGsi1Sk = `CREATED_AT#${createdAt}`
 
       const skuItemPk = `INVENTORY#SKU#${sku}`

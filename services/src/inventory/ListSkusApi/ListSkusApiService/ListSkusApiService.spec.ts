@@ -1,7 +1,7 @@
 import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { FailureKind } from '../../errors/FailureKind'
 import { Result } from '../../errors/Result'
-import { RestockSkuData } from '../../model/RestockSkuData'
+import { SkuData } from '../../model/SkuData'
 import { IDbListSkusClient } from '../DbListSkusClient/DbListSkusClient'
 import { IncomingListSkusRequest } from '../model/IncomingListSkusRequest'
 import { ListSkusCommand, ListSkusCommandInput } from '../model/ListSkusCommand'
@@ -24,18 +24,16 @@ const mockIncomingListSkusRequest = buildMockIncomingListSkusRequest()
  ************************************************************
  * Mock clients
  ************************************************************/
-const mockExistingSkuData: RestockSkuData[] = [
+const mockExistingSkuData: SkuData[] = [
   {
     sku: 'mockSku-1',
     units: 12,
-    lotId: 'mockLotId-1',
     createdAt: mockDate,
     updatedAt: mockDate,
   },
   {
     sku: `mockSku-2`,
     units: 6,
-    lotId: 'mockLotId-2',
     createdAt: mockDate,
     updatedAt: mockDate,
   },
@@ -171,14 +169,12 @@ describe(`Inventory Service ListSkusApi ListSkusApiService tests`, () => {
         {
           sku: mockExistingSkuData[0].sku,
           units: mockExistingSkuData[0].units,
-          lotId: mockExistingSkuData[0].lotId,
           createdAt: mockExistingSkuData[0].createdAt,
           updatedAt: mockExistingSkuData[0].updatedAt,
         },
         {
           sku: mockExistingSkuData[1].sku,
           units: mockExistingSkuData[1].units,
-          lotId: mockExistingSkuData[1].lotId,
           createdAt: mockExistingSkuData[1].createdAt,
           updatedAt: mockExistingSkuData[1].updatedAt,
         },

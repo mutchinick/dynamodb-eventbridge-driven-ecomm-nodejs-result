@@ -1,7 +1,5 @@
-export type RestockSkuData = {
-  sku: string
-  units: number
+import { SkuData } from './SkuData'
+
+export type RestockSkuData = SkuData & {
   lotId: string
-  createdAt: string
-  updatedAt: string
 }

@@ -1,13 +1,13 @@
 import { z } from 'zod'
 import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
-import { RestockSkuData } from '../../model/RestockSkuData'
+import { SkuData } from '../../model/SkuData'
 import { SortParams } from '../../model/SortParams'
 import { ValueValidators } from '../../model/ValueValidators'
 
-export type ListSkusCommandInput = TypeUtilsPretty<Partial<Pick<RestockSkuData, 'sku'> & SortParams>>
+export type ListSkusCommandInput = TypeUtilsPretty<Partial<Pick<SkuData, 'sku'> & SortParams>>
 
-type ListSkusCommandData = TypeUtilsPretty<Partial<Pick<RestockSkuData, 'sku'> & SortParams>>
+type ListSkusCommandData = TypeUtilsPretty<Partial<Pick<SkuData, 'sku'> & SortParams>>
 
 type ListSkusCommandProps = {
   readonly commandData: ListSkusCommandData

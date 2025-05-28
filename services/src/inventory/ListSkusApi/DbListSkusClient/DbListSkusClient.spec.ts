@@ -1,7 +1,7 @@
 import { DynamoDBDocumentClient, QueryCommand, QueryCommandOutput } from '@aws-sdk/lib-dynamodb'
 import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
-import { RestockSkuData } from '../../model/RestockSkuData'
+import { SkuData } from '../../model/SkuData'
 import { type SortDirection } from '../../model/SortDirection'
 import { ListSkusCommand, ListSkusCommandInput } from '../model/ListSkusCommand'
 import { DbListSkusClient } from './DbListSkusClient'
@@ -104,18 +104,16 @@ function buildMockDdbCommand_ListDefault(): QueryCommand {
  ************************************************************
  * Mock clients
  ************************************************************/
-const mockExistingSkuData: RestockSkuData[] = [
+const mockExistingSkuData: SkuData[] = [
   {
     sku: mockSku,
     units: 2,
-    lotId: 'mockLotId',
     createdAt: mockDate,
     updatedAt: mockDate,
   },
   {
     sku: `${mockSku}-2`,
     units: 2,
-    lotId: 'mockLotId',
     createdAt: mockDate,
     updatedAt: mockDate,
   },
@@ -276,12 +274,12 @@ describe(`Inventory Service ListSkusApi DbListSkusClient tests`, () => {
    ************************************************************
    * Test expected result
    ************************************************************/
-  it(`returns the expected empty Success<RestockSkuData[]> if
+  it(`returns the expected empty Success<SkuData[]> if
       DynamoDBDocumentClient.send returns Items with null items`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_nullItems()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     const result = await dbListSkusClient.listSkus(mockListSkusCommand)
-    const expectedSkus: RestockSkuData[] = []
+    const expectedSkus: SkuData[] = []
     const expectedResult = Result.makeSuccess(expectedSkus)
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)
@@ -292,22 +290,21 @@ describe(`Inventory Service ListSkusApi DbListSkusClient tests`, () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves('none')
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     const result = await dbListSkusClient.listSkus(mockListSkusCommand)
-    const expectedSkus: RestockSkuData[] = []
+    const expectedSkus: SkuData[] = []
     const expectedResult = Result.makeSuccess(expectedSkus)
     expect(Result.isSuccess(result)).toBe(true)
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it(`returns the expected Success<RestockSkuData[]> if DynamoDBDocumentClient.send
+  it(`returns the expected Success<SkuData[]> if DynamoDBDocumentClient.send
       returns Items with one item`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves('one')
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     const result = await dbListSkusClient.listSkus(mockListSkusCommand)
-    const expectedSkus: RestockSkuData[] = [
+    const expectedSkus: SkuData[] = [
       {
         sku: mockExistingSkuData[0].sku,
         units: mockExistingSkuData[0].units,
-        lotId: mockExistingSkuData[0].lotId,
         createdAt: mockExistingSkuData[0].createdAt,
         updatedAt: mockExistingSkuData[0].updatedAt,
       },
@@ -317,23 +314,21 @@ describe(`Inventory Service ListSkusApi DbListSkusClient tests`, () => {
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it(`returns the expected Success<RestockSkuData[]> if DynamoDBDocumentClient.send
+  it(`returns the expected Success<SkuData[]> if DynamoDBDocumentClient.send
       returns Items with many items`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves('many')
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     const result = await dbListSkusClient.listSkus(mockListSkusCommand)
-    const expectedSkus: RestockSkuData[] = [
+    const expectedSkus: SkuData[] = [
       {
         sku: mockExistingSkuData[0].sku,
         units: mockExistingSkuData[0].units,
-        lotId: mockExistingSkuData[0].lotId,
         createdAt: mockExistingSkuData[0].createdAt,
         updatedAt: mockExistingSkuData[0].updatedAt,
       },
       {
         sku: mockExistingSkuData[1].sku,
         units: mockExistingSkuData[1].units,
-        lotId: mockExistingSkuData[1].lotId,
         createdAt: mockExistingSkuData[1].createdAt,
         updatedAt: mockExistingSkuData[1].updatedAt,
       },

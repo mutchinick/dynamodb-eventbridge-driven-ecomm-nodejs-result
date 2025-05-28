@@ -47,14 +47,12 @@ const mockServiceOutput: ListSkusApiServiceOutput = {
     {
       sku: 'mockSku-1',
       units: 12,
-      lotId: 'mockLotId-1',
       createdAt: mockDate,
       updatedAt: mockDate,
     },
     {
       sku: `mockSku-2`,
       units: 6,
-      lotId: 'mockLotId-2',
       createdAt: mockDate,
       updatedAt: mockDate,
     },
