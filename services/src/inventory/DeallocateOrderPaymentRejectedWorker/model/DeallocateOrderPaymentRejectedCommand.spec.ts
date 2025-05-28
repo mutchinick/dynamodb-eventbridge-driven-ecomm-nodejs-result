@@ -1,7 +1,7 @@
 import { TypeUtilsMutable } from '../../../shared/TypeUtils'
 import { Result } from '../../errors/Result'
-import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { InventoryEventName } from '../../model/InventoryEventName'
+import { OrderAllocationData } from '../../model/OrderAllocationData'
 import {
   DeallocateOrderPaymentRejectedCommand,
   DeallocateOrderPaymentRejectedCommandInput,
@@ -640,9 +640,10 @@ describe(`Inventory Service DeallocateOrderPaymentRejectedWorker
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus
-      is 'CANCELED'`, () => {
+      is 'DEALLOCATED_ORDER_CANCELED'`, () => {
     const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
-    mockDeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus = 'CANCELED'
+    mockDeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus =
+      'DEALLOCATED_ORDER_CANCELED'
     const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
       mockDeallocateOrderPaymentRejectedCommandInput,
     )
@@ -653,9 +654,10 @@ describe(`Inventory Service DeallocateOrderPaymentRejectedWorker
 
   it(`returns a non-transient Failure of kind InvalidArgumentsError if the input
       DeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus
-      is 'PAYMENT_REJECTED'`, () => {
+      is 'DEALLOCATED_PAYMENT_REJECTED'`, () => {
     const mockDeallocateOrderPaymentRejectedCommandInput = buildMockDeallocateOrderPaymentRejectedCommandInput()
-    mockDeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus = 'PAYMENT_REJECTED'
+    mockDeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.allocationStatus =
+      'DEALLOCATED_PAYMENT_REJECTED'
     const result = DeallocateOrderPaymentRejectedCommand.validateAndBuild(
       mockDeallocateOrderPaymentRejectedCommandInput,
     )
@@ -1240,7 +1242,7 @@ describe(`Inventory Service DeallocateOrderPaymentRejectedWorker
         sku: mockDeallocateOrderPaymentRejectedCommandInput.incomingOrderPaymentRejectedEvent.eventData.sku,
         units: mockDeallocateOrderPaymentRejectedCommandInput.existingOrderAllocationData.units,
         updatedAt: mockDate,
-        allocationStatus: 'PAYMENT_REJECTED',
+        allocationStatus: 'DEALLOCATED_PAYMENT_REJECTED',
         expectedAllocationStatus: 'ALLOCATED',
       },
       options: {},

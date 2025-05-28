@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { z } from 'zod'
-import { AllocationStatusMembers } from './AllocationStatus'
+import { AllocationStatus } from './AllocationStatus'
 import { InventoryEventName } from './InventoryEventName'
 import { SortDirection } from './SortDirection'
 
@@ -36,5 +36,5 @@ export class ValueValidators {
 
   public static validLimit = () => z.number().int().min(1).max(1000)
 
-  public static validAllocationStatus = () => z.enum(AllocationStatusMembers)
+  public static validAllocationStatus = () => z.nativeEnum(AllocationStatus)
 }

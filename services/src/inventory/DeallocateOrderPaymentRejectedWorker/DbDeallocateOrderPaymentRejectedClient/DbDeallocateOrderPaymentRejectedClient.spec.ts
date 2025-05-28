@@ -20,7 +20,7 @@ const mockSku = 'mockSku'
 const mockUnits = 2
 const mockPrice = 10.32
 const mockUserId = 'mockUserId'
-const mockNewAllocationStatus: AllocationStatus = 'PAYMENT_REJECTED'
+const mockNewAllocationStatus: AllocationStatus = 'DEALLOCATED_PAYMENT_REJECTED'
 const mockExpectedAllocationStatus: AllocationStatus = 'ALLOCATED'
 
 function buildMockDeallocateOrderPaymentRejectedCommand(): TypeUtilsMutable<DeallocateOrderPaymentRejectedCommand> {

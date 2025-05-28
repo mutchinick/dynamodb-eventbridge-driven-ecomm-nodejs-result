@@ -1,5 +1,10 @@
-export const AllocationStatusMembers = ['ALLOCATED', 'CANCELED', 'PAYMENT_REJECTED'] as const
+export const AllocationStatus = {
+  ALLOCATED: 'ALLOCATED',
+  COMPLETED_PAYMENT_ACCEPTED: 'COMPLETED_PAYMENT_ACCEPTED',
+  DEALLOCATED_PAYMENT_REJECTED: 'DEALLOCATED_PAYMENT_REJECTED',
+  DEALLOCATED_ORDER_CANCELED: 'DEALLOCATED_ORDER_CANCELED',
+} as const
 
-type AllocationStatusMembers = (typeof AllocationStatusMembers)[number]
+export type AllocationStatus = (typeof AllocationStatus)[keyof typeof AllocationStatus]
 
-export type AllocationStatus<T extends AllocationStatusMembers = AllocationStatusMembers> = T
+export type FixedAllocationStatus<T extends AllocationStatus> = T

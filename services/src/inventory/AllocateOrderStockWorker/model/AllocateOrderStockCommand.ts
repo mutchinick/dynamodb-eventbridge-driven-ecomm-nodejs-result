@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import { TypeUtilsPretty } from '../../../shared/TypeUtils'
 import { Failure, Result, Success } from '../../errors/Result'
-import { AllocationStatus } from '../../model/AllocationStatus'
+import { FixedAllocationStatus } from '../../model/AllocationStatus'
+import { InventoryEventName } from '../../model/InventoryEventName'
 import { OrderAllocationData } from '../../model/OrderAllocationData'
 import { ValueValidators } from '../../model/ValueValidators'
 import { IncomingOrderCreatedEvent } from './IncomingOrderCreatedEvent'
-import { InventoryEventName } from '../../model/InventoryEventName'
 
 export type AllocateOrderStockCommandInput = {
   incomingOrderCreatedEvent: IncomingOrderCreatedEvent
@@ -13,7 +13,7 @@ export type AllocateOrderStockCommandInput = {
 
 type AllocateOrderStockCommandData = TypeUtilsPretty<
   OrderAllocationData & {
-    allocationStatus: AllocationStatus<'ALLOCATED'>
+    allocationStatus: FixedAllocationStatus<'ALLOCATED'>
   }
 >
 
