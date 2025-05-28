@@ -526,7 +526,7 @@ describe(`Inventory Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validAllocationStatus().parse(testInput)).not.toThrow()
     })
 
-    it(`is valid if the input allocationStatus is a AllocationStatus like PAYMENT_REJECTEDs`, () => {
+    it(`is valid if the input allocationStatus is a AllocationStatus like PAYMENT_REJECTED`, () => {
       const testInput: AllocationStatus = 'PAYMENT_REJECTED'
       expect(() => ValueValidators.validAllocationStatus().parse(testInput)).not.toThrow()
     })
