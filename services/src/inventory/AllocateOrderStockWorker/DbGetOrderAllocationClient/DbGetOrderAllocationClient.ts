@@ -84,7 +84,7 @@ export class DbGetOrderAllocationClient implements IDbGetOrderAllocationClient {
       const { orderId, sku } = getOrderAllocationCommand.commandData
 
       const allocationPk = `INVENTORY#SKU#${sku}`
-      const allocationSk = `SKU#${sku}#ORDER_ID#${orderId}#ALLOCATION`
+      const allocationSk = `SKU#${sku}#ORDER_ID#${orderId}#ORDER_ALLOCATION`
 
       const ddbCommand = new GetCommand({
         TableName: tableName,

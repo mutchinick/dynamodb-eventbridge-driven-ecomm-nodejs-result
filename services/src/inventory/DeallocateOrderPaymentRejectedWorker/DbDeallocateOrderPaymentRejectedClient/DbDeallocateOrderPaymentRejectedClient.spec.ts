@@ -61,7 +61,7 @@ function buildMockDdbCommand(): TransactWriteCommand {
           TableName: mockInventoryTableName,
           Key: {
             pk: `INVENTORY#SKU#${mockSku}`,
-            sk: `SKU#${mockSku}#ORDER_ID#${mockOrderId}#ALLOCATION`,
+            sk: `SKU#${mockSku}#ORDER_ID#${mockOrderId}#ORDER_ALLOCATION`,
           },
           UpdateExpression: 'SET #allocationStatus = :newAllocationStatus, #updatedAt = :updatedAt',
           ExpressionAttributeNames: {
