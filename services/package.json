@@ -9,9 +9,10 @@
     "lint": "eslint . --ext '**/*.js,.jsx,.ts,.tsx' --ignore-pattern node_modules/",
     "test": "jest",
     "test:coverage": "jest --silent --coverage --verbose",
-    "test:build": "run-s format:check lint test:coverage build",
     "build": "tsc --build -v -f",
-    "build:lint": "run-s format:check lint build"
+    "build:test": "run-s format:check lint test:coverage build",
+    "build:lint": "run-s format:check lint build",
+    "init-database": "ts-node scripts/init-database.ts"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.147",
@@ -36,6 +37,7 @@
     "@aws-sdk/client-dynamodb": "^3.767.0",
     "@aws-sdk/lib-dynamodb": "^3.767.0",
     "@aws-sdk/util-dynamodb": "^3.705.0",
+    "dotenv": "^16.5.0",
     "ksuid": "^3.0.0",
     "zod": "^3.24.2"
   }

@@ -112,36 +112,71 @@ function writeOutputsToEnvFiles(outputsFilePath: string, deploymentPrefix: strin
   const outputPrefix = `${deploymentPrefix}${deploymentStage}`
 
   const envFilesConfig = [
+    // API tests .env files (used by Rest Client files)
     {
-      cdkOutputName: `${outputPrefix}OrdersApiHttpApiUrl`,
       envFilePath: '../_restclient/orders/.env',
-      envVarName: 'ORDERS_API_BASE_URL',
+      envVariables: [
+        {
+          cdkOutputName: `${outputPrefix}OrdersApiHttpApiUrl`,
+          envVarName: 'ORDERS_API_BASE_URL',
+        },
+      ],
     },
     {
-      cdkOutputName: `${outputPrefix}TestingApiHttpApiUrl`,
       envFilePath: '../_restclient/testing/.env',
-      envVarName: 'TESTING_API_BASE_URL',
+      envVariables: [
+        {
+          cdkOutputName: `${outputPrefix}TestingApiHttpApiUrl`,
+          envVarName: 'TESTING_API_BASE_URL',
+        },
+      ],
     },
     {
-      cdkOutputName: `${outputPrefix}InventoryApiHttpApiUrl`,
       envFilePath: '../_restclient/inventory/.env',
-      envVarName: 'INVENTORY_API_BASE_URL',
+      envVariables: [
+        {
+          cdkOutputName: `${outputPrefix}InventoryApiHttpApiUrl`,
+          envVarName: 'INVENTORY_API_BASE_URL',
+        },
+      ],
     },
     {
-      cdkOutputName: `${outputPrefix}PaymentsApiHttpApiUrl`,
       envFilePath: '../_restclient/payments/.env',
-      envVarName: 'PAYMENTS_API_BASE_URL',
+      envVariables: [
+        {
+          cdkOutputName: `${outputPrefix}PaymentsApiHttpApiUrl`,
+          envVarName: 'PAYMENTS_API_BASE_URL',
+        },
+      ],
+    },
+    // Services .env file (used by init-database script)
+    {
+      envFilePath: '../services/.env',
+      envVariables: [
+        {
+          cdkOutputName: `${outputPrefix}InventoryApiHttpApiUrl`,
+          envVarName: 'INVENTORY_API_BASE_URL',
+        },
+        {
+          cdkOutputName: `${outputPrefix}OrdersApiHttpApiUrl`,
+          envVarName: 'ORDERS_API_BASE_URL',
+        },
+      ],
     },
   ]
 
   console.info('')
 
-  envFilesConfig.forEach(({ cdkOutputName, envFilePath, envVarName }) => {
-    const cdkOutputValue = outputs[cdkOutputName]
-    const envVarValue = cdkOutputValue.endsWith('/') ? cdkOutputValue.slice(0, -1) : cdkOutputValue
-    const envFileFullPath = path.resolve(process.cwd(), envFilePath)
+  envFilesConfig.forEach(({ envFilePath, envVariables }) => {
+    let envFileContents = ''
+    envVariables.forEach(({ cdkOutputName, envVarName }) => {
+      const cdkOutputValue = outputs[cdkOutputName]
+      const envVarValue = cdkOutputValue.endsWith('/') ? cdkOutputValue.slice(0, -1) : cdkOutputValue
+      envFileContents += `${envVarName}=${envVarValue}\n`
+    })
 
-    writeFileSync(envFileFullPath, `${envVarName}=${envVarValue}\n`)
+    const envFileFullPath = path.resolve(process.cwd(), envFilePath)
+    writeFileSync(envFileFullPath, envFileContents)
     console.info(`cdk-runner: Created .env file: ${envFilePath}`)
   })
 }
