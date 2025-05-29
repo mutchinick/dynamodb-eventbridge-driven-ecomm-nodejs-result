@@ -274,8 +274,8 @@ describe(`Inventory Service ListSkusApi DbListSkusClient tests`, () => {
    ************************************************************
    * Test expected result
    ************************************************************/
-  it(`returns the expected empty Success<SkuData[]> if
-      DynamoDBDocumentClient.send returns Items with null items`, async () => {
+  it(`returns the expected empty Success<SkuData[]> if DynamoDBDocumentClient.send
+      returns Items with null items`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves_nullItems()
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     const result = await dbListSkusClient.listSkus(mockListSkusCommand)
@@ -296,8 +296,8 @@ describe(`Inventory Service ListSkusApi DbListSkusClient tests`, () => {
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it(`returns the expected Success<SkuData[]> if DynamoDBDocumentClient.send
-      returns Items with one item`, async () => {
+  it(`returns the expected Success<SkuData[]> if DynamoDBDocumentClient.send returns
+      Items with one item`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves('one')
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     const result = await dbListSkusClient.listSkus(mockListSkusCommand)
@@ -314,8 +314,8 @@ describe(`Inventory Service ListSkusApi DbListSkusClient tests`, () => {
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it(`returns the expected Success<SkuData[]> if DynamoDBDocumentClient.send
-      returns Items with many items`, async () => {
+  it(`returns the expected Success<SkuData[]> if DynamoDBDocumentClient.send returns
+      Items with many items`, async () => {
     const mockDdbDocClient = buildMockDdbDocClient_resolves('many')
     const dbListSkusClient = new DbListSkusClient(mockDdbDocClient)
     const result = await dbListSkusClient.listSkus(mockListSkusCommand)

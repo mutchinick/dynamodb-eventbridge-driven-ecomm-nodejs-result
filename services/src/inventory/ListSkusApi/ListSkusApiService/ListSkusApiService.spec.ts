@@ -140,8 +140,7 @@ describe(`Inventory Service ListSkusApi ListSkusApiService tests`, () => {
     expect(mockDbListSkusClient.listSkus).toHaveBeenCalledWith(expectedListSkusCommand)
   })
 
-  it(`returns the same Failure if DbListSkusClient.listSkus returns a
-      Failure`, async () => {
+  it(`returns the same Failure if DbListSkusClient.listSkus returns a Failure`, async () => {
     const mockFailureKind = 'mockFailureKind' as never
     const mockError = 'mockError'
     const mockTransient = 'mockTransient' as never

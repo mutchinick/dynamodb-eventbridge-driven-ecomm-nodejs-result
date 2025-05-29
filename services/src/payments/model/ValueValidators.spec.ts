@@ -30,7 +30,8 @@ describe(`Payments Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validPaymentsEventName().parse(testInput)).toThrow()
     })
 
-    it(`is valid if the input eventName is a PaymentsEventName like ORDER_STOCK_ALLOCATED_EVENT`, () => {
+    it(`is valid if the input eventName is a PaymentsEventName like
+        ORDER_STOCK_ALLOCATED_EVENT`, () => {
       const testInput: PaymentsEventName = PaymentsEventName.ORDER_STOCK_ALLOCATED_EVENT
       expect(() => ValueValidators.validPaymentsEventName().parse(testInput)).not.toThrow()
     })
@@ -129,7 +130,8 @@ describe(`Payments Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validPaymentsEventNameGroup(testEventGroup).parse(testInput)).not.toThrow()
     })
 
-    it(`is valid if the input eventName exists in an event group with a single event name`, () => {
+    it(`is valid if the input eventName exists in an event group with a single event
+        name`, () => {
       const testInput = PaymentsEventName.ORDER_PAYMENT_ACCEPTED_EVENT
       expect(() => ValueValidators.validPaymentsEventNameGroup([testInput]).parse(testInput)).not.toThrow()
     })

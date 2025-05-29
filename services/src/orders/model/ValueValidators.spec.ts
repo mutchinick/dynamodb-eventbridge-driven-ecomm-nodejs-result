@@ -29,7 +29,8 @@ describe(`Orders Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validOrderEventName().parse(testInput)).toThrow()
     })
 
-    it(`is valid if the input eventName is a OrderEventName like ORDER_STOCK_ALLOCATED_EVENT`, () => {
+    it(`is valid if the input eventName is a OrderEventName like
+        ORDER_STOCK_ALLOCATED_EVENT`, () => {
       const testInput: OrderEventName = OrderEventName.ORDER_STOCK_ALLOCATED_EVENT
       expect(() => ValueValidators.validOrderEventName().parse(testInput)).not.toThrow()
     })
@@ -128,7 +129,8 @@ describe(`Orders Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validOrderEventNameGroup(testEventGroup).parse(testInput)).not.toThrow()
     })
 
-    it(`is valid if the input eventName exists in an event group with a single event name`, () => {
+    it(`is valid if the input eventName exists in an event group with a single event
+        name`, () => {
       const testInput = OrderEventName.ORDER_PAYMENT_ACCEPTED_EVENT
       expect(() => ValueValidators.validOrderEventNameGroup([testInput]).parse(testInput)).not.toThrow()
     })

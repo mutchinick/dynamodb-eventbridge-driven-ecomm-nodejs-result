@@ -30,12 +30,14 @@ describe(`Inventory Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validInventoryEventName().parse(testInput)).toThrow()
     })
 
-    it(`is valid if the input eventName is a InventoryEventName like ORDER_STOCK_ALLOCATED_EVENT`, () => {
+    it(`is valid if the input eventName is a InventoryEventName like
+        ORDER_STOCK_ALLOCATED_EVENT`, () => {
       const testInput: InventoryEventName = InventoryEventName.ORDER_STOCK_ALLOCATED_EVENT
       expect(() => ValueValidators.validInventoryEventName().parse(testInput)).not.toThrow()
     })
 
-    it(`is valid if the input eventName is a InventoryEventName like ORDER_CANCELED_EVENT`, () => {
+    it(`is valid if the input eventName is a InventoryEventName like
+        ORDER_CANCELED_EVENT`, () => {
       const testInput: InventoryEventName = InventoryEventName.ORDER_CANCELED_EVENT
       expect(() => ValueValidators.validInventoryEventName().parse(testInput)).not.toThrow()
     })
@@ -129,7 +131,8 @@ describe(`Inventory Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validInventoryEventNameGroup(testEventGroup).parse(testInput)).not.toThrow()
     })
 
-    it(`is valid if the input eventName exists in an event group with a single event name`, () => {
+    it(`is valid if the input eventName exists in an event group with a single event
+        name`, () => {
       const testInput = InventoryEventName.ORDER_STOCK_DEPLETED_EVENT
       expect(() => ValueValidators.validInventoryEventNameGroup([testInput]).parse(testInput)).not.toThrow()
     })
@@ -526,7 +529,8 @@ describe(`Inventory Service ValueValidators tests`, () => {
       expect(() => ValueValidators.validAllocationStatus().parse(testInput)).not.toThrow()
     })
 
-    it(`is valid if the input allocationStatus is a AllocationStatus like DEALLOCATED_PAYMENT_REJECTED`, () => {
+    it(`is valid if the input allocationStatus is a AllocationStatus like
+        DEALLOCATED_PAYMENT_REJECTED`, () => {
       const testInput: AllocationStatus = 'DEALLOCATED_PAYMENT_REJECTED'
       expect(() => ValueValidators.validAllocationStatus().parse(testInput)).not.toThrow()
     })

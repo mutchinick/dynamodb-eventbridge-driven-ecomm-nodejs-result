@@ -116,7 +116,8 @@ describe(`Inventory Service RestockSkuApi RestockSkuApiService tests`, () => {
     expect(mockEsRaiseSkuRestockedEventClient.raiseSkuRestockedEvent).toHaveBeenCalledTimes(1)
   })
 
-  it(`calls EsRaiseSkuRestockedEventClient.raiseSkuRestockedEvent with the expected input`, async () => {
+  it(`calls EsRaiseSkuRestockedEventClient.raiseSkuRestockedEvent with the expected
+      input`, async () => {
     const mockEsRaiseSkuRestockedEventClient = buildMockEsRaiseSkuRestockedEventClient_succeeds()
     const restockSkuApiService = new RestockSkuApiService(mockEsRaiseSkuRestockedEventClient)
     await restockSkuApiService.restockSku(mockIncomingRestockSkuRequest)
@@ -126,8 +127,8 @@ describe(`Inventory Service RestockSkuApi RestockSkuApiService tests`, () => {
     expect(mockEsRaiseSkuRestockedEventClient.raiseSkuRestockedEvent).toHaveBeenCalledWith(expectedSkuRestockedEvent)
   })
 
-  it(`returns the same Failure if EsRaiseSkuRestockedEventClient.raiseSkuRestockedEvent returns a
-      Failure`, async () => {
+  it(`returns the same Failure if
+      EsRaiseSkuRestockedEventClient.raiseSkuRestockedEvent returns a Failure`, async () => {
     const mockFailureKind = 'mockFailureKind' as never
     const mockError = 'mockError'
     const mockTransient = 'mockTransient' as never
