@@ -1,6 +1,5 @@
-#!/usr/bin/env tsx
-
-// Import dependencies for file system, file discovery, and AST parsing
+// This file was coded (or vibe coded?) with the help of AI.
+// It's kind of a mess so at some point will likely clean it up.
 import fg from 'fast-glob'
 import fs from 'fs/promises'
 import { CallExpression, NoSubstitutionTemplateLiteral, Project, StringLiteral, SyntaxKind } from 'ts-morph'
