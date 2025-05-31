@@ -19,7 +19,7 @@ import { OrderPaymentAcceptedEvent, OrderPaymentAcceptedEventInput } from '../mo
 import { OrderPaymentRejectedEvent, OrderPaymentRejectedEventInput } from '../model/OrderPaymentRejectedEvent'
 import { RecordOrderPaymentCommand, RecordOrderPaymentCommandInput } from '../model/RecordOrderPaymentCommand'
 import { SubmitOrderPaymentCommand, SubmitOrderPaymentCommandInput } from '../model/SubmitOrderPaymentCommand'
-import { ProcessOrderPaymentWorkerService } from './ProcessOrderPaymentWorkerService'
+import { MAX_ALLOWED_PAYMENT_RETRIES, ProcessOrderPaymentWorkerService } from './ProcessOrderPaymentWorkerService'
 
 jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
 
@@ -422,8 +422,11 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerSe
       updatedAt: mockUpdatedAt,
       paymentId: 'mockPaymentFailedId',
       paymentStatus: 'PAYMENT_FAILED',
-      paymentRetries: 3,
+      paymentRetries: MAX_ALLOWED_PAYMENT_RETRIES,
     }
+
+    // TODO: Add tests for when the Payment already exists as Accepted or Rejected
+    // It will be much easier once we migrate to a single EventStore client.
 
     it(`does not call AxSubmitOrderPaymentClient.submitOrderPayment when it exceeds the
         retry limit and it rejects the Payment`, async () => {
@@ -563,7 +566,11 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerSe
      ************************************************************/
     it(`returns the same Failure if OrderPaymentRejectedEvent.validateAndBuild returns a
         Failure when it exceeds the retry limit and it rejects the Payment`, async () => {
-      const mockExistingOrderPaymentData = buildMockOrderPaymentData(undefined, 'PAYMENT_FAILED', 3)
+      const mockExistingOrderPaymentData = buildMockOrderPaymentData(
+        undefined,
+        'PAYMENT_FAILED',
+        MAX_ALLOWED_PAYMENT_RETRIES,
+      )
       const mockDbGetOrderPaymentClient = buildMockDbGetOrderPaymentClient_succeeds(mockExistingOrderPaymentData)
       const mockAxSubmitOrderPaymentClient = buildMockAxSubmitOrderPaymentClient_succeeds()
       const mockDbRecordOrderPaymentClient = buildMockDbRecordOrderPaymentClient_succeeds()
@@ -588,7 +595,11 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerSe
 
     it(`calls EsRaiseOrderPaymentRejectedEventClient.raiseOrderPaymentRejectedEvent a
         single time when it exceeds the retry limit and it rejects the Payment`, async () => {
-      const mockExistingOrderPaymentData = buildMockOrderPaymentData(undefined, 'PAYMENT_FAILED', 3)
+      const mockExistingOrderPaymentData = buildMockOrderPaymentData(
+        undefined,
+        'PAYMENT_FAILED',
+        MAX_ALLOWED_PAYMENT_RETRIES,
+      )
       const mockDbGetOrderPaymentClient = buildMockDbGetOrderPaymentClient_succeeds(mockExistingOrderPaymentData)
       const mockAxSubmitOrderPaymentClient = buildMockAxSubmitOrderPaymentClient_succeeds()
       const mockDbRecordOrderPaymentClient = buildMockDbRecordOrderPaymentClient_succeeds()
@@ -608,7 +619,11 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerSe
     it(`calls EsRaiseOrderPaymentRejectedEventClient.raiseOrderPaymentRejectedEvent the
         expected OrderPaymentRejectedEvent when it exceeds the retry limit and it
         rejects the Payment`, async () => {
-      const mockExistingOrderPaymentData = buildMockOrderPaymentData(undefined, 'PAYMENT_FAILED', 3)
+      const mockExistingOrderPaymentData = buildMockOrderPaymentData(
+        undefined,
+        'PAYMENT_FAILED',
+        MAX_ALLOWED_PAYMENT_RETRIES,
+      )
       const mockDbGetOrderPaymentClient = buildMockDbGetOrderPaymentClient_succeeds(mockExistingOrderPaymentData)
       const mockAxSubmitOrderPaymentClient = buildMockAxSubmitOrderPaymentClient_succeeds()
       const mockDbRecordOrderPaymentClient = buildMockDbRecordOrderPaymentClient_succeeds()
@@ -642,7 +657,11 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerSe
     it(`returns the same Failure if
         EsRaiseOrderPaymentRejectedEventClient.raiseOrderPaymentRejectedEvent returns a
         Failure when it exceeds the retry limit and it rejects the Payment`, async () => {
-      const mockExistingOrderPaymentData = buildMockOrderPaymentData(undefined, 'PAYMENT_FAILED', 3)
+      const mockExistingOrderPaymentData = buildMockOrderPaymentData(
+        undefined,
+        'PAYMENT_FAILED',
+        MAX_ALLOWED_PAYMENT_RETRIES,
+      )
       const mockDbGetOrderPaymentClient = buildMockDbGetOrderPaymentClient_succeeds(mockExistingOrderPaymentData)
       const mockAxSubmitOrderPaymentClient = buildMockAxSubmitOrderPaymentClient_succeeds()
       const mockDbRecordOrderPaymentClient = buildMockDbRecordOrderPaymentClient_succeeds()
@@ -676,7 +695,11 @@ describe(`Payments Service ProcessOrderPaymentWorker ProcessOrderPaymentWorkerSe
      ************************************************************/
     it(`returns the expected Success<void> if the execution path is successful when it
         exceeds the retry limit and it rejects the Payment`, async () => {
-      const mockExistingOrderPaymentData = buildMockOrderPaymentData(undefined, 'PAYMENT_FAILED', 3)
+      const mockExistingOrderPaymentData = buildMockOrderPaymentData(
+        undefined,
+        'PAYMENT_FAILED',
+        MAX_ALLOWED_PAYMENT_RETRIES,
+      )
       const mockDbGetOrderPaymentClient = buildMockDbGetOrderPaymentClient_succeeds(mockExistingOrderPaymentData)
       const mockAxSubmitOrderPaymentClient = buildMockAxSubmitOrderPaymentClient_succeeds()
       const mockDbRecordOrderPaymentClient = buildMockDbRecordOrderPaymentClient_succeeds()
