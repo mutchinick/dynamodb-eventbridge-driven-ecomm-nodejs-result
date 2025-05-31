@@ -641,7 +641,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
      ************************************************************/
     it(`returns the same Failure if the OrderStockAllocatedEvent.validateAndBuild
         returns a Failure`, async () => {
-      const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds_nullItem()
+      const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds_OrderAllocation()
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_succeeds()
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
       const mockEsRaiseOrderStockDepletedEventClient = buildMockEsRaiseOrderStockDepletedEventClient_succeeds()
