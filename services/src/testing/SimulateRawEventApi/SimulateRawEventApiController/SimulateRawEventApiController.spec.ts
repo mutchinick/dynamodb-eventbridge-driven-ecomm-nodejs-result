@@ -62,7 +62,7 @@ function buildMockSimulateRawEventApiService_fails(failureKind: FailureKind): IS
   return { simulateRawEvent: jest.fn().mockResolvedValue(mockFailure) }
 }
 
-describe(`Orders Service SimulateRawEventApi SimulateRawEventApiController tests`, () => {
+describe(`Testing Service SimulateRawEventApi SimulateRawEventApiController tests`, () => {
   /*
    *
    *
