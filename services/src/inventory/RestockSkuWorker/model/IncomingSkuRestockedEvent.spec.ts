@@ -6,7 +6,7 @@ import { Result } from '../../errors/Result'
 import { InventoryEventName } from '../../model/InventoryEventName'
 import { IncomingSkuRestockedEvent } from './IncomingSkuRestockedEvent'
 
-jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
+jest.useFakeTimers().setSystemTime(new Date('2024-10-19T03:24:00Z'))
 
 const mockDate = new Date().toISOString()
 const mockEventName = InventoryEventName.SKU_RESTOCKED_EVENT

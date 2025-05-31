@@ -21,7 +21,7 @@ import { RecordOrderPaymentCommand, RecordOrderPaymentCommandInput } from '../mo
 import { SubmitOrderPaymentCommand, SubmitOrderPaymentCommandInput } from '../model/SubmitOrderPaymentCommand'
 import { MAX_ALLOWED_PAYMENT_RETRIES, ProcessOrderPaymentWorkerService } from './ProcessOrderPaymentWorkerService'
 
-jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
+jest.useFakeTimers().setSystemTime(new Date('2024-10-19T03:24:00Z'))
 
 const mockDate = new Date().toISOString()
 const mockOrderId = 'mockOrderId'

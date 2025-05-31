@@ -6,7 +6,7 @@ import { IncomingSimulateRawEventRequest } from '../model/IncomingSimulateRawEve
 import { RawSimulatedEvent, RawSimulatedEventInput } from '../model/RawSimulatedEvent'
 import { SimulateRawEventApiService, SimulateRawEventApiServiceOutput } from './SimulateRawEventApiService'
 
-jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
+jest.useFakeTimers().setSystemTime(new Date('2024-10-19T03:24:00Z'))
 
 const mockDate = new Date().toISOString()
 

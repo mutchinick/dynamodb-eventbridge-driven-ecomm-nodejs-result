@@ -10,7 +10,7 @@ import { GetOrderAllocationCommand } from '../model/GetOrderAllocationCommand'
 import { IncomingOrderPaymentRejectedEvent } from '../model/IncomingOrderPaymentRejectedEvent'
 import { DeallocateOrderPaymentRejectedWorkerService } from './DeallocateOrderPaymentRejectedWorkerService'
 
-jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
+jest.useFakeTimers().setSystemTime(new Date('2024-10-19T03:24:00Z'))
 
 const mockDate = new Date().toISOString()
 const mockOrderId = 'mockOrderId'

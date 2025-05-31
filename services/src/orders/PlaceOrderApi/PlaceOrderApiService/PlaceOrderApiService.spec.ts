@@ -6,7 +6,7 @@ import { IncomingPlaceOrderRequest } from '../model/IncomingPlaceOrderRequest'
 import { OrderPlacedEvent, OrderPlacedEventInput } from '../model/OrderPlacedEvent'
 import { PlaceOrderApiService, PlaceOrderApiServiceOutput } from './PlaceOrderApiService'
 
-jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
+jest.useFakeTimers().setSystemTime(new Date('2024-10-19T03:24:00Z'))
 
 function buildMockIncomingPlaceOrderRequest(): TypeUtilsMutable<IncomingPlaceOrderRequest> {
   const mockClass = IncomingPlaceOrderRequest.validateAndBuild({

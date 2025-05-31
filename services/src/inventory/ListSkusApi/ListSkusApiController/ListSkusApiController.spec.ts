@@ -7,7 +7,7 @@ import { IListSkusApiService, ListSkusApiServiceOutput } from '../ListSkusApiSer
 import { IncomingListSkusRequest } from '../model/IncomingListSkusRequest'
 import { ListSkusApiController } from './ListSkusApiController'
 
-jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
+jest.useFakeTimers().setSystemTime(new Date('2024-10-19T03:24:00Z'))
 
 const mockDate = new Date().toISOString()
 const mockSku = 'mockSku'

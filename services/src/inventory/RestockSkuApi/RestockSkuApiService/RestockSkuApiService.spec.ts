@@ -6,7 +6,7 @@ import { IncomingRestockSkuRequest } from '../model/IncomingRestockSkuRequest'
 import { SkuRestockedEvent, SkuRestockedEventInput } from '../model/SkuRestockedEvent'
 import { RestockSkuApiService, RestockSkuApiServiceOutput } from './RestockSkuApiService'
 
-jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
+jest.useFakeTimers().setSystemTime(new Date('2024-10-19T03:24:00Z'))
 
 function buildMockIncomingRestockSkuRequest(): TypeUtilsMutable<IncomingRestockSkuRequest> {
   const mockClass = IncomingRestockSkuRequest.validateAndBuild({

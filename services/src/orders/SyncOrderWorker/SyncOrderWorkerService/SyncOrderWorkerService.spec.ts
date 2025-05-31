@@ -16,7 +16,7 @@ import { OrderCreatedEvent, OrderCreatedEventInput } from '../model/OrderCreated
 import { UpdateOrderCommand, UpdateOrderCommandInput } from '../model/UpdateOrderCommand'
 import { SyncOrderWorkerService } from './SyncOrderWorkerService'
 
-jest.useFakeTimers().setSystemTime(new Date('2024-10-19Z03:24:00'))
+jest.useFakeTimers().setSystemTime(new Date('2024-10-19T03:24:00Z'))
 
 const mockDate = new Date().toISOString()
 const mockOrderId = 'mockOrderId'
