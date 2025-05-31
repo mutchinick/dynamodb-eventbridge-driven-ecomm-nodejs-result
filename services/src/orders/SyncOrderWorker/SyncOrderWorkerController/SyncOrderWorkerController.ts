@@ -59,7 +59,7 @@ export class SyncOrderWorkerController implements ISyncOrderWorkerController {
     | Failure<'DuplicateEventRaisedError'>
     | Failure<'InvalidOperationError'>
     | Failure<'ForbiddenOrderStatusTransitionError'>
-    | Failure<'NotReadyOrderStatusTransitionError'>
+    | Failure<'StaleOrderStatusTransitionError'>
     | Failure<'RedundantOrderStatusTransitionError'>
   > {
     const logContext = 'SyncOrderWorkerController.syncOrderSafe'

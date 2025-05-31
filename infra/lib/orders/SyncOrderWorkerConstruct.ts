@@ -128,8 +128,6 @@ export class SyncOrderWorkerConstruct extends Construct {
                   'ORDER_STOCK_DEPLETED_EVENT',
                   'ORDER_PAYMENT_ACCEPTED_EVENT',
                   'ORDER_PAYMENT_REJECTED_EVENT',
-                  'ORDER_FULFILLED_EVENT',
-                  'ORDER_PACKAGED_EVENT',
                   'ORDER_SHIPPED_EVENT',
                   'ORDER_DELIVERED_EVENT',
                   'ORDER_CANCELED_EVENT',

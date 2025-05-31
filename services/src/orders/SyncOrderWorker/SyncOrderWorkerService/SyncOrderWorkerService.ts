@@ -19,7 +19,7 @@ export interface ISyncOrderWorkerService {
     | Failure<'InvalidOperationError'>
     | Failure<'DuplicateEventRaisedError'>
     | Failure<'ForbiddenOrderStatusTransitionError'>
-    | Failure<'NotReadyOrderStatusTransitionError'>
+    | Failure<'StaleOrderStatusTransitionError'>
     | Failure<'RedundantOrderStatusTransitionError'>
     | Failure<'UnrecognizedError'>
   >
@@ -50,7 +50,7 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     | Failure<'InvalidOperationError'>
     | Failure<'DuplicateEventRaisedError'>
     | Failure<'ForbiddenOrderStatusTransitionError'>
-    | Failure<'NotReadyOrderStatusTransitionError'>
+    | Failure<'StaleOrderStatusTransitionError'>
     | Failure<'RedundantOrderStatusTransitionError'>
     | Failure<'UnrecognizedError'>
   > {
@@ -253,7 +253,7 @@ export class SyncOrderWorkerService implements ISyncOrderWorkerService {
     | Failure<'InvalidArgumentsError'>
     | Failure<'InvalidOperationError'>
     | Failure<'ForbiddenOrderStatusTransitionError'>
-    | Failure<'NotReadyOrderStatusTransitionError'>
+    | Failure<'StaleOrderStatusTransitionError'>
     | Failure<'RedundantOrderStatusTransitionError'>
     | Failure<'UnrecognizedError'>
   > {

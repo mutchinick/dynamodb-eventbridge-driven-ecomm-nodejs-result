@@ -4,6 +4,6 @@ export type FailureKind =
   | 'InvalidArgumentsError'
   | 'RedundantOrderStatusTransitionError'
   | 'NotFoundOrderStatusTransitionError'
-  | 'NotReadyOrderStatusTransitionError'
+  | 'StaleOrderStatusTransitionError'
   | 'ForbiddenOrderStatusTransitionError'
   | 'DuplicateEventRaisedError'

@@ -59,44 +59,6 @@ Content-Type: application/json
   }
 }
 
-### ORDER_FULFILLED_EVENT
-### POST ###
-POST {{simulateRawEventBaseUrl}}/api/v1/testing/simulateRawEvent
-Origin: https://localhost
-Content-Type: application/json
-
-{
-  "pk": "EVENTS#ORDER_ID#{{orderId}}",
-  "sk": "EVENT#ORDER_FULFILLED_EVENT",
-  "eventName": "ORDER_FULFILLED_EVENT",
-  "eventData": {
-    "orderId": "{{orderId}}",
-    "sku": "ORANGES",
-    "units": 2,
-    "price": 22.99,
-    "userId": "123456"
-  }
-}
-
-### ORDER_PACKAGED_EVENT
-### POST ###
-POST {{simulateRawEventBaseUrl}}/api/v1/testing/simulateRawEvent
-Origin: https://localhost
-Content-Type: application/json
-
-{
-  "pk": "EVENTS#ORDER_ID#{{orderId}}",
-  "sk": "EVENT#ORDER_PACKAGED_EVENT",
-  "eventName": "ORDER_PACKAGED_EVENT",
-  "eventData": {
-    "orderId": "{{orderId}}",
-    "sku": "ORANGES",
-    "units": 2,
-    "price": 22.99,
-    "userId": "123456"
-  }
-}
-
 ### ORDER_SHIPPED_EVENT
 ### POST ###
 POST {{simulateRawEventBaseUrl}}/api/v1/testing/simulateRawEvent

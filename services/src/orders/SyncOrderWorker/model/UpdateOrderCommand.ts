@@ -19,6 +19,11 @@ type UpdateOrderCommandProps = {
   readonly options?: Record<string, unknown>
 }
 
+type UpdateOrderFailureFactory = () =>
+  | Failure<'ForbiddenOrderStatusTransitionError'>
+  | Failure<'RedundantOrderStatusTransitionError'>
+  | Failure<'StaleOrderStatusTransitionError'>
+
 /**
  *
  */
@@ -41,10 +46,10 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
     | Failure<'InvalidArgumentsError'>
     | Failure<'InvalidOperationError'>
     | Failure<'ForbiddenOrderStatusTransitionError'>
-    | Failure<'NotReadyOrderStatusTransitionError'>
+    | Failure<'StaleOrderStatusTransitionError'>
     | Failure<'RedundantOrderStatusTransitionError'>
   > {
-    const logContext = 'UpdateOrderCommand.validateAndBuild'
+    const logContext = 'this.validateAndBuild'
     console.info(`${logContext} init:`, { updateOrderCommandInput })
 
     const propsResult = this.buildProps(updateOrderCommandInput)
@@ -69,7 +74,7 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
     | Success<UpdateOrderCommandProps>
     | Failure<'InvalidArgumentsError'>
     | Failure<'ForbiddenOrderStatusTransitionError'>
-    | Failure<'NotReadyOrderStatusTransitionError'>
+    | Failure<'StaleOrderStatusTransitionError'>
     | Failure<'RedundantOrderStatusTransitionError'>
     | Failure<'InvalidOperationError'>
   > {
@@ -106,7 +111,7 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
   private static validateInput(
     updateOrderCommandInput: UpdateOrderCommandInput,
   ): Success<void> | Failure<'InvalidArgumentsError'> {
-    const logContext = 'UpdateOrderCommand.validateInput'
+    const logContext = 'this.validateInput'
 
     // COMBAK: Maybe some schemas can be converted to shared models at some point.
     const existingOrderDataSchema = z.object({
@@ -163,177 +168,16 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
   }): TypeUtilsWrapper<
     | Success<OrderStatus>
     | Failure<'ForbiddenOrderStatusTransitionError'>
-    | Failure<'NotReadyOrderStatusTransitionError'>
+    | Failure<'StaleOrderStatusTransitionError'>
     | Failure<'RedundantOrderStatusTransitionError'>
     | Failure<'InvalidOperationError'>
   > {
-    const logContext = 'UpdateOrderCommand.computeNewOrderStatus'
+    const logContext = 'this.computeNewOrderStatus'
 
-    const forbiddenFailure = Result.makeFailure(
-      'ForbiddenOrderStatusTransitionError',
-      'Order status transition is forbidden (non-transient error, cannot retry)',
-      false,
-    )
+    const eventToStatusMap = this.orderStatusTransitionRules[existingOrderStatus]
+    const statusOrFailureFactory = eventToStatusMap?.[incomingEventName]
 
-    const redundancyFailure = Result.makeFailure(
-      'RedundantOrderStatusTransitionError',
-      'Order status transition is redundant (non-transient error, cannot retry)',
-      false,
-    )
-
-    const notReadyFailure = Result.makeFailure(
-      'NotReadyOrderStatusTransitionError',
-      'Order status is not ready to transition to the new status (transient error, can retry)',
-      true,
-    )
-
-    const orderStatusTransitionRules: Record<
-      OrderStatus,
-      Record<
-        OrderEventName,
-        | Success<OrderStatus>
-        | Failure<'ForbiddenOrderStatusTransitionError'>
-        | Failure<'NotReadyOrderStatusTransitionError'>
-        | Failure<'RedundantOrderStatusTransitionError'>
-      >
-    > = {
-      // This reads: When existing OrderStatus upon receiving OrderEventName then...
-      ORDER_CREATED_STATUS: {
-        ORDER_PLACED_EVENT: forbiddenFailure,
-        ORDER_CREATED_EVENT: redundancyFailure,
-        ORDER_STOCK_DEPLETED_EVENT: Result.makeSuccess(OrderStatus.ORDER_STOCK_DEPLETED_STATUS),
-        ORDER_STOCK_ALLOCATED_EVENT: Result.makeSuccess(OrderStatus.ORDER_STOCK_ALLOCATED_STATUS),
-        ORDER_PAYMENT_REJECTED_EVENT: notReadyFailure,
-        ORDER_PAYMENT_ACCEPTED_EVENT: notReadyFailure,
-        ORDER_FULFILLED_EVENT: notReadyFailure,
-        ORDER_PACKAGED_EVENT: notReadyFailure,
-        ORDER_SHIPPED_EVENT: notReadyFailure,
-        ORDER_DELIVERED_EVENT: notReadyFailure,
-        ORDER_CANCELED_EVENT: Result.makeSuccess(OrderStatus.ORDER_CANCELED_STATUS),
-      },
-      ORDER_STOCK_DEPLETED_STATUS: {
-        ORDER_PLACED_EVENT: forbiddenFailure,
-        ORDER_CREATED_EVENT: forbiddenFailure,
-        ORDER_STOCK_DEPLETED_EVENT: redundancyFailure,
-        ORDER_STOCK_ALLOCATED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_REJECTED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_ACCEPTED_EVENT: forbiddenFailure,
-        ORDER_FULFILLED_EVENT: forbiddenFailure,
-        ORDER_PACKAGED_EVENT: forbiddenFailure,
-        ORDER_SHIPPED_EVENT: forbiddenFailure,
-        ORDER_DELIVERED_EVENT: forbiddenFailure,
-        ORDER_CANCELED_EVENT: Result.makeSuccess(OrderStatus.ORDER_CANCELED_STATUS),
-      },
-      ORDER_STOCK_ALLOCATED_STATUS: {
-        ORDER_PLACED_EVENT: forbiddenFailure,
-        ORDER_CREATED_EVENT: forbiddenFailure,
-        ORDER_STOCK_DEPLETED_EVENT: forbiddenFailure,
-        ORDER_STOCK_ALLOCATED_EVENT: redundancyFailure,
-        ORDER_PAYMENT_REJECTED_EVENT: Result.makeSuccess(OrderStatus.ORDER_PAYMENT_REJECTED_STATUS),
-        ORDER_PAYMENT_ACCEPTED_EVENT: Result.makeSuccess(OrderStatus.ORDER_PAYMENT_ACCEPTED_STATUS),
-        ORDER_FULFILLED_EVENT: notReadyFailure,
-        ORDER_PACKAGED_EVENT: notReadyFailure,
-        ORDER_SHIPPED_EVENT: notReadyFailure,
-        ORDER_DELIVERED_EVENT: notReadyFailure,
-        ORDER_CANCELED_EVENT: Result.makeSuccess(OrderStatus.ORDER_CANCELED_STATUS),
-      },
-      ORDER_PAYMENT_REJECTED_STATUS: {
-        ORDER_PLACED_EVENT: forbiddenFailure,
-        ORDER_CREATED_EVENT: forbiddenFailure,
-        ORDER_STOCK_DEPLETED_EVENT: forbiddenFailure,
-        ORDER_STOCK_ALLOCATED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_REJECTED_EVENT: redundancyFailure,
-        ORDER_PAYMENT_ACCEPTED_EVENT: forbiddenFailure,
-        ORDER_FULFILLED_EVENT: forbiddenFailure,
-        ORDER_PACKAGED_EVENT: forbiddenFailure,
-        ORDER_SHIPPED_EVENT: forbiddenFailure,
-        ORDER_DELIVERED_EVENT: forbiddenFailure,
-        ORDER_CANCELED_EVENT: Result.makeSuccess(OrderStatus.ORDER_CANCELED_STATUS),
-      },
-      ORDER_PAYMENT_ACCEPTED_STATUS: {
-        ORDER_PLACED_EVENT: forbiddenFailure,
-        ORDER_CREATED_EVENT: forbiddenFailure,
-        ORDER_STOCK_DEPLETED_EVENT: forbiddenFailure,
-        ORDER_STOCK_ALLOCATED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_REJECTED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_ACCEPTED_EVENT: redundancyFailure,
-        ORDER_FULFILLED_EVENT: Result.makeSuccess(OrderStatus.ORDER_FULFILLED_STATUS),
-        ORDER_PACKAGED_EVENT: notReadyFailure,
-        ORDER_SHIPPED_EVENT: notReadyFailure,
-        ORDER_DELIVERED_EVENT: notReadyFailure,
-        ORDER_CANCELED_EVENT: Result.makeSuccess(OrderStatus.ORDER_CANCELED_STATUS),
-      },
-      ORDER_FULFILLED_STATUS: {
-        ORDER_PLACED_EVENT: forbiddenFailure,
-        ORDER_CREATED_EVENT: forbiddenFailure,
-        ORDER_STOCK_DEPLETED_EVENT: forbiddenFailure,
-        ORDER_STOCK_ALLOCATED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_REJECTED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_ACCEPTED_EVENT: forbiddenFailure,
-        ORDER_FULFILLED_EVENT: redundancyFailure,
-        ORDER_PACKAGED_EVENT: Result.makeSuccess(OrderStatus.ORDER_PACKAGED_STATUS),
-        ORDER_SHIPPED_EVENT: notReadyFailure,
-        ORDER_DELIVERED_EVENT: notReadyFailure,
-        ORDER_CANCELED_EVENT: Result.makeSuccess(OrderStatus.ORDER_CANCELED_STATUS),
-      },
-      ORDER_PACKAGED_STATUS: {
-        ORDER_PLACED_EVENT: forbiddenFailure,
-        ORDER_CREATED_EVENT: forbiddenFailure,
-        ORDER_STOCK_DEPLETED_EVENT: forbiddenFailure,
-        ORDER_STOCK_ALLOCATED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_REJECTED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_ACCEPTED_EVENT: forbiddenFailure,
-        ORDER_FULFILLED_EVENT: forbiddenFailure,
-        ORDER_PACKAGED_EVENT: redundancyFailure,
-        ORDER_SHIPPED_EVENT: Result.makeSuccess(OrderStatus.ORDER_SHIPPED_STATUS),
-        ORDER_DELIVERED_EVENT: notReadyFailure,
-        ORDER_CANCELED_EVENT: Result.makeSuccess(OrderStatus.ORDER_CANCELED_STATUS),
-      },
-      ORDER_SHIPPED_STATUS: {
-        ORDER_PLACED_EVENT: forbiddenFailure,
-        ORDER_CREATED_EVENT: forbiddenFailure,
-        ORDER_STOCK_DEPLETED_EVENT: forbiddenFailure,
-        ORDER_STOCK_ALLOCATED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_REJECTED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_ACCEPTED_EVENT: forbiddenFailure,
-        ORDER_FULFILLED_EVENT: forbiddenFailure,
-        ORDER_PACKAGED_EVENT: forbiddenFailure,
-        ORDER_SHIPPED_EVENT: redundancyFailure,
-        ORDER_DELIVERED_EVENT: Result.makeSuccess(OrderStatus.ORDER_DELIVERED_STATUS),
-        ORDER_CANCELED_EVENT: Result.makeSuccess(OrderStatus.ORDER_CANCELED_STATUS),
-      },
-      ORDER_DELIVERED_STATUS: {
-        ORDER_PLACED_EVENT: forbiddenFailure,
-        ORDER_CREATED_EVENT: forbiddenFailure,
-        ORDER_STOCK_DEPLETED_EVENT: forbiddenFailure,
-        ORDER_STOCK_ALLOCATED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_REJECTED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_ACCEPTED_EVENT: forbiddenFailure,
-        ORDER_FULFILLED_EVENT: forbiddenFailure,
-        ORDER_PACKAGED_EVENT: forbiddenFailure,
-        ORDER_SHIPPED_EVENT: forbiddenFailure,
-        ORDER_DELIVERED_EVENT: redundancyFailure,
-        ORDER_CANCELED_EVENT: Result.makeSuccess(OrderStatus.ORDER_CANCELED_STATUS),
-      },
-      ORDER_CANCELED_STATUS: {
-        ORDER_PLACED_EVENT: forbiddenFailure,
-        ORDER_CREATED_EVENT: forbiddenFailure,
-        ORDER_STOCK_DEPLETED_EVENT: forbiddenFailure,
-        ORDER_STOCK_ALLOCATED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_REJECTED_EVENT: forbiddenFailure,
-        ORDER_PAYMENT_ACCEPTED_EVENT: forbiddenFailure,
-        ORDER_FULFILLED_EVENT: forbiddenFailure,
-        ORDER_PACKAGED_EVENT: forbiddenFailure,
-        ORDER_SHIPPED_EVENT: forbiddenFailure,
-        ORDER_DELIVERED_EVENT: forbiddenFailure,
-        ORDER_CANCELED_EVENT: redundancyFailure,
-      },
-    }
-
-    const eventNameToOrderStatusMap = orderStatusTransitionRules[existingOrderStatus]
-    const newOrderStatusResult = eventNameToOrderStatusMap?.[incomingEventName]
-
-    if (!newOrderStatusResult) {
+    if (!statusOrFailureFactory) {
       // NOTE: Unreachable with current tests because of guards, but helps make the system fundamentally safe.
       const error = new Error(`Expected valid event but received "${incomingEventName}"`)
       const invalidOpsFailure = Result.makeFailure('InvalidOperationError', error, false)
@@ -341,10 +185,152 @@ export class UpdateOrderCommand implements UpdateOrderCommandProps {
       return invalidOpsFailure
     }
 
-    Result.isFailure(newOrderStatusResult)
-      ? console.error(`${logContext} exit failure:`, { newOrderStatusResult, existingOrderStatus, incomingEventName })
-      : console.info(`${logContext} exit success:`, { newOrderStatusResult, existingOrderStatus, incomingEventName })
+    const isErrorFactory = (val: unknown): val is UpdateOrderFailureFactory => typeof val === 'function'
+
+    if (isErrorFactory(statusOrFailureFactory)) {
+      const newOrderStatusResult = statusOrFailureFactory()
+      console.error(`${logContext} exit failure:`, {
+        newOrderStatusResult,
+        existingOrderStatus,
+        incomingEventName,
+      })
+      return newOrderStatusResult
+    }
+
+    const newOrderStatus = statusOrFailureFactory as OrderStatus
+    const newOrderStatusResult = Result.makeSuccess(newOrderStatus)
+    console.info(`${logContext} exit success:`, {
+      newOrderStatusResult: statusOrFailureFactory,
+      existingOrderStatus,
+      incomingEventName,
+    })
 
     return newOrderStatusResult
+  }
+
+  /**
+   * ForbiddenOrderStatusTransitionError: something nasty happened upstream.
+   * Transition will not be allowed nor should it be retried.
+   */
+  public static forbiddenFailureFactory(): Failure<'ForbiddenOrderStatusTransitionError'> {
+    const error = new Error('Order status transition is forbidden (non-transient error, cannot retry)')
+    return Result.makeFailure('ForbiddenOrderStatusTransitionError', error, false)
+  }
+
+  /**
+   * RedundantOrderStatusTransitionError: probably a glitch happened upstream.
+   * Transition will not be allowed nor should it be retried.
+   */
+  public static redundancyFailureFactory(): Failure<'RedundantOrderStatusTransitionError'> {
+    const error = new Error('Order status transition is redundant (non-transient error, cannot retry)')
+    return Result.makeFailure('RedundantOrderStatusTransitionError', error, false)
+  }
+
+  /**
+   * StaleOrderStatusTransitionError: event got here late and is no longer valid.
+   * Transition will not be allowed nor should it be retried.
+   */
+  public static staleFailureFactory(): Failure<'StaleOrderStatusTransitionError'> {
+    const error = new Error('Order status transition is stale (non-transient error, cannot retry)')
+    return Result.makeFailure('StaleOrderStatusTransitionError', error, false)
+  }
+
+  /**
+   * Rules for transitioning order statuses based on incoming events.
+   * Each order status maps to a set of events and their resulting statuses or errors.
+   */
+  public static readonly orderStatusTransitionRules: Record<
+    OrderStatus,
+    Record<OrderEventName, OrderStatus | UpdateOrderFailureFactory>
+  > = {
+    // This reads: When existing OrderStatus upon receiving OrderEventName then...
+    ORDER_CREATED_STATUS: {
+      ORDER_PLACED_EVENT: this.staleFailureFactory,
+      ORDER_CREATED_EVENT: this.redundancyFailureFactory,
+      ORDER_STOCK_DEPLETED_EVENT: OrderStatus.ORDER_STOCK_DEPLETED_STATUS,
+      ORDER_STOCK_ALLOCATED_EVENT: OrderStatus.ORDER_STOCK_ALLOCATED_STATUS,
+      ORDER_PAYMENT_REJECTED_EVENT: OrderStatus.ORDER_PAYMENT_REJECTED_STATUS,
+      ORDER_PAYMENT_ACCEPTED_EVENT: OrderStatus.ORDER_PAYMENT_ACCEPTED_STATUS,
+      ORDER_SHIPPED_EVENT: OrderStatus.ORDER_SHIPPED_STATUS,
+      ORDER_DELIVERED_EVENT: OrderStatus.ORDER_DELIVERED_STATUS,
+      ORDER_CANCELED_EVENT: OrderStatus.ORDER_CANCELED_STATUS,
+    },
+    ORDER_STOCK_DEPLETED_STATUS: {
+      ORDER_PLACED_EVENT: this.staleFailureFactory,
+      ORDER_CREATED_EVENT: this.staleFailureFactory,
+      ORDER_STOCK_DEPLETED_EVENT: this.redundancyFailureFactory,
+      ORDER_STOCK_ALLOCATED_EVENT: this.forbiddenFailureFactory,
+      ORDER_PAYMENT_REJECTED_EVENT: this.forbiddenFailureFactory,
+      ORDER_PAYMENT_ACCEPTED_EVENT: this.forbiddenFailureFactory,
+      ORDER_SHIPPED_EVENT: this.forbiddenFailureFactory,
+      ORDER_DELIVERED_EVENT: this.forbiddenFailureFactory,
+      ORDER_CANCELED_EVENT: OrderStatus.ORDER_CANCELED_STATUS,
+    },
+    ORDER_STOCK_ALLOCATED_STATUS: {
+      ORDER_PLACED_EVENT: this.staleFailureFactory,
+      ORDER_CREATED_EVENT: this.staleFailureFactory,
+      ORDER_STOCK_DEPLETED_EVENT: this.forbiddenFailureFactory,
+      ORDER_STOCK_ALLOCATED_EVENT: this.redundancyFailureFactory,
+      ORDER_PAYMENT_REJECTED_EVENT: OrderStatus.ORDER_PAYMENT_REJECTED_STATUS,
+      ORDER_PAYMENT_ACCEPTED_EVENT: OrderStatus.ORDER_PAYMENT_ACCEPTED_STATUS,
+      ORDER_SHIPPED_EVENT: OrderStatus.ORDER_SHIPPED_STATUS,
+      ORDER_DELIVERED_EVENT: OrderStatus.ORDER_DELIVERED_STATUS,
+      ORDER_CANCELED_EVENT: OrderStatus.ORDER_CANCELED_STATUS,
+    },
+    ORDER_PAYMENT_REJECTED_STATUS: {
+      ORDER_PLACED_EVENT: this.staleFailureFactory,
+      ORDER_CREATED_EVENT: this.staleFailureFactory,
+      ORDER_STOCK_DEPLETED_EVENT: this.forbiddenFailureFactory,
+      ORDER_STOCK_ALLOCATED_EVENT: this.staleFailureFactory,
+      ORDER_PAYMENT_REJECTED_EVENT: this.redundancyFailureFactory,
+      ORDER_PAYMENT_ACCEPTED_EVENT: this.forbiddenFailureFactory,
+      ORDER_SHIPPED_EVENT: this.forbiddenFailureFactory,
+      ORDER_DELIVERED_EVENT: this.forbiddenFailureFactory,
+      ORDER_CANCELED_EVENT: OrderStatus.ORDER_CANCELED_STATUS,
+    },
+    ORDER_PAYMENT_ACCEPTED_STATUS: {
+      ORDER_PLACED_EVENT: this.staleFailureFactory,
+      ORDER_CREATED_EVENT: this.staleFailureFactory,
+      ORDER_STOCK_DEPLETED_EVENT: this.forbiddenFailureFactory,
+      ORDER_STOCK_ALLOCATED_EVENT: this.staleFailureFactory,
+      ORDER_PAYMENT_REJECTED_EVENT: this.forbiddenFailureFactory,
+      ORDER_PAYMENT_ACCEPTED_EVENT: this.redundancyFailureFactory,
+      ORDER_SHIPPED_EVENT: OrderStatus.ORDER_SHIPPED_STATUS,
+      ORDER_DELIVERED_EVENT: OrderStatus.ORDER_DELIVERED_STATUS,
+      ORDER_CANCELED_EVENT: OrderStatus.ORDER_CANCELED_STATUS,
+    },
+    ORDER_SHIPPED_STATUS: {
+      ORDER_PLACED_EVENT: this.staleFailureFactory,
+      ORDER_CREATED_EVENT: this.staleFailureFactory,
+      ORDER_STOCK_DEPLETED_EVENT: this.forbiddenFailureFactory,
+      ORDER_STOCK_ALLOCATED_EVENT: this.staleFailureFactory,
+      ORDER_PAYMENT_REJECTED_EVENT: this.forbiddenFailureFactory,
+      ORDER_PAYMENT_ACCEPTED_EVENT: this.staleFailureFactory,
+      ORDER_SHIPPED_EVENT: this.redundancyFailureFactory,
+      ORDER_DELIVERED_EVENT: OrderStatus.ORDER_DELIVERED_STATUS,
+      ORDER_CANCELED_EVENT: OrderStatus.ORDER_CANCELED_STATUS,
+    },
+    ORDER_DELIVERED_STATUS: {
+      ORDER_PLACED_EVENT: this.staleFailureFactory,
+      ORDER_CREATED_EVENT: this.staleFailureFactory,
+      ORDER_STOCK_DEPLETED_EVENT: this.forbiddenFailureFactory,
+      ORDER_STOCK_ALLOCATED_EVENT: this.staleFailureFactory,
+      ORDER_PAYMENT_REJECTED_EVENT: this.forbiddenFailureFactory,
+      ORDER_PAYMENT_ACCEPTED_EVENT: this.staleFailureFactory,
+      ORDER_SHIPPED_EVENT: this.staleFailureFactory,
+      ORDER_DELIVERED_EVENT: this.redundancyFailureFactory,
+      ORDER_CANCELED_EVENT: OrderStatus.ORDER_CANCELED_STATUS,
+    },
+    ORDER_CANCELED_STATUS: {
+      ORDER_PLACED_EVENT: this.staleFailureFactory,
+      ORDER_CREATED_EVENT: this.staleFailureFactory,
+      ORDER_STOCK_DEPLETED_EVENT: this.staleFailureFactory,
+      ORDER_STOCK_ALLOCATED_EVENT: this.staleFailureFactory,
+      ORDER_PAYMENT_REJECTED_EVENT: this.staleFailureFactory,
+      ORDER_PAYMENT_ACCEPTED_EVENT: this.staleFailureFactory,
+      ORDER_SHIPPED_EVENT: this.staleFailureFactory,
+      ORDER_DELIVERED_EVENT: this.staleFailureFactory,
+      ORDER_CANCELED_EVENT: this.redundancyFailureFactory,
+    },
   }
 }
