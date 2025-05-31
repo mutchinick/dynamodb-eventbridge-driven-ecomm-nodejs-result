@@ -34,7 +34,7 @@ const mockListOrderPaymentsCommand = buildMockListOrderPaymentsCommand({})
  ************************************************************/
 function buildMockDdbCommand_ByOrderId(orderId: string): QueryCommand {
   const listPk = `PAYMENTS#ORDER_ID#${orderId}`
-  const listSk = `ORDER_ID#${orderId}#PAYMENT`
+  const listSk = `ORDER_ID#${orderId}#ORDER_PAYMENT`
   const ddbCommand = new QueryCommand({
     TableName: mockPaymentsTableName,
     KeyConditionExpression: '#pk = :pk AND #sk = :sk',
@@ -58,7 +58,7 @@ function buildMockDdbCommand_ByOrderId(orderId: string): QueryCommand {
  ************************************************************/
 function buildMockDdbCommand_ListFiltered(sortDirection: SortDirection, limit: number): QueryCommand {
   const indexName = 'gsi1pk-gsi1sk-index'
-  const listGsi1pk = `PAYMENTS#PAYMENT`
+  const listGsi1pk = `PAYMENTS#ORDER_PAYMENT`
   const ddbCommand = new QueryCommand({
     TableName: mockPaymentsTableName,
     IndexName: indexName,
@@ -83,7 +83,7 @@ function buildMockDdbCommand_ListFiltered(sortDirection: SortDirection, limit: n
  ************************************************************/
 function buildMockDdbCommand_ListDefault(): QueryCommand {
   const indexName = 'gsi1pk-gsi1sk-index'
-  const listGsi1pk = `PAYMENTS#PAYMENT`
+  const listGsi1pk = `PAYMENTS#ORDER_PAYMENT`
   const ddbCommand = new QueryCommand({
     TableName: mockPaymentsTableName,
     IndexName: indexName,

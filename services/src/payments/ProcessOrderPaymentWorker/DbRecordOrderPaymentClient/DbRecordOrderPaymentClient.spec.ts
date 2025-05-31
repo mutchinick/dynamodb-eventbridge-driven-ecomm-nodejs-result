@@ -57,7 +57,7 @@ function buildMockDdbCommand(): UpdateCommand {
     TableName: mockPaymentsTableName,
     Key: {
       pk: `PAYMENTS#ORDER_ID#${mockOrderId}`,
-      sk: `ORDER_ID#${mockOrderId}#PAYMENT`,
+      sk: `ORDER_ID#${mockOrderId}#ORDER_PAYMENT`,
     },
     UpdateExpression:
       'SET ' +
@@ -102,9 +102,9 @@ function buildMockDdbCommand(): UpdateCommand {
       ':paymentRetries': mockRecordOrderPaymentCommand.commandData.paymentRetries,
       ':updatedAt': mockDate,
       ':createdAt': mockDate,
-      ':_tn': 'PAYMENTS#PAYMENT',
+      ':_tn': 'PAYMENTS#ORDER_PAYMENT',
       ':_sn': 'PAYMENTS',
-      ':gsi1pk': 'PAYMENTS#PAYMENT',
+      ':gsi1pk': 'PAYMENTS#ORDER_PAYMENT',
       ':gsi1sk': `CREATED_AT#${mockDate}`,
       ':paymentAcceptedStatus': mockPaymentAcceptedStatus,
       ':paymentRejectedStatus': mockPaymentRejectedStatus,

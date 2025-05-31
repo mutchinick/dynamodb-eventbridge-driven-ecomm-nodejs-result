@@ -82,7 +82,7 @@ export class DbGetOrderPaymentClient implements IDbGetOrderPaymentClient {
       const { orderId } = getOrderPaymentCommand.commandData
 
       const paymentPk = `PAYMENTS#ORDER_ID#${orderId}`
-      const paymentSk = `ORDER_ID#${orderId}#PAYMENT`
+      const paymentSk = `ORDER_ID#${orderId}#ORDER_PAYMENT`
 
       const ddbCommand = new GetCommand({
         TableName: tableName,

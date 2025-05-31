@@ -97,10 +97,10 @@ export class DbRecordOrderPaymentClient implements IDbRecordOrderPaymentClient {
       const { paymentId, paymentStatus, paymentRetries } = commandData
 
       const paymentPk = `PAYMENTS#ORDER_ID#${orderId}`
-      const paymentSk = `ORDER_ID#${orderId}#PAYMENT`
-      const paymentTn = `PAYMENTS#PAYMENT`
+      const paymentSk = `ORDER_ID#${orderId}#ORDER_PAYMENT`
+      const paymentTn = `PAYMENTS#ORDER_PAYMENT`
       const paymentSn = `PAYMENTS`
-      const paymentGsi1Pk = `PAYMENTS#PAYMENT`
+      const paymentGsi1Pk = `PAYMENTS#ORDER_PAYMENT`
       const paymentGsi1Sk = `CREATED_AT#${createdAt}`
 
       const paymentAcceptedStatus: PaymentStatus = 'PAYMENT_ACCEPTED'

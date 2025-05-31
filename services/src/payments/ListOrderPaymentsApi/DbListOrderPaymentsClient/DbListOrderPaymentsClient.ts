@@ -88,7 +88,7 @@ export class DbListOrderPaymentsClient implements IDbListOrderPaymentsClient {
       let params: QueryCommandInput
       if (orderId) {
         const listPk = `PAYMENTS#ORDER_ID#${orderId}`
-        const listSk = `ORDER_ID#${orderId}#PAYMENT`
+        const listSk = `ORDER_ID#${orderId}#ORDER_PAYMENT`
         params = {
           TableName: tableName,
           KeyConditionExpression: '#pk = :pk AND #sk = :sk',
@@ -103,7 +103,7 @@ export class DbListOrderPaymentsClient implements IDbListOrderPaymentsClient {
         }
       } else {
         const listIndexName = 'gsi1pk-gsi1sk-index'
-        const listGsi1pk = `PAYMENTS#PAYMENT`
+        const listGsi1pk = `PAYMENTS#ORDER_PAYMENT`
         const listSortDirection = SortDirection[sortDirection] ?? DbListOrderPaymentsClient.DEFAULT_SORT_DIRECTION
         const listScanIndexForward = listSortDirection === DbListOrderPaymentsClient.DEFAULT_SORT_DIRECTION
         const listLimit = limit || DbListOrderPaymentsClient.DEFAULT_LIMIT

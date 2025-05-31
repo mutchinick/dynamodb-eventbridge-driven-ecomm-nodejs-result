@@ -28,7 +28,7 @@ function buildMockDdbCommand(): GetCommand {
     TableName: mockPaymentsTableName,
     Key: {
       pk: `PAYMENTS#ORDER_ID#${mockOrderId}`,
-      sk: `ORDER_ID#${mockOrderId}#PAYMENT`,
+      sk: `ORDER_ID#${mockOrderId}#ORDER_PAYMENT`,
     },
   })
   return ddbCommand
