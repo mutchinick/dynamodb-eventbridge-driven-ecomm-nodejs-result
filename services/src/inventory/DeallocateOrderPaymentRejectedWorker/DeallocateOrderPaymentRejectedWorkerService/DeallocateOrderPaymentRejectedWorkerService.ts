@@ -10,7 +10,7 @@ import { GetOrderAllocationCommand, GetOrderAllocationCommandInput } from '../mo
 import { IncomingOrderPaymentRejectedEvent } from '../model/IncomingOrderPaymentRejectedEvent'
 
 export interface IDeallocateOrderPaymentRejectedWorkerService {
-  deallocateOrderStock: (
+  deallocateOrder: (
     incomingOrderPaymentRejectedEvent: IncomingOrderPaymentRejectedEvent,
   ) => Promise<
     | Success<void>
@@ -35,7 +35,7 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
   /**
    *
    */
-  public async deallocateOrderStock(
+  public async deallocateOrder(
     incomingOrderPaymentRejectedEvent: IncomingOrderPaymentRejectedEvent,
   ): Promise<
     | Success<void>
@@ -43,7 +43,7 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
     | Failure<'InvalidStockDeallocationError'>
     | Failure<'UnrecognizedError'>
   > {
-    const logContext = 'DeallocateOrderPaymentRejectedWorkerService.deallocateOrderStock'
+    const logContext = 'DeallocateOrderPaymentRejectedWorkerService.deallocateOrder'
     console.info(`${logContext} init:`, { incomingOrderPaymentRejectedEvent })
 
     const inputValidationResult = this.validateInput(incomingOrderPaymentRejectedEvent)
@@ -62,19 +62,22 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
 
     // When the Allocation DOES exist and it deallocates it
     if (orderAllocationData) {
-      const deallocateOrderResult = await this.deallocateOrder(orderAllocationData, incomingOrderPaymentRejectedEvent)
+      const deallocateOrderAllocationResult = await this.deallocateOrderAllocation(
+        orderAllocationData,
+        incomingOrderPaymentRejectedEvent,
+      )
 
-      if (Result.isFailure(deallocateOrderResult)) {
+      if (Result.isFailure(deallocateOrderAllocationResult)) {
         console.error(`${logContext} exit failure:`, {
-          deallocateOrderResult,
+          deallocateOrderAllocationResult,
           orderAllocationData,
           incomingOrderPaymentRejectedEvent,
         })
-        return deallocateOrderResult
+        return deallocateOrderAllocationResult
       }
 
       console.info(`${logContext} exit success:`, {
-        deallocateOrderResult,
+        deallocateOrderAllocationResult,
         orderAllocationData,
         incomingOrderPaymentRejectedEvent,
       })
@@ -134,7 +137,7 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
   /**
    *
    */
-  private async deallocateOrder(
+  private async deallocateOrderAllocation(
     existingOrderAllocationData: OrderAllocationData,
     incomingOrderPaymentRejectedEvent: IncomingOrderPaymentRejectedEvent,
   ): Promise<
@@ -143,7 +146,7 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
     | Failure<'InvalidStockDeallocationError'>
     | Failure<'UnrecognizedError'>
   > {
-    const logContext = 'DeallocateOrderPaymentRejectedWorkerService.deallocateOrder'
+    const logContext = 'DeallocateOrderPaymentRejectedWorkerService.deallocateOrderAllocation'
     console.info(`${logContext} init:`, { incomingOrderPaymentRejectedEvent })
 
     const deallocateCommandInput: DeallocateOrderPaymentRejectedCommandInput = {
@@ -157,7 +160,7 @@ export class DeallocateOrderPaymentRejectedWorkerService implements IDeallocateO
     }
 
     const deallocateCommand = buildDeallocateCommandResult.value
-    const deallocateResult = await this.dbDeallocateOrderPaymentRejectedClient.deallocateOrderStock(deallocateCommand)
+    const deallocateResult = await this.dbDeallocateOrderPaymentRejectedClient.deallocateOrder(deallocateCommand)
     Result.isFailure(deallocateResult)
       ? console.error(`${logContext} exit failure:`, { deallocateResult, deallocateCommand })
       : console.info(`${logContext} exit success:`, { deallocateResult, deallocateCommand })

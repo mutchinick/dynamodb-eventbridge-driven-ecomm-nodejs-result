@@ -21,7 +21,7 @@ function createHandler(): (sqsEvent: SQSEvent) => Promise<SQSBatchResponse> {
   const deallocateOrderPaymentRejectedWorkerController = new DeallocateOrderPaymentRejectedWorkerController(
     deallocateOrderPaymentRejectedWorkerService,
   )
-  return deallocateOrderPaymentRejectedWorkerController.deallocateOrderStock
+  return deallocateOrderPaymentRejectedWorkerController.deallocateOrders
 }
 
 export const handler = createHandler()

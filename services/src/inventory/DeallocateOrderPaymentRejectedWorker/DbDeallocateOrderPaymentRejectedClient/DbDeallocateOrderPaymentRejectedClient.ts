@@ -4,7 +4,7 @@ import { Failure, Result, Success } from '../../errors/Result'
 import { DeallocateOrderPaymentRejectedCommand } from '../model/DeallocateOrderPaymentRejectedCommand'
 
 export interface IDbDeallocateOrderPaymentRejectedClient {
-  deallocateOrderStock: (
+  deallocateOrder: (
     deallocateOrderPaymentRejectedCommand: DeallocateOrderPaymentRejectedCommand,
   ) => Promise<
     | Success<void>
@@ -26,7 +26,7 @@ export class DbDeallocateOrderPaymentRejectedClient implements IDbDeallocateOrde
   /**
    *
    */
-  public async deallocateOrderStock(
+  public async deallocateOrder(
     deallocateOrderPaymentRejectedCommand: DeallocateOrderPaymentRejectedCommand,
   ): Promise<
     | Success<void>
@@ -34,7 +34,7 @@ export class DbDeallocateOrderPaymentRejectedClient implements IDbDeallocateOrde
     | Failure<'InvalidStockDeallocationError'>
     | Failure<'UnrecognizedError'>
   > {
-    const logContext = 'DbDeallocateOrderPaymentRejectedClient.deallocateOrderStock'
+    const logContext = 'DbDeallocateOrderPaymentRejectedClient.deallocateOrder'
     console.info(`${logContext} init:`, { deallocateOrderPaymentRejectedCommand })
 
     const inputValidationResult = this.validateInput(deallocateOrderPaymentRejectedCommand)
