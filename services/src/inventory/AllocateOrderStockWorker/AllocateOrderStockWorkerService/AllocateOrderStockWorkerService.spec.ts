@@ -136,7 +136,7 @@ function buildMockDbGetOrderAllocationClient_fails(
 }
 
 function buildMockDbAllocateOrderStockClient_succeeds(): IDbAllocateOrderStockClient {
-  return { allocateOrderStock: jest.fn().mockResolvedValue(Result.makeSuccess(undefined)) }
+  return { allocateOrder: jest.fn().mockResolvedValue(Result.makeSuccess(undefined)) }
 }
 
 function buildMockDbAllocateOrderStockClient_fails(
@@ -145,7 +145,7 @@ function buildMockDbAllocateOrderStockClient_fails(
   transient?: boolean,
 ): IDbAllocateOrderStockClient {
   return {
-    allocateOrderStock: jest
+    allocateOrder: jest
       .fn()
       .mockResolvedValue(
         Result.makeFailure(failureKind ?? 'UnrecognizedError', message ?? 'UnrecognizedError', transient ?? false),
@@ -218,7 +218,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(Result.isFailure(result)).toBe(false)
     })
 
@@ -235,7 +235,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockDepletedEventClient,
       )
       const mockTestEvent = undefined as never
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockTestEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockTestEvent)
       expect(Result.isFailure(result)).toBe(true)
       expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
       expect(Result.isFailureTransient(result)).toBe(false)
@@ -254,7 +254,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockDepletedEventClient,
       )
       const mockTestEvent = null as never
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockTestEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockTestEvent)
       expect(Result.isFailure(result)).toBe(true)
       expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
       expect(Result.isFailureTransient(result)).toBe(false)
@@ -273,7 +273,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockDepletedEventClient,
       )
       const mockTestEvent = { ...mockIncomingOrderCreatedEvent }
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockTestEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockTestEvent)
       expect(Result.isFailure(result)).toBe(true)
       expect(Result.isFailureOfKind(result, 'InvalidArgumentsError')).toBe(true)
       expect(Result.isFailureTransient(result)).toBe(false)
@@ -304,7 +304,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       const mockTransient = 'mockTransient' as never
       const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
       jest.spyOn(GetOrderAllocationCommand, 'validateAndBuild').mockReturnValueOnce(expectedResult)
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(Result.isFailure(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
     })
@@ -320,7 +320,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(mockDbGetOrderAllocationClient.getOrderAllocation).toHaveBeenCalledTimes(1)
     })
 
@@ -336,7 +336,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(mockDbGetOrderAllocationClient.getOrderAllocation).toHaveBeenCalledWith(expectedGetOrderAllocationCommand)
     })
 
@@ -359,7 +359,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
       expect(Result.isFailure(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
@@ -397,12 +397,12 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       const mockTransient = 'mockTransient' as never
       const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
       jest.spyOn(AllocateOrderStockCommand, 'validateAndBuild').mockReturnValueOnce(expectedResult)
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(Result.isFailure(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
     })
 
-    it(`calls DbAllocateOrderStockClient.allocateOrderStock a single time`, async () => {
+    it(`calls DbAllocateOrderStockClient.allocateOrder a single time`, async () => {
       const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds_nullItem()
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_succeeds()
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
@@ -413,11 +413,11 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
-      expect(mockDbAllocateOrderStockClient.allocateOrderStock).toHaveBeenCalledTimes(1)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
+      expect(mockDbAllocateOrderStockClient.allocateOrder).toHaveBeenCalledTimes(1)
     })
 
-    it(`calls DbAllocateOrderStockClient.allocateOrderStock with the expected
+    it(`calls DbAllocateOrderStockClient.allocateOrder with the expected
         AllocateOrderStockCommand`, async () => {
       const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds_nullItem()
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_succeeds()
@@ -429,11 +429,11 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
-      expect(mockDbAllocateOrderStockClient.allocateOrderStock).toHaveBeenCalledWith(expectedAllocateOrderStockCommand)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
+      expect(mockDbAllocateOrderStockClient.allocateOrder).toHaveBeenCalledWith(expectedAllocateOrderStockCommand)
     })
 
-    it(`returns the same Failure if DbAllocateOrderStockClient.allocateOrderStock
+    it(`returns the same Failure if DbAllocateOrderStockClient.allocateOrder
         returns a Failure not accounted for`, async () => {
       const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds_nullItem()
       const mockFailureKind = 'mockFailureKind' as never
@@ -452,7 +452,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
       expect(Result.isFailure(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
@@ -481,7 +481,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       const mockTransient = 'mockTransient' as never
       const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
       jest.spyOn(OrderStockAllocatedEvent, 'validateAndBuild').mockReturnValueOnce(expectedResult)
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(Result.isFailure(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
     })
@@ -498,7 +498,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(mockEsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent).toHaveBeenCalledTimes(1)
     })
 
@@ -514,7 +514,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       const { eventData } = mockIncomingOrderCreatedEvent
       const expectedOrderStockAllocatedEventResult = OrderStockAllocatedEvent.validateAndBuild(eventData)
       const expectedOrderStockAllocatedEvent = Result.getSuccessValueOrThrow(expectedOrderStockAllocatedEventResult)
@@ -543,7 +543,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       const expectedResult = Result.makeFailure(mockFailureKind, mockMessage, mockTransient)
       expect(Result.isFailure(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
@@ -566,7 +566,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       const expectedResult = Result.makeSuccess()
       expect(Result.isSuccess(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
@@ -598,11 +598,11 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockDepletedEventClient,
       )
       const spy = jest.spyOn(AllocateOrderStockCommand, 'validateAndBuild')
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(spy).not.toHaveBeenCalled()
     })
 
-    it(`does not call DbAllocateOrderStockClient.allocateOrderStock`, async () => {
+    it(`does not call DbAllocateOrderStockClient.allocateOrder`, async () => {
       const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds_OrderAllocation()
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_succeeds()
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
@@ -613,11 +613,11 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
-      expect(mockDbAllocateOrderStockClient.allocateOrderStock).not.toHaveBeenCalled()
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
+      expect(mockDbAllocateOrderStockClient.allocateOrder).not.toHaveBeenCalled()
     })
 
-    it(`does not return a Failure if DbAllocateOrderStockClient.allocateOrderStock
+    it(`does not return a Failure if DbAllocateOrderStockClient.allocateOrder
         returns a Failure`, async () => {
       const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds_OrderAllocation()
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails()
@@ -629,7 +629,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(Result.isFailure(result)).toBe(false)
     })
 
@@ -656,7 +656,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       const mockTransient = 'mockTransient' as never
       const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
       jest.spyOn(OrderStockAllocatedEvent, 'validateAndBuild').mockReturnValueOnce(expectedResult)
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(Result.isFailure(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
     })
@@ -673,7 +673,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(mockEsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent).toHaveBeenCalledTimes(1)
     })
 
@@ -689,7 +689,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       const { eventData } = mockIncomingOrderCreatedEvent
       const expectedOrderStockAllocatedEventResult = OrderStockAllocatedEvent.validateAndBuild(eventData)
       const expectedOrderStockAllocatedEvent = Result.getSuccessValueOrThrow(expectedOrderStockAllocatedEventResult)
@@ -718,7 +718,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       const expectedResult = Result.makeFailure(mockFailureKind, mockMessage, mockTransient)
       expect(Result.isFailure(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
@@ -741,7 +741,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       const expectedResult = Result.makeSuccess()
       expect(Result.isSuccess(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
@@ -779,12 +779,12 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       const mockTransient = 'mockTransient' as never
       const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
       jest.spyOn(AllocateOrderStockCommand, 'validateAndBuild').mockReturnValueOnce(expectedResult)
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(Result.isFailure(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
     })
 
-    it(`calls DbAllocateOrderStockClient.allocateOrderStock a single time`, async () => {
+    it(`calls DbAllocateOrderStockClient.allocateOrder a single time`, async () => {
       const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds_nullItem()
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DuplicateStockAllocationError')
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
@@ -795,11 +795,11 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
-      expect(mockDbAllocateOrderStockClient.allocateOrderStock).toHaveBeenCalledTimes(1)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
+      expect(mockDbAllocateOrderStockClient.allocateOrder).toHaveBeenCalledTimes(1)
     })
 
-    it(`calls DbAllocateOrderStockClient.allocateOrderStock with the expected
+    it(`calls DbAllocateOrderStockClient.allocateOrder with the expected
         AllocateOrderStockCommand`, async () => {
       const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds_nullItem()
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DuplicateStockAllocationError')
@@ -811,11 +811,11 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
-      expect(mockDbAllocateOrderStockClient.allocateOrderStock).toHaveBeenCalledWith(expectedAllocateOrderStockCommand)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
+      expect(mockDbAllocateOrderStockClient.allocateOrder).toHaveBeenCalledWith(expectedAllocateOrderStockCommand)
     })
 
-    it(`does not return a Failure if DbAllocateOrderStockClient.allocateOrderStock
+    it(`does not return a Failure if DbAllocateOrderStockClient.allocateOrder
         returns a Failure of kind DuplicateStockAllocationError`, async () => {
       const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds_nullItem()
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DuplicateStockAllocationError')
@@ -827,7 +827,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(Result.isFailure(result)).toBe(false)
     })
 
@@ -854,7 +854,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       const mockTransient = 'mockTransient' as never
       const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
       jest.spyOn(OrderStockAllocatedEvent, 'validateAndBuild').mockReturnValueOnce(expectedResult)
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(Result.isFailure(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
     })
@@ -871,7 +871,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(mockEsRaiseOrderStockAllocatedEventClient.raiseOrderStockAllocatedEvent).toHaveBeenCalledTimes(1)
     })
 
@@ -887,7 +887,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       const { eventData } = mockIncomingOrderCreatedEvent
       const expectedOrderStockAllocatedEventResult = OrderStockAllocatedEvent.validateAndBuild(eventData)
       const expectedOrderStockAllocatedEvent = Result.getSuccessValueOrThrow(expectedOrderStockAllocatedEventResult)
@@ -916,7 +916,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       const expectedResult = Result.makeFailure(mockFailureKind, mockMessage, mockTransient)
       expect(Result.isFailure(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
@@ -933,7 +933,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       const expectedResult = Result.makeSuccess()
       expect(Result.isSuccess(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
@@ -971,12 +971,12 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       const mockTransient = 'mockTransient' as never
       const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
       jest.spyOn(AllocateOrderStockCommand, 'validateAndBuild').mockReturnValueOnce(expectedResult)
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(Result.isFailure(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
     })
 
-    it(`calls DbAllocateOrderStockClient.allocateOrderStock a single time`, async () => {
+    it(`calls DbAllocateOrderStockClient.allocateOrder a single time`, async () => {
       const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds_nullItem()
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DepletedStockAllocationError')
       const mockEsRaiseOrderStockAllocatedEventClient = buildMockEsRaiseOrderStockAllocatedEventClient_succeeds()
@@ -987,11 +987,11 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
-      expect(mockDbAllocateOrderStockClient.allocateOrderStock).toHaveBeenCalledTimes(1)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
+      expect(mockDbAllocateOrderStockClient.allocateOrder).toHaveBeenCalledTimes(1)
     })
 
-    it(`calls DbAllocateOrderStockClient.allocateOrderStock with the expected
+    it(`calls DbAllocateOrderStockClient.allocateOrder with the expected
         AllocateOrderStockCommand`, async () => {
       const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds_nullItem()
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DepletedStockAllocationError')
@@ -1003,11 +1003,11 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
-      expect(mockDbAllocateOrderStockClient.allocateOrderStock).toHaveBeenCalledWith(expectedAllocateOrderStockCommand)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
+      expect(mockDbAllocateOrderStockClient.allocateOrder).toHaveBeenCalledWith(expectedAllocateOrderStockCommand)
     })
 
-    it(`does not return a Failure if DbAllocateOrderStockClient.allocateOrderStock
+    it(`does not return a Failure if DbAllocateOrderStockClient.allocateOrder
         returns a Failure of kind DepletedStockAllocationError`, async () => {
       const mockDbGetOrderAllocationClient = buildMockDbGetOrderAllocationClient_succeeds_nullItem()
       const mockDbAllocateOrderStockClient = buildMockDbAllocateOrderStockClient_fails('DepletedStockAllocationError')
@@ -1019,7 +1019,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(Result.isFailure(result)).toBe(false)
     })
 
@@ -1046,7 +1046,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
       const mockTransient = 'mockTransient' as never
       const expectedResult = Result.makeFailure(mockFailureKind, mockError, mockTransient)
       jest.spyOn(OrderStockDepletedEvent, 'validateAndBuild').mockReturnValueOnce(expectedResult)
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(Result.isFailure(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
     })
@@ -1063,7 +1063,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       expect(mockEsRaiseOrderStockDepletedEventClient.raiseOrderStockDepletedEvent).toHaveBeenCalledTimes(1)
     })
 
@@ -1079,7 +1079,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       const { eventData } = mockIncomingOrderCreatedEvent
       const expectedOrderStockDepletedEventResult = OrderStockDepletedEvent.validateAndBuild(eventData)
       const expectedOrderStockDepletedEvent = Result.getSuccessValueOrThrow(expectedOrderStockDepletedEventResult)
@@ -1108,7 +1108,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       const expectedResult = Result.makeFailure(mockFailureKind, mockMessage, mockTransient)
       expect(Result.isFailure(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)
@@ -1131,7 +1131,7 @@ describe(`Inventory Service AllocateOrderStockWorker AllocateOrderStockWorkerSer
         mockEsRaiseOrderStockAllocatedEventClient,
         mockEsRaiseOrderStockDepletedEventClient,
       )
-      const result = await allocateOrderStockWorkerService.allocateOrderStock(mockIncomingOrderCreatedEvent)
+      const result = await allocateOrderStockWorkerService.allocateOrder(mockIncomingOrderCreatedEvent)
       const expectedResult = Result.makeSuccess()
       expect(Result.isSuccess(result)).toBe(true)
       expect(result).toStrictEqual(expectedResult)

@@ -4,7 +4,7 @@ import { DynamoDbUtils } from '../../shared/DynamoDbUtils'
 import { AllocateOrderStockCommand } from '../model/AllocateOrderStockCommand'
 
 export interface IDbAllocateOrderStockClient {
-  allocateOrderStock: (
+  allocateOrder: (
     allocateOrderStockCommand: AllocateOrderStockCommand,
   ) => Promise<
     | Success<void>
@@ -27,7 +27,7 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
   /**
    *
    */
-  public async allocateOrderStock(
+  public async allocateOrder(
     allocateOrderStockCommand: AllocateOrderStockCommand,
   ): Promise<
     | Success<void>
@@ -36,7 +36,7 @@ export class DbAllocateOrderStockClient implements IDbAllocateOrderStockClient {
     | Failure<'DepletedStockAllocationError'>
     | Failure<'UnrecognizedError'>
   > {
-    const logContext = 'DbAllocateOrderStockClient.allocateOrderStock'
+    const logContext = 'DbAllocateOrderStockClient.allocateOrder'
     console.info(`${logContext} init:`, { allocateOrderStockCommand })
 
     const inputValidationResult = this.validateInput(allocateOrderStockCommand)
