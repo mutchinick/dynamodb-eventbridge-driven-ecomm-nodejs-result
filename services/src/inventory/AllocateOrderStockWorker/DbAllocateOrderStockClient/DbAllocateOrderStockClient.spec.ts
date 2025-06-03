@@ -108,7 +108,7 @@ function buildMockDdbDocClient_throws(): DynamoDBDocumentClient {
   return { send: jest.fn().mockRejectedValue(new Error()) } as unknown as DynamoDBDocumentClient
 }
 
-function buildMockDdbDocClient_throws_ConditionalCheckFailedException_Duplicate(): DynamoDBDocumentClient {
+function buildMockDdbDocClient_throws_Duplicate(): DynamoDBDocumentClient {
   const error: Error = new TransactionCanceledException({
     $metadata: {},
     message: '',
@@ -119,7 +119,7 @@ function buildMockDdbDocClient_throws_ConditionalCheckFailedException_Duplicate(
   } as unknown as DynamoDBDocumentClient
 }
 
-function buildMockDdbDocClient_throws_ConditionalCheckFailedException_Duplicate_Depleted(): DynamoDBDocumentClient {
+function buildMockDdbDocClient_throws_Duplicate_Depleted(): DynamoDBDocumentClient {
   const error: Error = new TransactionCanceledException({
     $metadata: {},
     message: '',
@@ -133,7 +133,7 @@ function buildMockDdbDocClient_throws_ConditionalCheckFailedException_Duplicate_
   } as unknown as DynamoDBDocumentClient
 }
 
-function buildMockDdbDocClient_throws_ConditionalCheckFailedException_Depleted(): DynamoDBDocumentClient {
+function buildMockDdbDocClient_throws_Depleted(): DynamoDBDocumentClient {
   const error: Error = new TransactionCanceledException({
     $metadata: {},
     message: '',
@@ -258,9 +258,9 @@ describe(`Inventory Service AllocateOrderStockWorker DbAllocateOrderStockClient 
    * Test transaction errors
    ************************************************************/
   it(`returns a non-transient Failure of kind DuplicateStockAllocationError if
-      DynamoDBDocumentClient.send throws a ConditionalCheckFailedException error when
+      DynamoDBDocumentClient.send throws a TransactionCanceledException error when
       allocating the stock`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_throws_ConditionalCheckFailedException_Duplicate()
+    const mockDdbDocClient = buildMockDdbDocClient_throws_Duplicate()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
     const result = await dbAllocateOrderStockClient.allocateOrder(mockAllocateOrderStockCommand)
     expect(Result.isFailure(result)).toBe(true)
@@ -269,9 +269,9 @@ describe(`Inventory Service AllocateOrderStockWorker DbAllocateOrderStockClient 
   })
 
   it(`returns a non-transient Failure of kind DuplicateStockAllocationError if
-      DynamoDBDocumentClient.send throws a ConditionalCheckFailedException error when
+      DynamoDBDocumentClient.send throws a TransactionCanceledException error when
       both allocating and subtracting the stock`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_throws_ConditionalCheckFailedException_Duplicate_Depleted()
+    const mockDdbDocClient = buildMockDdbDocClient_throws_Duplicate_Depleted()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
     const result = await dbAllocateOrderStockClient.allocateOrder(mockAllocateOrderStockCommand)
     expect(Result.isFailure(result)).toBe(true)
@@ -280,9 +280,9 @@ describe(`Inventory Service AllocateOrderStockWorker DbAllocateOrderStockClient 
   })
 
   it(`returns a non-transient Failure of kind DepletedStockAllocationError if
-      DynamoDBDocumentClient.send throws a ConditionalCheckFailedException error when
+      DynamoDBDocumentClient.send throws a TransactionCanceledException error when
       subtracting the sku stock`, async () => {
-    const mockDdbDocClient = buildMockDdbDocClient_throws_ConditionalCheckFailedException_Depleted()
+    const mockDdbDocClient = buildMockDdbDocClient_throws_Depleted()
     const dbAllocateOrderStockClient = new DbAllocateOrderStockClient(mockDdbDocClient)
     const result = await dbAllocateOrderStockClient.allocateOrder(mockAllocateOrderStockCommand)
     expect(Result.isFailure(result)).toBe(true)
