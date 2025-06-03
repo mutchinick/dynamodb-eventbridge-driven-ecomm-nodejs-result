@@ -5,6 +5,7 @@ import { Construct } from 'constructs'
 import { DynamoDbConstruct } from './common/DynamoDbConstruct'
 import { EventBusConstruct } from './common/EventBusConstruct'
 import { AllocateOrderStockWorkerConstruct } from './inventory/AllocateOrderStockWorkerConstruct'
+import { CompleteOrderPaymentAcceptedWorkerConstruct } from './inventory/CompleteOrderPaymentAcceptedWorkerConstruct'
 import { DeallocateOrderPaymentRejectedWorkerConstruct } from './inventory/DeallocateOrderPaymentRejectedWorkerConstruct'
 import { InventoryApiConstruct } from './inventory/InventoryApiConstruct'
 import { ListSkusApiLambdaConstruct } from './inventory/ListSkusApiLambdaConstruct'
@@ -14,11 +15,11 @@ import { ListOrdersApiLambdaConstruct } from './orders/ListOrdersApiLambdaConstr
 import { OrdersApiConstruct } from './orders/OrdersApiConstruct'
 import { PlaceOrderApiLambdaConstruct } from './orders/PlaceOrderApiLambdaConstruct'
 import { SyncOrderWorkerConstruct } from './orders/SyncOrderWorkerConstruct'
+import { ListOrderPaymentsApiLambdaConstruct } from './payments/ListOrderPaymentsApiLambdaConstruct'
 import { PaymentsApiConstruct } from './payments/PaymentsApiConstruct'
 import { ProcessOrderPaymentWorkerConstruct } from './payments/ProcessOrderPaymentWorkerConstruct'
 import { SimulateRawEventApiLambdaConstruct } from './testing/SimulateRawEventApiLambdaConstruct'
 import { TestingApiConstruct } from './testing/TestingApiConstruct'
-import { ListOrderPaymentsApiLambdaConstruct } from './payments/ListOrderPaymentsApiLambdaConstruct'
 
 export interface IMainStackProps extends StackProps {
   config: {
@@ -158,6 +159,12 @@ export class MainStack extends Stack {
 
     const deallocateOrderPaymentRejectedWorkerConstructName = `${serviceId}-DeallocateOrderPaymentRejectedWorker`
     new DeallocateOrderPaymentRejectedWorkerConstruct(this, deallocateOrderPaymentRejectedWorkerConstructName, {
+      dynamoDbTable,
+      eventBus,
+    })
+
+    const completeOrderPaymentAcceptedWorkerConstructName = `${serviceId}-CompleteOrderPaymentAcceptedWorker`
+    new CompleteOrderPaymentAcceptedWorkerConstruct(this, completeOrderPaymentAcceptedWorkerConstructName, {
       dynamoDbTable,
       eventBus,
     })
