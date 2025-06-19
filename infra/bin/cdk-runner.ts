@@ -161,6 +161,14 @@ function writeOutputsToEnvFiles(outputsFilePath: string, deploymentPrefix: strin
           cdkOutputName: `${outputPrefix}OrdersApiHttpApiUrl`,
           envVarName: 'ORDERS_API_BASE_URL',
         },
+        {
+          cdkOutputName: `${outputPrefix}PaymentsApiHttpApiUrl`,
+          envVarName: 'PAYMENTS_API_BASE_URL',
+        },
+        {
+          cdkOutputName: `${outputPrefix}TestingApiHttpApiUrl`,
+          envVarName: 'TESTING_API_BASE_URL',
+        },
       ],
     },
   ]
