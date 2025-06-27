@@ -686,8 +686,6 @@ _(and this is based on light research)_
 
 - **`ScyllaDB -> CDC -> Kafka Connector -> AWS MSK Kafka -> Lambda -> SQS`**: You could also replace DynamoDB entirely with a compatible alternative like ScyllaDB, which claims to be much cheaper. To my understanding, they offer their own cloud-managed service or can be managed on AWS and the other major cloud providers. From there, the flow into Kafka would be similar.
 
-**There are really many different ways you can play with these services.**
-
 > **Relevant AWS Documentation:**
 >
 > - [Integrating DynamoDB with Amazon EventBridge](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/eventbridge-for-dynamodb.html)
