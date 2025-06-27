@@ -49,9 +49,9 @@ Here are a few important clarifications to keep in mind while reading through th
 
 1.  **It's a WIP:** Both the system and this README file are a work in progress. I tried to make this README complete enough so that it's understandable how the system and the architecture work, and to make it easy to deploy and play with. But most likely there are some gaps.
 
-2.  **There are two versions of this Project:** Both were developed in parallel. One version **throws exceptions** and uses custom error classes to represent domain errors. The other version uses another common pattern where every operation returns a `Success` or `Failure` object. To avoid the hassle of maintaining two separate READMEs, I've tried to use neutral language here. When you see a phrase like **"produces an error,"** it's meant to cover both scenarios: throwing an exception or returning a `Failure` object.
+2.  **There are two versions of this Project:** Both were developed in parallel. One version **throws exceptions** and uses custom error classes to represent domain errors. The other version uses another common pattern where every operation **returns a `Success` or `Failure` object**. To avoid the hassle of maintaining two separate READMEs, I've tried to use neutral language here. When you see a phrase like **"produces an error"**, it's meant to cover both scenarios: throwing an exception or returning a `Failure` object.
 
-    - These are the links to both projects (you are most likely already in one of them):
+    - These are the links to both projects (you are likely already in one of them):
       - [Throwing and catching exceptions error handling](https://github.com/mutchinick/dynamodb-eventbridge-driven-ecomm-nodejs-exceptions)
       - [Returning Success/Failure type error handling](https://github.com/mutchinick/dynamodb-eventbridge-driven-ecomm-nodejs-result)
 
@@ -203,7 +203,7 @@ This pattern has its own implications and complexities (as all patterns do) rega
 
 ### Error Handling & The `doSomething`/`publishEvent` Pattern
 
-Handling errors correctly is the most critical part of making the `doSomething`/`publishEvent` pattern reliable. A key concept here is to have domain errors that provide the required information about the error—like `DuplicateEventRaisedError`, `OrderStockDepletedError`, or `PaymentFailedError` to name a few—and the distinction between transient and non-transient errors.
+Handling errors correctly is a critical part of making the `doSomething`/`publishEvent` pattern reliable. A key concept here is to have domain errors that provide the required information about the error—like `DuplicateEventRaisedError`, `OrderStockDepletedError`, or `PaymentFailedError` to name a few—and the distinction between transient and non-transient errors.
 
 - **Transient Errors:** These are errors where the operation can and should be retried. The expectation is that the error condition is temporary. Common examples include database connection issues or network timeouts. We also have _purposefully designed_ transient errors, like the `PaymentFailedError` from our fake payment SDK, which we expect to retry.
 
@@ -481,15 +481,13 @@ participant RestockSkuWorker as RestockSkuWorker (Lambda)
 participant TransactionalDB as Transactional DB (DynamoDB)
 
     User->>RestockSkuApi: POST /restock (SKU, quantity)
-    RestockSkuApi->>EventStore: Publishes SkuRestockedEvent
+    RestockSkuApi->>EventStore: Publishes SKU_RESTOCKED_EVENT
     activate EventStore
-    Note over EventStore: DynamoDB Stream captures event
     deactivate EventStore
 
     EventStore->>EventBridge: Pipes event
     activate EventBridge
-    Note over EventBridge: Rule routes SkuRestockedEvent
-    EventBridge-->>RestockSkuWorker: Sends event to SQS queue
+    EventBridge-->>RestockSkuWorker: Routes event
     deactivate EventBridge
 
     activate RestockSkuWorker
@@ -674,7 +672,7 @@ There are many different ways of achieving something similar. For this example, 
 
 - **`DynamoDB -> Stream -> EventBridge Pipe -> SNS Topic -> SQS`**: This would be a more cost-efficient version of the POC's architecture.
 
-- **`Application -> EventBridge Bus -> SQS`**: This is the most compact and "Event Bus-first" approach, where your app publishes directly to the bus.
+- **`Application -> EventBridge Bus -> SQS`**: This is a compact and "Event Bus-first" approach, where your app publishes directly to the bus.
 
 - **`Application -> SNS -> SQS`**: This is a great option if persisting events first is not that important or relevant to your use case.
 
