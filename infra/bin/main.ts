@@ -20,10 +20,6 @@ if (!deploymentStage) {
 const qualifier = `${deploymentPrefix}-${deploymentStage}`
 const app = new cdk.App()
 new MainStack(app, qualifier, {
-  env: {
-    account: '355320011200',
-    region: 'us-east-1',
-  },
   tags: {
     qualifier,
     deploymentPrefix,
