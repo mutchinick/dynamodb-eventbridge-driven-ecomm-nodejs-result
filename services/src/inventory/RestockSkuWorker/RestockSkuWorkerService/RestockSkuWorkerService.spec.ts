@@ -16,7 +16,7 @@ const mockUnits = 2
 const mockLotId = 'mockLotId'
 
 function buildMockIncomingSkuRestockedEvent(): TypeUtilsMutable<IncomingSkuRestockedEvent> {
-  const incomingOrderEventProps: IncomingSkuRestockedEvent = {
+  const incomingSkuRestockedEventProps: IncomingSkuRestockedEvent = {
     eventName: InventoryEventName.SKU_RESTOCKED_EVENT,
     eventData: {
       sku: mockSku,
@@ -44,7 +44,7 @@ function buildMockIncomingSkuRestockedEvent(): TypeUtilsMutable<IncomingSkuResto
       eventSource: 'aws:dynamodb',
       eventVersion: 'mockEventVersion',
       dynamodb: {
-        NewImage: marshall(incomingOrderEventProps, { removeUndefinedValues: true }),
+        NewImage: marshall(incomingSkuRestockedEventProps, { removeUndefinedValues: true }),
       },
     },
   })
